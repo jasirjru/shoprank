@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ShopRank Study Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Print layout: A4, one idea per box, every "Notebook" box is something to write by hand. */
+:root {
+  --ink: #1B1F24;
+  --muted: #555C66;
+  --line: #CDD3DB;
+  --soft: #F3F5F8;
+  --blue: #1F4E99;
+  --blue-soft: #E8EFFA;
+  --green: #1D6B45;
+  --green-soft: #E6F3EC;
+  --amber: #8A5A00;
+  --amber-soft: #FBF1DC;
+  --red: #9B2C2C;
+  --serif: "Literata", Georgia, serif;
+  --sans: "Inter", "Segoe UI", Arial, sans-serif;
+  --mono: "JetBrains Mono", Consolas, monospace;
+}
+@page { size: A4; margin: 15mm 15mm 17mm 15mm; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; color: var(--ink); font: 10.4pt/1.55 var(--sans); }
+h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 { font-size: 30pt; }
+h2 { font-size: 17pt; margin: 0 0 8px; color: var(--blue); }
+h3 { font-size: 12.5pt; margin: 16px 0 6px; }
+p { margin: 0 0 8px; }
+ul, ol { margin: 0 0 8px; padding-left: 18px; }
+li { margin-bottom: 3px; }
+code, .mono { font-family: var(--mono); font-size: 9pt; }
+pre { font-family: var(--mono); font-size: 8.8pt; line-height: 1.45; background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; margin: 6px 0 10px; white-space: pre-wrap; break-inside: avoid; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 9.4pt; break-inside: avoid; }
+th, td { border: 1px solid var(--line); padding: 5px 7px; text-align: left; vertical-align: top; }
+th { background: var(--soft); font-weight: 600; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.part { break-before: page; }
+.part-head { border-bottom: 3px solid var(--blue); padding-bottom: 8px; margin-bottom: 14px; }
+.part-head .tag { font: 600 8.5pt/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.box { border-radius: 7px; padding: 9px 12px; margin: 8px 0 12px; break-inside: avoid; border: 1px solid; }
+.box > :last-child { margin-bottom: 0; }
+.box .label { font: 700 8.5pt/1 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.memo { background: var(--amber-soft); border-color: #E7C982; }
+.memo .label { color: var(--amber); }
+.note { background: var(--blue-soft); border-color: #B7C9EA; }
+.note .label { color: var(--blue); }
+.task { background: #fff; border: 1.5px dashed var(--green); }
+.task .label { color: var(--green); }
+.answer { background: var(--green-soft); border-color: #A9D3BC; }
+.answer .label { color: var(--green); }
+.formula { font-family: var(--mono); font-size: 10pt; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 6px 0 10px; text-align: center; break-inside: avoid; }
+.cover { height: 260mm; display: flex; flex-direction: column; justify-content: space-between; }
+.cover .eyebrow { font: 600 9pt/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); }
+.cover .sub { font-size: 13pt; color: var(--muted); max-width: 140mm; margin-top: 10px; }
+.cover .pipe { font-family: var(--mono); font-size: 9.5pt; line-height: 1.7; border-left: 3px solid var(--blue); padding-left: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.qa { break-inside: avoid; margin-bottom: 9px; }
+.qa b { display: block; }
+.small { font-size: 9pt; color: var(--muted); }
+.check { list-style: none; padding-left: 0; }
+.check li::before { content: "\2610  "; color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER ============================== -->
+<section class="cover">
+  <div>
+    <div class="eyebrow">Study guide · Weeks 1–3 and the road ahead</div>
+    <h1 style="margin-top:10px">ShopRank</h1>
+    <p class="sub">Product search and ranking on Amazon's ESCI data. Everything you built in weeks 1 to 3, explained simply, with worked examples to redo by hand in your notebook. Made for 2 days without a laptop.</p>
+  </div>
+  <div class="pipe">
+    query "samsung tv 55 black"<br>
+    &nbsp;&nbsp;→ find candidate products&nbsp;&nbsp;(BM25, later a neural model)<br>
+    &nbsp;&nbsp;→ describe each pair with numbers&nbsp;&nbsp;(14 features)<br>
+    &nbsp;&nbsp;→ a learned model scores them&nbsp;&nbsp;(LambdaMART)<br>
+    &nbsp;&nbsp;→ sort, show the top 10<br>
+    &nbsp;&nbsp;→ measure with nDCG and a 95% confidence interval
+  </div>
+  <div>
+    <table>
+      <tr><th>Day</th><th>Block</th><th>What you study</th><th class="n">Time</th></tr>
+      <tr><td rowspan="2"><b>Day 1</b></td><td>Morning</td><td>Big picture + Week 1: data, leakage, nDCG, bootstrap, BM25</td><td class="n">3–4 h</td></tr>
+      <tr><td>Afternoon</td><td>Week 2: features, logistic regression, training loop, LambdaMART</td><td class="n">3–4 h</td></tr>
+      <tr><td rowspan="2"><b>Day 2</b></td><td>Morning</td><td>Week 3: autograd, neural networks, two-tower model, InfoNCE</td><td class="n">3–4 h</td></tr>
+      <tr><td>Afternoon</td><td>Weeks 4–10 preview, interview questions, final self-test</td><td class="n">3 h</td></tr>
+    </table>
+    <p class="small">How to use: read a section, close the page, then write the "Notebook" tasks from memory. Check against the green answer boxes. Anything you get wrong, write again at the end of the day. Boxes marked <b>Memorize</b> are what interviewers ask.</p>
+  </div>
+</section>
+
+<!-- ============================== BIG PICTURE ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Start here · 30 minutes</span><h2>The big picture</h2></div>
+
+  <h3>The problem</h3>
+  <p>A shopper types a query. The shop has millions of products. We must show the <b>best products first</b>. ShopRank builds this step by step and <b>measures every step</b> against labels written by humans.</p>
+
+  <h3>The data: Amazon ESCI</h3>
+  <ul>
+    <li>Real shopper queries. For each query, about 20 candidate products.</li>
+    <li>Humans labelled every (query, product) pair with one of four labels:</li>
+  </ul>
+  <table>
+    <tr><th>Label</th><th>Meaning</th><th>Example for "iphone 12"</th><th class="n">Gain (score value)</th><th class="n">Share of US labels</th></tr>
+    <tr><td><b>E</b>xact</td><td>exactly what was asked</td><td>iPhone 12</td><td class="n">1.0</td><td class="n">69%</td></tr>
+    <tr><td><b>S</b>ubstitute</td><td>not exact, but could replace it</td><td>iPhone 11</td><td class="n">0.1</td><td class="n">20%</td></tr>
+    <tr><td><b>C</b>omplement</td><td>goes with it</td><td>iPhone 12 case</td><td class="n">0.01</td><td class="n">2%</td></tr>
+    <tr><td><b>I</b>rrelevant</td><td>no use</td><td>a towel</td><td class="n">0.0</td><td class="n">9%</td></tr>
+  </table>
+  <p>US English part: <b>97,345 queries</b>, <b>1.82 million labels</b>, <b>1.22 million products</b>. Our measuring set ("dev") has <b>2,099 queries</b>.</p>
+  <p><b>Task 1</b> = for each query, put its ~20 judged products in the best order.</p>
+
+  <h3>The results so far (dev, nDCG over the full list)</h3>
+  <table>
+    <tr><th>Week</th><th>System</th><th class="n">nDCG full</th><th class="n">nDCG@10</th><th>Lesson</th></tr>
+    <tr><td>—</td><td>Random order</td><td class="n">0.7500</td><td class="n">0.5786</td><td>69% Exact, so random is already high</td></tr>
+    <tr><td>1</td><td>BM25 on title</td><td class="n">0.8193</td><td class="n">0.6907</td><td>keyword matching works, then hits a ceiling</td></tr>
+    <tr><td>2</td><td>Logistic regression, 14 features</td><td class="n">0.8296</td><td class="n">0.7069</td><td>learning beats hand-tuning</td></tr>
+    <tr><td>2</td><td><b>LambdaMART, 14 features</b></td><td class="n"><b>0.8359</b></td><td class="n"><b>0.7167</b></td><td>best so far; listwise beats pointwise</td></tr>
+    <tr><td>3</td><td>Two-tower neural model from scratch</td><td class="n">0.7849</td><td class="n">0.6405</td><td>lost to BM25; we know why</td></tr>
+    <tr><td>—</td><td>Public official baseline / KDD Cup winner</td><td class="n">0.850 / 0.9043</td><td class="n">—</td><td>3 languages, so only a rough guide</td></tr>
+  </table>
+
+  <div class="box memo"><span class="label">Memorize · your 30-second pitch</span>
+    <p>"ShopRank is a product search engine on Amazon's ESCI dataset. I built BM25 keyword search from the formula, then a learning-to-rank model with 14 features in LightGBM LambdaMART, which improved nDCG from 0.819 to 0.836 with a 95% confidence interval of +0.013 to +0.021. I also built a neural two-tower model from scratch. It lost to BM25, and I can explain why: no pretrained language knowledge and easy training negatives. Next I add a pretrained transformer, hard negatives and a cross-encoder reranker."</p>
+  </div>
+
+  <h3>The four rules used every week</h3>
+  <ol>
+    <li><b>Split by query.</b> A query is only in train, or only in dev, or only in test.</li>
+    <li><b>Test set is locked.</b> Tune on dev. Report test once, at the very end.</li>
+    <li><b>Always compare to a baseline</b> (random, then BM25).</li>
+    <li><b>Every improvement needs a 95% confidence interval.</b> If the interval crosses 0, it is not proven.</li>
+  </ol>
+
+  <div class="box task"><span class="label">Notebook task 0</span>
+    <p>Close the page. Write: (1) the 4 ESCI labels with their gain values, (2) the 4 rules, (3) the results ladder from random to LambdaMART with the numbers. Then say your 30-second pitch out loud twice.</p>
+  </div>
+</section>
+
+<!-- ============================== DAY 1 · WEEK 1 ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Day 1 · Morning</span><h2>Week 1 — Data, metrics, statistics, BM25</h2></div>
+  <p>Goal: (1) explain how a ranked list is scored, (2) say whether one system is really better than another, (3) build keyword search from its formula.</p>
+
+  <h3>1.1 The tools (stack)</h3>
+  <table>
+    <tr><th>Tool</th><th>Job in ShopRank</th><th>What happens underneath</th></tr>
+    <tr><td>uv</td><td>project environment, exact versions (<code>uv.lock</code>)</td><td>solves dependencies once, writes a lock file</td></tr>
+    <tr><td>DuckDB</td><td>reads the 1.1 GB data, filters, joins, splits</td><td>column engine: reads only needed columns, uses all CPU cores</td></tr>
+    <tr><td>Parquet</td><td>file format for tables</td><td>stored column by column, compressed; ~10× smaller than CSV</td></tr>
+    <tr><td>NumPy</td><td>fast math (bootstrap)</td><td>loops run in C over whole arrays</td></tr>
+    <tr><td>pytest</td><td>tests define correct behaviour</td><td>runs every <code>test_*</code> function</td></tr>
+  </table>
+  <p class="small">We wrote BM25 and the metrics in plain Python on purpose, to understand them. Later weeks use fast libraries and check they give the same numbers.</p>
+
+  <h3>1.2 Splits and leakage</h3>
+  <p><b>Leakage</b> = information from the evaluation data gets into training or tuning. Scores then look better than they will be on new data.</p>
+  <ul>
+    <li><b>Why split by query, not by row:</b> if "iphone xs pro" had 8 products in train and 8 in dev, the model learns "this query wants phones, not screen protectors" from train, and looks great on the same query in dev. Real users send new queries, so dev must have unseen queries.</li>
+    <li><b>How:</b> 1 in 10 train queries go to dev, chosen by <code>MD5(query_id) % 10 == 0</code>. MD5 never changes, so the split is the same on every machine, every run.</li>
+    <li>BM25 statistics use product text only, never labels, so they are not leakage.</li>
+  </ul>
+
+  <h3>1.3 Ranking metrics: DCG and nDCG</h3>
+  <p>A list is good when the best products are <b>near the top</b>. Position 1 matters most, and attention falls slowly as you go down.</p>
+  <div class="formula">DCG@k = Σ<sub>i=1..k</sub> gain<sub>i</sub> / log<sub>2</sub>(i + 1) &nbsp;&nbsp;&nbsp;&nbsp; nDCG@k = DCG@k / ideal DCG@k</div>
+  <ul>
+    <li><b>Ideal DCG</b> = DCG of the same gains sorted best-first. So nDCG is always between 0 and 1.</li>
+    <li><b>Why normalize:</b> a query with 3 good products and one with 20 good products end up on the same 0 to 1 scale.</li>
+    <li><b>Why log:</b> the discount grows slowly. Position 1 divides by 1, position 3 by 2, position 10 by 3.46.</li>
+  </ul>
+  <table>
+    <tr><th>Position i</th><td class="n">1</td><td class="n">2</td><td class="n">3</td><td class="n">4</td><td class="n">5</td><td class="n">6</td><td class="n">7</td><td class="n">8</td><td class="n">9</td><td class="n">10</td></tr>
+    <tr><th>log<sub>2</sub>(i+1)</th><td class="n">1.000</td><td class="n">1.585</td><td class="n">2.000</td><td class="n">2.322</td><td class="n">2.585</td><td class="n">2.807</td><td class="n">3.000</td><td class="n">3.170</td><td class="n">3.322</td><td class="n">3.459</td></tr>
+  </table>
+  <div class="box note"><span class="label">Worked example (from the tests)</span>
+    <p>Ranked gains: [1.0, 0.1, 0.0, 0.01]</p>
+    <p>DCG@4 = 1.0/1 + 0.1/1.585 + 0/2 + 0.01/2.322 = 1 + 0.0631 + 0 + 0.0043 = <b>1.0674</b></p>
+    <p>Ideal order [1.0, 0.1, 0.01, 0.0]: 1 + 0.0631 + 0.005 + 0 = <b>1.0681</b> &nbsp;→&nbsp; nDCG@4 = 1.0674 / 1.0681 = <b>0.99935</b></p>
+    <p>Only the last two swapped, and they barely matter. Order near the top matters most.</p>
+  </div>
+  <p><b>Other metrics:</b> <b>Recall@k</b> = relevant products found in the top k ÷ all relevant products. <b>Reciprocal rank</b> = 1 ÷ position of the first relevant product. <b>MRR</b> = its average over queries.</p>
+  <p><b>Two nDCG versions here:</b> <code>nDCG@10</code> = what a shopper sees on page 1. <code>nDCG full</code> = over the whole candidate list, no cutoff. That is the official ESCI Task 1 metric (Amazon's trec_eval command with the same gains).</p>
+  <div class="box task"><span class="label">Notebook task 1.3</span>
+    <p>Ranked gains: <b>[0.1, 1.0, 1.0, 0.0]</b>. Compute DCG@4, ideal DCG@4 and nDCG@4. Use the log table above.</p>
+  </div>
+  <div class="box answer"><span class="label">Answer 1.3</span>
+    <p>DCG = 0.1/1 + 1/1.585 + 1/2 + 0 = 0.1 + 0.631 + 0.5 = <b>1.231</b>. Ideal [1, 1, 0.1, 0] = 1 + 0.631 + 0.05 = <b>1.681</b>. nDCG = <b>0.732</b>. Putting a Substitute first cost a lot, because position 1 has full weight.</p>
+  </div>
+
+  <h3>1.4 Is a difference real? The paired bootstrap</h3>
+  <p>System B beats A by 0.012 on 2,099 queries. With a different set of queries, could A have won? The bootstrap answers this without formulas.</p>
+  <pre>deltas = b - a                                          # improvement per query
+picks  = rng.integers(0, n, size=(10_000, n))           # 10,000 resamples WITH replacement
+means  = deltas[picks].mean(axis=1)                     # mean improvement in each resample
+low, high = np.percentile(means, [2.5, 97.5])           # middle 95% = confidence interval</pre>
+  <ul>
+    <li>Interval fully <b>above 0</b> → B is better. Fully <b>below 0</b> → A is better. <b>Crosses 0</b> → no clear difference. Do not claim a win.</li>
+    <li><b>Paired:</b> use per-query differences. Hard queries are hard for both systems, so subtracting cancels that out. The interval gets much narrower.</li>
+    <li><b>With replacement:</b> some queries picked twice, some not at all. That imitates "a different sample of queries".</li>
+    <li><b>Fixed seed:</b> the same interval every run.</li>
+  </ul>
+  <div class="box memo"><span class="label">Memorize</span>
+    <p>"+0.008 with 95% CI [−0.002, +0.018]" means <b>not proven</b>: the interval includes 0. Next step: more queries, check which query types gained, or call it no difference. Never ship it as an improvement.</p>
+  </div>
+
+  <h3>1.5 BM25 — keyword search from the formula</h3>
+  <p>Three ideas in one formula:</p>
+  <ol>
+    <li><b>Rare words matter more</b> (IDF). "kindle" in 20 of 40,000 products says much more than "for".</li>
+    <li><b>Repeats help, but less and less</b> (saturation, set by <b>k1</b>). "case case case" is not 3× more about cases.</li>
+    <li><b>Long texts get a penalty</b> (length normalization, set by <b>b</b>). A 300-word listing matches many words by chance.</li>
+  </ol>
+  <div class="formula">IDF(t) = ln(1 + (N − n<sub>t</sub> + 0.5) / (n<sub>t</sub> + 0.5))</div>
+  <div class="formula">score = Σ<sub>t in query</sub> IDF(t) · f·(k1 + 1) / (f + k1·(1 − b + b·len/avglen))</div>
+  <p><code>N</code> = number of products, <code>n<sub>t</sub></code> = products containing word t, <code>f</code> = times t appears in this product, <code>len</code> = this product's length in words, <code>avglen</code> = average length. We used <b>k1 = 1.5, b = 0.75</b>.</p>
+  <ul>
+    <li><b>Why the "1 +" inside ln:</b> without it, a word found in more than half the products gets a <b>negative</b> IDF, so matching a common word would lower the score. Adding 1 keeps IDF ≥ 0.</li>
+    <li><b>b = 0</b> turns length penalty off. <b>b = 1</b> is the full penalty. Our run: b = 0 was clearly worse (−0.0105).</li>
+    <li>BM25 has <b>no idea of meaning</b>: "sneakers" and "trainers" do not match; "phone" and "phone case" look alike.</li>
+  </ul>
+  <div class="box note"><span class="label">Worked example</span>
+    <p>N = 40,000. "kindle" in 20 products: IDF = ln(1 + 39,980.5 / 20.5) = ln(1951.3) = <b>7.58</b>. "for" in 30,000 products: IDF = ln(1 + 10,000.5 / 30,000.5) = ln(1.333) = <b>0.29</b>.</p>
+  </div>
+  <div class="box task"><span class="label">Notebook task 1.5</span>
+    <p>N = 1,000 products. The word "nike" is in 10 of them, so IDF = 4.557. k1 = 1.5, b = 0.75, average length = 10 words. Compute the score of "nike" for: (a) a 6-word title with "nike" once, (b) the same title with "nike" twice, (c) a 30-word title with "nike" once. What do (a)→(b) and (a)→(c) show?</p>
+  </div>
+  <div class="box answer"><span class="label">Answer 1.5</span>
+    <p>(a) length part = 1 − 0.75 + 0.75·6/10 = 0.7; tf = 1·2.5/(1 + 1.5·0.7) = 1.2195; score = <b>5.56</b>.
+    (b) tf = 2·2.5/(2 + 1.05) = 1.6393; score = <b>7.47</b>: twice the word, but only 34% more score (saturation).
+    (c) length part = 2.5; tf = 2.5/(1 + 3.75) = 0.5263; score = <b>2.40</b>: the long title is penalized.</p>
+  </div>
+
+  <h3>1.6 Week 1 results and lessons</h3>
+  <table>
+    <tr><th>Run (dev)</th><th class="n">nDCG full</th><th>Δ vs BM25 title (95% CI)</th></tr>
+    <tr><td>random</td><td class="n">0.7500</td><td>−0.0693 [−0.0763, −0.0622]</td></tr>
+    <tr><td><b>bm25 title (k1 1.5, b 0.75)</b></td><td class="n"><b>0.8193</b></td><td>—</td></tr>
+    <tr><td>title + brand</td><td class="n">0.8207</td><td>+0.0015 [−0.0002, +0.0032] no clear difference</td></tr>
+    <tr><td>title + brand + bullets</td><td class="n">0.8199</td><td>+0.0006 [−0.0034, +0.0046] no clear difference</td></tr>
+    <tr><td>b = 0</td><td class="n">0.8087</td><td>−0.0105 [−0.0136, −0.0076] worse</td></tr>
+    <tr><td>k1 = 3</td><td class="n">0.8175</td><td>−0.0018 [−0.0029, −0.0007] slightly worse</td></tr>
+  </table>
+  <ol>
+    <li>BM25 clearly beats random. 2. Tuning BM25 barely moves it: it hits a ceiling around 0.82. 3. Length normalization matters. 4. Without confidence intervals, "+0.0015" would look like a win. It is not proven.</li>
+  </ol>
+  <p><b>Where BM25 fails</b> (this list became the plan for later weeks):</p>
+  <table>
+    <tr><th>Failure</th><th>Example</th><th>Fix later</th></tr>
+    <tr><td>long natural-language request</td><td>"one that's fast, reliable, light-weight…"</td><td>fine-tuned bi-encoder (meaning), week 5</td></tr>
+    <tr><td>constraint ignored</td><td>"air force 1 shoes <b>girls</b>" → men's shoes</td><td>query parser, week 7</td></tr>
+    <tr><td>accessory instead of product</td><td>"iphone xs pro" → screen protectors</td><td>cross-encoder, week 6</td></tr>
+    <tr><td>spelling</td><td>"ana outfit" (Anna)</td><td>subword pieces, weeks 3–5</td></tr>
+    <tr><td>label noise</td><td>"iqos heat not burn" labelled Exact = batteries</td><td>cannot fix; report it</td></tr>
+  </table>
+
+  <h3>1.7 Debugging exercise (no AI)</h3>
+  <p>The buggy DCG file had two planted bugs: (a) <code>gains[: k - 1]</code> drops the k-th result (off-by-one; should be <code>[:k]</code>); (b) <code>sorted(gains)</code> sorts low to high, so the "ideal" is the <b>worst</b> order and nDCG went above 1 (it printed 16.85). Fix: <code>sorted(gains, reverse=True)</code>. Rule: <b>nDCG must always be between 0 and 1</b>.</p>
+
+  <div class="box task"><span class="label">Notebook task 1.7 — Week 1 checkpoint (answer without looking)</span>
+    <ol>
+      <li>Why is nDCG better than accuracy for search?</li>
+      <li>Why must we split by query? Give a concrete ESCI example.</li>
+      <li>What does IDF capture? Why ln(1 + …)?</li>
+      <li>What do k1 and b control? What does b = 0 do to a 300-word listing?</li>
+      <li>+0.008 with CI [−0.002, +0.018]: what do you conclude?</li>
+    </ol>
+  </div>
+  <div class="box answer"><span class="label">Model answers 1.7</span>
+    <ol>
+      <li>Search is about <b>order</b>, and users see the top. Accuracy ignores position. nDCG rewards relevant items near the top and supports graded labels (E &gt; S &gt; C &gt; I).</li>
+      <li>So dev has only unseen queries. Example: "iphone xs pro" in both train and dev lets the model memorize "phones, not protectors" and look good on dev.</li>
+      <li>How rare, so how informative, a word is. Without the 1 +, words in more than half the products get negative IDF.</li>
+      <li>k1: how fast repeated words stop adding score. b: how strongly long texts are penalized. b = 0 turns the penalty off, so the long listing competes equally with a precise short title. Our run: worse by 0.0105.</li>
+      <li>Not proven, the interval includes 0. Get more queries, check per query type, or treat it as no difference.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== DAY 1 · WEEK 2 ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Day 1 · Afternoon</span><h2>Week 2 — Teaching a model to rank</h2></div>
+  <pre>Week 1:  query + product ──► BM25 formula (written by us)            ──► score
+Week 2:  query + product ──► 14 clues ──► model learned from examples ──► score</pre>
+  <div class="box memo"><span class="label">Memorize</span>
+    <p><b>Machine learning = learning a rule from examples instead of writing it by hand.</b></p>
+  </div>
+
+  <h3>2.1 Features (the clues)</h3>
+  <p>A <b>feature</b> is one number that describes a (query, product) pair. Example query: "samsung tv 55 black".</p>
+  <table>
+    <tr><th>Feature</th><th>Plain meaning</th><th>Example value</th></tr>
+    <tr><td>bm25_title / brand / bullets / description</td><td>Week 1 BM25 on each text field</td><td>high if words match</td></tr>
+    <tr><td>title_coverage</td><td>share of query words found in the title</td><td>4 of 4 → 1.0</td></tr>
+    <tr><td>title_jaccard</td><td>shared words ÷ all different words in both</td><td>4 ÷ 6 = 0.67</td></tr>
+    <tr><td>phrase_in_title</td><td>whole query appears exactly</td><td>0 or 1</td></tr>
+    <tr><td>brand_in_query / color_in_query</td><td>product's brand / colour is in the query</td><td>"samsung" → 1, "black" → 1</td></tr>
+    <tr><td>numbers_matched / numbers_missing</td><td>numbers like "55" found / not found in the title</td><td>1 / 0</td></tr>
+    <tr><td>query_len, title_len, has_description</td><td>sizes and presence</td><td>—</td></tr>
+  </table>
+  <div class="box memo"><span class="label">Memorize · the leakage rule for features</span>
+    <p>Features may use <b>query text and product text only, never the label</b>. A test flips every label and checks no feature changes. Forbidden example: "how often this product was labelled Exact". That is the answer itself.</p>
+  </div>
+
+  <h3>2.2 Logistic regression (the simplest learner)</h3>
+  <p>It answers: "what is the probability this product is Exact?"</p>
+  <div class="formula">z = w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + … + bias &nbsp;&nbsp;&nbsp; p = σ(z) = 1 / (1 + e<sup>−z</sup>)</div>
+  <p>Sigmoid squeezes any number into 0 to 1. σ(0) = 0.5, σ(2) = 0.88, σ(−2) = 0.12.</p>
+  <p><b>Log loss</b> (how wrong): for a true Exact product, −ln(p). Predict 0.9 → loss 0.105 (small). Predict 0.1 → loss 2.303 (big).</p>
+  <div class="box memo"><span class="label">Memorize · the 4-step training loop (used by every model later, neural networks too)</span>
+    <pre style="margin:0">repeat:
+  1. predict       p = sigmoid(X·w + b)
+  2. loss          how wrong are we?  (log loss)
+  3. gradient      which way to move each weight to lower the loss
+  4. update        w = w − learning_rate × gradient      ("step downhill")</pre>
+  </div>
+  <ul>
+    <li><b>Standardize</b> features (mean 0, standard deviation 1), so big-number features (title_len ≈ 20) don't drown small ones (coverage ≈ 0.5). Use the <b>train</b> mean and std for dev and test too.</li>
+    <li><b>L2 penalty</b> = a small cost for big weights. It stops the model trusting one feature too much (less overfitting).</li>
+    <li>We wrote it from scratch in NumPy. It matched scikit-learn: weights equal within 0.0001, and both scored <b>0.8296</b> on dev.</li>
+  </ul>
+  <div class="box task"><span class="label">Notebook task 2.2</span>
+    <p>(a) Weights w = [2, 1], bias = −1, features x = [0.8, 0.5]. Compute z and p (σ(1.1) ≈ 0.75). (b) Standardize [10, 20, 30] (std = 8.165). (c) Why must dev use the train mean and std?</p>
+  </div>
+  <div class="box answer"><span class="label">Answer 2.2</span>
+    <p>(a) z = 2·0.8 + 1·0.5 − 1 = <b>1.1</b>; p ≈ <b>0.75</b>. (b) mean 20 → [−1.225, 0, 1.225]. (c) The model learned on train's scale, so dev must be measured with the same ruler. Using dev's own numbers also lets evaluation data leak into the model.</p>
+  </div>
+
+  <h3>2.3 Pointwise, pairwise, listwise</h3>
+  <table>
+    <tr><th></th><th>Pointwise (logistic regression)</th><th>Listwise (LambdaMART)</th></tr>
+    <tr><td>Looks at</td><td>one product at a time</td><td>the whole list for a query</td></tr>
+    <tr><td>Learns</td><td>"is this product Exact?"</td><td>"is this ORDER good?"</td></tr>
+    <tr><td>Optimizes</td><td>log loss</td><td>nDCG (through pairs)</td></tr>
+  </table>
+  <p>Analogy: pointwise = grading each student alone. Listwise = deciding the class ranking. Search needs a ranking, so listwise fits better. The three families: <b>pointwise</b> (score each item), <b>pairwise</b> (is A better than B?), <b>listwise</b> (optimize the whole list's metric). LambdaMART is pairwise/listwise.</p>
+
+  <h3>2.4 LambdaMART (best model this week)</h3>
+  <ol>
+    <li><b>MART = gradient-boosted decision trees.</b> A tree asks yes/no questions ("coverage &gt; 0.8? → brand_in_query = 1? → +0.3"). <b>Boosting</b>: tree 1, look at its mistakes, tree 2 fixes them, tree 3 fixes what is left. Final score = sum of all trees. Ours used <b>274 trees</b>.</li>
+    <li><b>Lambda = the ranking trick.</b> For each pair of products in a query: "if I swapped these two, how much would nDCG change?" It pushes hardest on swaps that matter most (near the top, big label gap).</li>
+  </ol>
+  <ul>
+    <li><code>label_gain = [0, 0.01, 0.1, 1.0]</code> tells LightGBM our ESCI gains. Its default (2<sup>label</sup> − 1) would optimize a different nDCG.</li>
+    <li><b>Early stopping</b>: keep adding trees until a held-out 10% of <b>train</b> queries stops improving for 100 trees. We did <b>not</b> use dev for this; dev must stay a clean measurement.</li>
+    <li><code>learning_rate 0.05</code>: each tree corrects only a little. Slower, but more reliable.</li>
+    <li>Trees are usually the strongest model for a small table of numbers, are fast, and don't need standardizing.</li>
+  </ul>
+
+  <h3>2.5 Week 2 results</h3>
+  <table>
+    <tr><th>Model (dev)</th><th class="n">nDCG full</th><th>Δ vs BM25 title (95% CI)</th></tr>
+    <tr><td>LambdaMART, BM25 features only</td><td class="n">0.8223</td><td>+0.0031 [+0.0004, +0.0058]</td></tr>
+    <tr><td>Logistic regression (ours = scikit-learn)</td><td class="n">0.8296</td><td>+0.0104 [+0.0067, +0.0141]</td></tr>
+    <tr><td>LambdaMART, no BM25 features</td><td class="n">0.8322</td><td>—</td></tr>
+    <tr><td><b>LambdaMART, all 14 features</b></td><td class="n"><b>0.8359</b></td><td><b>+0.0166 [+0.0127, +0.0205]</b></td></tr>
+  </table>
+  <p>LambdaMART vs logistic regression: +0.0062 [+0.0032, +0.0093], so <b>listwise wins</b>. Most useful features: title_coverage, bm25_title, title_jaccard, <b>numbers_missing</b> (4th: sizes and model numbers like "55 inch" matter to shoppers).</p>
+  <p><b>Bugs this week:</b> empty Parquet values become NaN, and NaN counts as "true" in Python, so clean missing values when loading. A test can be wrong too (I expected Jaccard 4/7; the code's 4/6 was right). DuckDB stores 0.1 as an exact DECIMAL, so cast to DOUBLE.</p>
+
+  <div class="box task"><span class="label">Notebook task 2.5 — Week 2 checkpoint</span>
+    <ol>
+      <li>What is a feature? Give two from ShopRank.</li>
+      <li>Write the 4 steps of the training loop.</li>
+      <li>Pointwise vs listwise: difference, and which won?</li>
+      <li>What does "boosting" mean?</li>
+      <li>Why not use dev for early stopping?</li>
+      <li>Give one feature that would be leakage.</li>
+    </ol>
+  </div>
+  <div class="box answer"><span class="label">Model answers 2.5</span>
+    <ol>
+      <li>A number describing a query-product pair. title_coverage = share of query words in the title; numbers_missing = query numbers absent from the title.</li>
+      <li>Predict → loss → gradient → update (step downhill). Repeat.</li>
+      <li>Pointwise scores each product alone; listwise optimizes the whole list (nDCG). Listwise won: +0.0062 [+0.0032, +0.0093].</li>
+      <li>Trees are built one after another; each new tree corrects the mistakes of all earlier trees.</li>
+      <li>Dev is the measuring stick. If it decides when to stop, its scores become optimistic, because we tuned on it.</li>
+      <li>"Fraction of times this product was labelled Exact": it is made from the answer we predict.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== DAY 2 · WEEK 3 ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Day 2 · Morning</span><h2>Week 3 — Neural networks from scratch, then PyTorch</h2></div>
+  <p>Weeks 1–2 matched <b>words</b>. A neural network learns its own <b>vector</b> for text: a list of numbers where similar meanings end up close together.</p>
+  <pre>"running shoes" ──► [0.12, -0.40, 0.88, ...] ┐  close together = similar
+"sneakers"      ──► [0.10, -0.38, 0.91, ...] ┘
+"phone case"    ──► [-0.70, 0.22, 0.05, ...]    far away = different</pre>
+
+  <h3>3.1 Autograd — how a network learns</h3>
+  <p>A network has thousands to millions of weights. Training needs, for <b>every</b> weight, "if I nudge it up a little, does the loss go up or down, and by how much?" That is its <b>gradient</b>.</p>
+  <p><b>The trick:</b> every number remembers <b>how it was made</b>. Then we walk backwards with the <b>chain rule</b>.</p>
+  <pre>a = 2, b = -3
+c = a * b        c remembers "a × b"
+L = c + 10       L remembers "c + 10"
+
+backward:  dL/dL = 1
+           dL/dc = 1            (+ passes the gradient through)
+           dL/da = b × 1 = -3   (× gives each input the OTHER input × gradient)
+           dL/db = a × 1 =  2</pre>
+  <table>
+    <tr><th>Operation</th><th>Local rule (how the gradient flows back)</th></tr>
+    <tr><td>a + b</td><td>both get the gradient unchanged</td></tr>
+    <tr><td>a × b</td><td>a gets b × grad, b gets a × grad</td></tr>
+    <tr><td>relu(a)</td><td>passes the gradient if a &gt; 0, blocks it (0) if a ≤ 0</td></tr>
+    <tr><td>exp(a)</td><td>gets exp(a) × grad</td></tr>
+    <tr><td>log(a)</td><td>gets (1/a) × grad</td></tr>
+  </table>
+  <div class="box memo"><span class="label">Memorize</span>
+    <ul style="margin:0">
+      <li><b>Chain rule:</b> the gradient along a path = product of the local slopes.</li>
+      <li><b>A value used twice: its gradients ADD.</b> y = x·x + x → dy/dx = 2x + 1. The code uses <code>+=</code>.</li>
+      <li>Our engine matched PyTorch to 9 decimal places, and matched finite differences (nudge by 0.000001 and measure). <code>loss.backward()</code> in PyTorch is the same idea on big tables (tensors) on the GPU.</li>
+    </ul>
+  </div>
+  <div class="box task"><span class="label">Notebook task 3.1</span>
+    <p>(a) y = x·x + x at x = 3: compute y and dy/dx. (b) L = (a·b + c)·d with a = 2, b = −3, c = 10, d = −2. Draw the graph and compute dL/da, dL/db, dL/dc, dL/dd.</p>
+  </div>
+  <div class="box answer"><span class="label">Answer 3.1</span>
+    <p>(a) y = 12; dy/dx = 2·3 + 1 = <b>7</b>. (b) e = a·b = −6; f = e + c = 4; L = f·d = −8. dL/dd = f = <b>4</b>; dL/df = d = −2, so dL/dc = <b>−2</b>, dL/de = −2; dL/da = b·(−2) = <b>6</b>; dL/db = a·(−2) = <b>−4</b>.</p>
+  </div>
+
+  <h3>3.2 A neural network (MLP)</h3>
+  <ul>
+    <li><b>Neuron</b> = weighted sum of inputs + bias, then <b>ReLU</b> = max(0, x) ("fire only if positive").</li>
+    <li><b>Layer</b> = many neurons reading the same inputs. <b>MLP</b> = layers stacked: input → hidden → output.</li>
+    <li><b>Why ReLU (a non-linearity)?</b> Without it, stacked layers collapse into one weighted sum, so the network only learns straight-line rules.</li>
+    <li><b>He initialization</b>: start weights small and random, scaled by √(2 / inputs), so signals don't explode or vanish.</li>
+    <li>Training loop = the same 4 steps as week 2. New detail: <b>set gradients to zero before each backward</b>, because they add up. Forgetting <code>zero_grad()</code> is a classic bug.</li>
+  </ul>
+
+  <h3>3.3 The two-tower model</h3>
+  <pre>query text   ──► query tower   ──► 128 numbers ┐
+                                                ├──► cosine similarity = relevance score
+product text ──► product tower ──► 128 numbers ┘</pre>
+  <ol>
+    <li><b>Text to ids (hashing trick):</b> each word → one id for the word + one id per 3-letter piece. "anna" → word:anna, #an, ann, nna, na#. "ana" → word:ana, #an, ana, na#. They share 2 pieces, so misspellings still match. Pieces are hashed into 262,144 slots: no vocabulary file, new words still work.</li>
+    <li><b>Tower:</b> <code>EmbeddingBag</code> = one learnable 128-number vector per slot; a text = the <b>average</b> of its pieces. Then Linear → ReLU → Linear. Then <b>normalize</b> to length 1, so dot product = cosine similarity (−1 to 1).</li>
+    <li><b>Why two towers:</b> products are encoded <b>once, ahead of time</b>. At search time only the query is encoded, then compared with millions of stored product vectors very fast. This is how large-scale search works.</li>
+  </ol>
+
+  <h3>3.4 Contrastive learning — InfoNCE loss</h3>
+  <p>Training data: 163,125 (query, Exact product) pairs. In a batch of 256 pairs, each query has 1 correct product and 255 other products in the batch that act as wrong answers: <b>in-batch negatives</b>, free, no extra labels.</p>
+  <pre>             product1  product2  product3 ...
+query1    [   HIGH      low       low   ]    want the diagonal high
+query2    [   low       HIGH      low   ]
+query3    [   low       low       HIGH  ]</pre>
+  <p><b>Loss:</b> for each row, softmax over the 256 similarities, then −log(probability of the correct one). This is just <b>cross-entropy</b> where the correct "class" is the matching product. Random guessing gives ln(256) = <b>5.545</b>.</p>
+  <p><b>Temperature</b> divides similarities before softmax:</p>
+  <table>
+    <tr><th>Similarities [0.9, 0.5, 0.1]</th><th>Softmax result</th><th>Meaning</th></tr>
+    <tr><td>temperature 0.05</td><td class="mono">[0.9997, 0.0003, 0.0000]</td><td>sharp, strong learning signal</td></tr>
+    <tr><td>temperature 1.0</td><td class="mono">[0.472, 0.316, 0.212]</td><td>almost flat, weak signal</td></tr>
+  </table>
+  <p><b>False negatives:</b> if the same query appears twice in a batch with two different Exact products, each is a <b>correct</b> answer for the other row. Punishing it teaches the wrong thing, so we <b>mask</b> those cells.</p>
+  <div class="box memo"><span class="label">Memorize</span>
+    <p>InfoNCE = "pick the right partner out of the batch". In-batch negatives = other rows' positives. Temperature controls how sharp the softmax is. Mask false negatives.</p>
+  </div>
+
+  <h3>3.5 Results — and why the neural model lost</h3>
+  <table>
+    <tr><th>Model (dev)</th><th class="n">nDCG full</th><th>Δ (95% CI)</th></tr>
+    <tr><td><b>Two-tower, batch 256, temp 0.05</b></td><td class="n"><b>0.7849</b></td><td>+0.0350 vs random; <b>−0.0343 [−0.0403, −0.0283] vs BM25</b></td></tr>
+    <tr><td>batch 32 / batch 1024</td><td class="n">0.7847 / 0.7817</td><td>no clear difference</td></tr>
+    <tr><td>temperature 0.2</td><td class="n">0.7754</td><td>−0.0096, worse</td></tr>
+    <tr><td>temperature 1.0</td><td class="n">0.7607</td><td>−0.0243, much worse (loss stuck near ln 256)</td></tr>
+  </table>
+  <div class="box memo"><span class="label">Memorize · the most important page of week 3</span>
+    <ol style="margin:0">
+      <li><b>No language knowledge.</b> It started from random numbers and saw only 163k pairs. Fix: a <b>pretrained transformer</b> (week 4).</li>
+      <li><b>Training is easier than the test.</b> Batch negatives are random (shoe vs phone). Task 1 orders ~20 products on the same topic (iPhone vs iPhone case). Fix: <b>hard negatives</b> (week 5).</li>
+      <li><b>Bag of pieces ignores word order.</b> "case for iphone" = "iphone for case". Fix: <b>attention</b> (week 4).</li>
+    </ol>
+    <p style="margin-top:6px">A new model that loses to the baseline is still a result. Report it with its CI, explain why, plan the next step. Never hide it.</p>
+  </div>
+  <p><b>Engineering lessons:</b> the <b>overfit-one-batch</b> test (a correct loop must memorize one batch): ours fell 5.60 → 0.37, not 0, because 41 of 256 rows shared product text, a data property, not a bug. The same run took 55 s alone and 5,554 s while a game used the GPU, so benchmark on an idle machine. Peak GPU memory: 1.3 GB of 8 GB.</p>
+  <p><b>Stack added:</b> PyTorch (tensors, autograd, GPU), <code>nn.EmbeddingBag</code> (lookup + average), <b>AdamW</b> (per-weight step sizes + weight decay), CUDA (thousands of GPU cores doing matrix maths in parallel).</p>
+
+  <div class="box task"><span class="label">Notebook task 3.5 — Week 3 checkpoint</span>
+    <ol>
+      <li>What does autograd do, in one sentence?</li>
+      <li>Why do networks need ReLU?</li>
+      <li>What are in-batch negatives? What is a false negative, and what did we do?</li>
+      <li>Why did temperature 1.0 train badly?</li>
+      <li>Why did the two-tower model lose to BM25? Two reasons and a fix for each.</li>
+      <li>What is the overfit-one-batch test, and what did ours show?</li>
+    </ol>
+  </div>
+  <div class="box answer"><span class="label">Model answers 3.5</span>
+    <ol>
+      <li>It records how every value was computed, then applies the chain rule backwards to get the loss gradient for every weight.</li>
+      <li>Without a non-linearity, stacked layers collapse into one linear function.</li>
+      <li>Other pairs' products used as wrong answers for free. A false negative is a batch product that is actually correct for the query (same query twice). We masked it.</li>
+      <li>Cosine is only −1 to 1, so with temperature 1 all logits are close, softmax is nearly flat, and the loss stayed near ln(256).</li>
+      <li>No pretrained knowledge → pretrained transformer. Easy random negatives vs hard Task 1 lists → hard negatives. (Also: no word order → attention.)</li>
+      <li>Train on one small batch many times; it should reach ~0 loss. Ours stopped at 0.37 because 41 rows had duplicate product text.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================== DAY 2 · AHEAD ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Day 2 · Afternoon (part 1)</span><h2>What comes next — weeks 4 to 10</h2></div>
+  <p>Read for understanding, not memory. Each week fixes a failure you already saw.</p>
+
+  <h3>Week 4 — Transformers, tokenization, dense retrieval, ANN</h3>
+  <div class="formula">Attention(Q, K, V) = softmax(Q·K<sup>T</sup> / √d) · V</div>
+  <ul>
+    <li>Each word asks a <b>query</b> (Q), compares it with every word's <b>key</b> (K), and takes a weighted mix of their <b>values</b> (V). So "case for iphone" and "iphone for case" differ: words see their context.</li>
+    <li>Divide by √d (d = vector size, e.g. √64 = 8) so dot products don't grow huge and make softmax too sharp.</li>
+    <li>Cost grows with length² (every word looks at every word).</li>
+    <li><b>Tokenization</b> (WordPiece/BPE): rare words split into pieces. Watch model numbers like "sm-g991b".</li>
+    <li><b>Sentence-BERT</b>: a pretrained transformer that gives one vector per text (often the mean of word vectors).</li>
+    <li><b>HNSW</b> (FAISS): a graph of products. Search jumps between near neighbours instead of comparing with all million products. Trade-off: recall vs speed, set by <code>M</code> and <code>efSearch</code>. Target: recall@100 ≥ 0.98 vs exact search.</li>
+  </ul>
+  <h3>Week 5 — Fine-tune the bi-encoder; hybrid search</h3>
+  <ul>
+    <li><b>Hard negatives</b>: wrong products that look right, mined with BM25. Never use labelled E or S products as negatives (they would be false negatives).</li>
+    <li><b>Fusion</b>: combine BM25 and dense results. <b>RRF</b> score = Σ 1/(60 + rank). A product ranked 1st in A and 3rd in B: 1/61 + 1/63 = 0.0323.</li>
+    <li>Mixed precision (fp16) for speed; watch for overflow (NaN loss).</li>
+  </ul>
+  <h3>Week 6 — Cross-encoder reranker</h3>
+  <ul>
+    <li>A <b>cross-encoder</b> reads query and product <b>together</b>, with full attention across both. Much more accurate, much slower. So use it only on the top 50.</li>
+    <li>Bi-encoder = fast, precomputed, good for finding candidates. Cross-encoder = slow, accurate, good for final order.</li>
+    <li>Error taxonomy on 200 failures: substitute vs exact, brand, colour, negation, numbers, size units.</li>
+  </ul>
+  <h3>Week 7 — Small LLM query parser with QLoRA</h3>
+  <ul>
+    <li>Turn "air force 1 shoes girls" into JSON: <code>{"brand": "nike", "gender": "girls", ...}</code>.</li>
+    <li><b>LoRA</b>: freeze the big weight W; learn two small matrices A (d×r) and B (r×d); new weight = W + B·A. Parameters for rank 16 on a 2048×2048 layer: 16 × (2048 + 2048) = <b>65,536</b> instead of <b>4,194,304</b>.</li>
+    <li><b>QLoRA</b>: the frozen base model is stored in 4-bit (NF4), so a 1.5B model fits on an 8 GB GPU.</li>
+    <li>Treat LLM output as untrusted: validate the JSON.</li>
+  </ul>
+  <h3>Week 8 — Fast serving</h3>
+  <ul>
+    <li>Export the reranker to <b>ONNX</b>, quantize to <b>int8</b>: faster on CPU, check how much nDCG drops.</li>
+    <li>FastAPI <code>/search</code>, Postgres catalogue, cache, load test. Report p50 / p95 / p99 latency. Target: p95 &lt; 300 ms on CPU.</li>
+  </ul>
+  <h3>Week 9 — MLOps</h3>
+  <ul>
+    <li>Docker, GitHub Actions with an <b>eval gate</b>: if nDCG on a smoke set drops more than 0.01, the build fails.</li>
+    <li>MLflow for runs and models. Monitor <b>drift</b> without labels: compare input distributions (PSI), score distributions.</li>
+    <li>Training/serving skew: features computed differently online and offline.</li>
+  </ul>
+  <h3>Week 10 — Write-up and interviews</h3>
+  <p>Model card, data card, case study, 5-minute demo video, mock interviews.</p>
+
+  <h3>The final pipeline</h3>
+  <pre>query ─► query parser (QLoRA) ─► filters + clean query
+      ├─► BM25 candidates  ┐
+      ├─► dense candidates ┴─► fuse ─► top 200
+      ├─► LambdaMART ─► top 50
+      └─► cross-encoder (int8 ONNX) ─► top 10 ─► FastAPI</pre>
+</section>
+
+<!-- ============================== INTERVIEW ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Day 2 · Afternoon (part 2)</span><h2>Interview questions</h2></div>
+  <p>Say each answer out loud, then write the key words in your notebook. A strong answer uses <b>your own numbers</b> and names failures without being asked.</p>
+
+  <div class="qa"><b>1. Walk me through your ranking pipeline.</b> Cheap stages on many products, expensive stages on few: BM25 + dense find ~200 candidates fast; LambdaMART on features narrows to 50; a cross-encoder orders the top 10. Each stage fits a time budget.</div>
+  <div class="qa"><b>2. Your nDCG improved by 0.02. Is it real?</b> I check with a paired bootstrap over queries: 10,000 resamples of per-query differences, 95% interval. If it excludes 0, it is unlikely to be luck. I also check per query type, because a gain can come from one segment.</div>
+  <div class="qa"><b>3. Why split by query?</b> Rows of the same query in train and dev let the model memorize the query. Real traffic brings new queries.</div>
+  <div class="qa"><b>4. Why LightGBM before a neural reranker?</b> It is cheap per product, works great on a small table of features, is easy to explain (feature importance), and it gave +0.0166 over BM25 with a clear interval.</div>
+  <div class="qa"><b>5. Pointwise vs listwise?</b> Pointwise predicts each item alone; listwise optimizes the order (nDCG). In ShopRank listwise won by +0.0062 [+0.0032, +0.0093].</div>
+  <div class="qa"><b>6. Your neural model lost to BM25. Why?</b> No pretrained language knowledge; easy in-batch negatives while Task 1 lists are all on-topic; bag of pieces ignores word order. Fixes: pretrained transformer, hard negatives, attention.</div>
+  <div class="qa"><b>7. Why do hard negatives help, and when do they hurt?</b> They teach the fine differences the test needs. They hurt when a "negative" is actually relevant (unlabelled, or labelled S/E): a false negative trains the wrong lesson.</div>
+  <div class="qa"><b>8. What is inside LoRA? Parameters for rank 16 on 2048×2048?</b> Freeze W, learn W + B·A with small A and B. r × (d<sub>in</sub> + d<sub>out</sub>) = 65,536 instead of 4.19 million.</div>
+  <div class="qa"><b>9. How do you detect drift without labels?</b> Watch input distributions (query length, language, PSI on features), score distributions, and proxy metrics like click rate.</div>
+  <div class="qa"><b>10. What would you not trust in your own results?</b> Label noise (e.g. Exact = batteries for an IQOS query), US-only vs 3-language public numbers, and offline-only evaluation without real users.</div>
+  <div class="qa"><b>11. Why nDCG, not accuracy?</b> Order matters and users look at the top; nDCG rewards good items high up and handles graded labels.</div>
+  <div class="qa"><b>12. Explain BM25 in three ideas.</b> Rare words count more (IDF), repeats saturate (k1), long texts are penalized (b).</div>
+
+  <div class="box task"><span class="label">Notebook task — teach it back</span>
+    <p>Write one page as if teaching a friend who knows nothing: "How does a search engine decide what to show first, and how do you know it got better?" Use nDCG, BM25, features, LambdaMART and the bootstrap. If you can teach it, you know it.</p>
+  </div>
+</section>
+
+<!-- ============================== FORMULA SHEET ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">Keep this page open</span><h2>Formula sheet</h2></div>
+  <table>
+    <tr><th>Name</th><th>Formula</th><th>Remember</th></tr>
+    <tr><td>DCG@k</td><td class="mono">Σ gain_i / log2(i + 1)</td><td>position 1 ÷ 1, position 3 ÷ 2</td></tr>
+    <tr><td>nDCG@k</td><td class="mono">DCG@k / ideal DCG@k</td><td>always 0 to 1; ideal = sorted best-first</td></tr>
+    <tr><td>Recall@k</td><td class="mono">relevant in top k / all relevant</td><td>ignores order inside top k</td></tr>
+    <tr><td>MRR</td><td class="mono">mean of 1 / rank of first relevant</td><td>only the first hit counts</td></tr>
+    <tr><td>ESCI gains</td><td class="mono">E 1.0 · S 0.1 · C 0.01 · I 0</td><td>69% of labels are Exact</td></tr>
+    <tr><td>Paired bootstrap</td><td class="mono">resample per-query deltas 10,000×; 2.5–97.5 percentile</td><td>crosses 0 = not proven</td></tr>
+    <tr><td>IDF</td><td class="mono">ln(1 + (N − n + 0.5) / (n + 0.5))</td><td>"1 +" keeps it ≥ 0</td></tr>
+    <tr><td>BM25 term</td><td class="mono">IDF · f(k1+1) / (f + k1(1 − b + b·len/avg))</td><td>k1 = saturation, b = length penalty</td></tr>
+    <tr><td>Sigmoid</td><td class="mono">σ(z) = 1 / (1 + e^−z)</td><td>σ(0) = 0.5</td></tr>
+    <tr><td>Log loss</td><td class="mono">−[y·ln p + (1 − y)·ln(1 − p)]</td><td>p 0.9 → 0.105; p 0.1 → 2.303</td></tr>
+    <tr><td>Gradient step</td><td class="mono">w ← w − learning_rate · gradient</td><td>predict, loss, gradient, update</td></tr>
+    <tr><td>Standardize</td><td class="mono">(x − mean_train) / std_train</td><td>train numbers on dev and test too</td></tr>
+    <tr><td>L2 penalty</td><td class="mono">loss + λ·Σ w²</td><td>keeps weights small</td></tr>
+    <tr><td>Chain rule</td><td class="mono">dL/dx = dL/dy · dy/dx</td><td>value used twice → gradients add</td></tr>
+    <tr><td>ReLU</td><td class="mono">max(0, x)</td><td>gradient 1 if x &gt; 0, else 0</td></tr>
+    <tr><td>He init</td><td class="mono">std = √(2 / inputs)</td><td>signals don't explode or vanish</td></tr>
+    <tr><td>Cosine</td><td class="mono">a·b / (|a|·|b|)</td><td>after normalizing, = dot product</td></tr>
+    <tr><td>Softmax with temp.</td><td class="mono">e^(s_i/T) / Σ e^(s_j/T)</td><td>small T = sharp</td></tr>
+    <tr><td>InfoNCE</td><td class="mono">−ln softmax(sim/T)[correct]</td><td>random guess = ln(batch) = 5.545 for 256</td></tr>
+    <tr><td>Attention</td><td class="mono">softmax(QKᵀ / √d) · V</td><td>cost grows with length²</td></tr>
+    <tr><td>RRF</td><td class="mono">Σ 1 / (60 + rank)</td><td>fuses BM25 and dense lists</td></tr>
+    <tr><td>LoRA params</td><td class="mono">r · (d_in + d_out)</td><td>r 16, 2048×2048 → 65,536</td></tr>
+  </table>
+  <h3>Numbers to know</h3>
+  <table>
+    <tr><td>Queries / labels / products (US)</td><td class="n">97,345 / 1.82 M / 1.22 M</td><td>Dev queries</td><td class="n">2,099</td></tr>
+    <tr><td>Random / BM25 / LogReg / LambdaMART / Two-tower</td><td class="n">0.750 / 0.819 / 0.830 / 0.836 / 0.785</td><td>LambdaMART trees</td><td class="n">274</td></tr>
+    <tr><td>LambdaMART vs BM25</td><td class="n">+0.0166 [+0.0127, +0.0205]</td><td>BM25 k1 / b</td><td class="n">1.5 / 0.75</td></tr>
+    <tr><td>Two-tower vs BM25</td><td class="n">−0.0343 [−0.0403, −0.0283]</td><td>Batch / temp / dim</td><td class="n">256 / 0.05 / 128</td></tr>
+    <tr><td>Public baseline / winner (3 languages)</td><td class="n">0.850 / 0.9043</td><td>Hash slots</td><td class="n">262,144</td></tr>
+  </table>
+</section>
+
+<!-- ============================== GLOSSARY + FINAL TEST ============================== -->
+<section class="part">
+  <div class="part-head"><span class="tag">End of day 2</span><h2>Glossary and final self-test</h2></div>
+  <div class="grid2">
+    <div>
+      <p><b>Baseline</b>: the simple system you must beat.</p>
+      <p><b>Leakage</b>: evaluation information gets into training or tuning.</p>
+      <p><b>Dev / test</b>: dev for tuning; test locked until the end.</p>
+      <p><b>Gain</b>: the number value of a label (E = 1.0).</p>
+      <p><b>Confidence interval</b>: range where the true improvement probably lies.</p>
+      <p><b>Feature</b>: one number describing a query-product pair.</p>
+      <p><b>Weight</b>: how much the model trusts a feature.</p>
+      <p><b>Loss</b>: how wrong the model is.</p>
+      <p><b>Gradient</b>: which way to move weights to lower the loss.</p>
+    </div>
+    <div>
+      <p><b>Learning rate</b>: size of each step.</p>
+      <p><b>Overfitting</b>: memorizing train; bad on new data.</p>
+      <p><b>Regularization (L2)</b>: penalty that keeps weights small.</p>
+      <p><b>Boosting</b>: each new tree fixes earlier trees' mistakes.</p>
+      <p><b>Early stopping</b>: stop when held-out score stops improving.</p>
+      <p><b>Embedding / vector</b>: list of numbers that stands for a text.</p>
+      <p><b>Negative</b>: a wrong answer used in training.</p>
+      <p><b>Temperature</b>: sharpness knob for softmax.</p>
+      <p><b>Epoch</b>: one pass over all training data.</p>
+    </div>
+  </div>
+  <hr>
+  <h3>Final self-test (no peeking; score yourself after)</h3>
+  <ol>
+    <li>Compute nDCG@3 for gains [0.01, 1.0, 0.1].</li>
+    <li>Why does random order already score 0.75 here?</li>
+    <li>Write the BM25 formula and label every symbol.</li>
+    <li>System B beats A by +0.003, 95% CI [+0.001, +0.005]. Is it real? Is it useful?</li>
+    <li>Name 5 of the 14 features and one forbidden feature.</li>
+    <li>Write the 4-step training loop and where <code>zero_grad()</code> goes.</li>
+    <li>Why did we hold out 10% of <b>train</b> for early stopping?</li>
+    <li>Draw the two-tower model. Why can products be encoded ahead of time?</li>
+    <li>What does a temperature of 0.05 do compared with 1.0?</li>
+    <li>Explain one ShopRank result that went against your prediction.</li>
+  </ol>
+  <div class="box answer"><span class="label">Answers</span>
+    <ol>
+      <li>DCG = 0.01/1 + 1/1.585 + 0.1/2 = 0.691. Ideal [1, 0.1, 0.01] = 1 + 0.063 + 0.005 = 1.068. nDCG ≈ <b>0.647</b>.</li>
+      <li>69% of candidates are Exact, so most positions hold good products anyway.</li>
+      <li>See formula sheet: IDF × f(k1+1)/(f + k1(1 − b + b·len/avglen)).</li>
+      <li>Real (interval above 0), but small. Decide if it is worth the cost; check which queries gained.</li>
+      <li>e.g. bm25_title, title_coverage, title_jaccard, brand_in_query, numbers_missing. Forbidden: anything computed from labels.</li>
+      <li>Predict → loss → gradient (backward) → update. <code>zero_grad()</code> before each backward.</li>
+      <li>So dev stays a clean measurement; choosing the stop point on dev would be tuning on it.</li>
+      <li>Query tower and product tower each make a 128-number vector; score = cosine. Product vectors don't depend on the query, so compute them once and store them.</li>
+      <li>0.05 makes softmax sharp (strong learning signal); 1.0 makes it nearly flat, so the model barely learns.</li>
+      <li>Week 1: I predicted adding bullets would help BM25. It did not (+0.0006, CI crosses 0).</li>
+    </ol>
+  </div>
+  <h3>Checklist for the 2 days</h3>
+  <ul class="check">
+    <li>I can say the 30-second pitch without notes.</li>
+    <li>I can compute DCG / nDCG by hand.</li>
+    <li>I can read a confidence interval and say what to conclude.</li>
+    <li>I can write BM25 and explain IDF, k1 and b.</li>
+    <li>I can explain features, the training loop and LambdaMART.</li>
+    <li>I can backprop a small graph by hand.</li>
+    <li>I can explain the two-tower model, InfoNCE and temperature.</li>
+    <li>I can explain why the neural model lost, and the fixes.</li>
+  </ul>
+</section>
+
+</body>
+</html>
