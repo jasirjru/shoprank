@@ -1,0 +1,1 @@
+source: huggingface/skills@5291c2b9365e06b175dc04817610c778623f4836 (Apache-2.0), copied 2026-11-18
