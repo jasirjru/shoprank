@@ -21,13 +21,14 @@ Rules:
 | 6 | Two-tower model: embeddings, InfoNCE loss, in-batch negatives, why it lost to BM25 | – |
 | 7 | Mock interview (no notes), then fix weak topics | One official US test-set run; README with results and limits; push to GitHub (ask first); resume bullets |
 
-## Phase B: v2, transformers (about 3 weeks, plan weeks 4-6)
+## Phase B: v2, transformers (about 3 weeks). Updated 17 Nov from `docs/BEST_MODEL_RESEARCH.md`
 
-| Week | Learn | Build | Target |
+| Step | Learn | Build | Target (estimate) |
 |---|---|---|---|
-| 4 | Transformers, tokenisation, pretrained embeddings, approximate nearest-neighbour search | Pretrained bi-encoder (zero-shot) on dev | Beat BM25 0.8193 |
-| 5 | Fine-tuning, hard negatives, hybrid fusion | Fine-tuned bi-encoder; fuse with BM25 | Beat LambdaMART 0.8359 |
-| 6 | Cross-encoders, stacking, error analysis | Cross-encoder reranker; LambdaMART on top | Reach or beat Amazon's English baseline 0.857 (dev first, then one test run) |
+| B1 | Embeddings and semantic similarity; negation | Add bge-small cosine, negation and numeric features to LambdaMART | about 0.85 (a same-setup public project reached 0.854) |
+| B2 | Transformers, attention, cross-encoders, fine-tuning | **Fine-tune DeBERTa-v3-base cross-encoder**: 4-class E/S/C/I loss, rank by expected gain, input query + title + brand + colour, max_length 128 | about 0.87-0.89; beat Amazon's 0.857 |
+| B3 | Stacking, error analysis | Cross-encoder score into LambdaMART; one official test run | +0.003-0.01 |
+| B4 (optional) | Ensembles, adversarial training | DeBERTa-v3-large or a 2-3 model ensemble | about 0.89-0.90 (ceiling, because label agreement is 91%) |
 
 ## Phase C: make it real (after v2)
 

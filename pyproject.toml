@@ -1,19 +1,26 @@
 [project]
 name = "shoprank"
 version = "0.1.0"
-description = "Add your description here"
+description = "Learned product search ranking on the Amazon ESCI dataset"
 authors = [
-    { name = "jasirjru", email = "jasirjru@example.com" }
+    { name = "Jasir Abdul Hameed", email = "144598391+jasirjru@users.noreply.github.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "accelerate>=1.16",
+    "datasets>=5.2",
     "duckdb>=2.0.0",
     "lightgbm>=4.7.0",
     "numpy>=2.5.4",
     "pandas>=3.1.1",
+    "protobuf>=7.36.2",
     "pyarrow>=26.0.1",
+    "pytrec-eval-terrier>=0.5.11",
     "scikit-learn>=1.9.1",
+    "sentence-transformers>=6.3",
+    "sentencepiece>=0.2.3",
     "torch>=2.11.0",
+    "transformers>=5.23",
 ]
 
 [project.scripts]
