@@ -1,7 +1,8 @@
 """Section 12a: fine-tune the MiniLM cross-encoder on ESCI train (Amazon's baseline recipe).
 
 Usage:
-    uv run python -m shoprank.cross.finetune                          # full run, then scores dev
+    uv run python -m shoprank.cross.finetune                          # 12a: MSE on gain, then scores dev
+    uv run python -m shoprank.cross.finetune --loss ce                # 12b: 4-class CE + expected gain
     uv run python -m shoprank.cross.finetune --limit-steps 200 --name minilm_ft_smoke   # timing check
 
 Recipe (amazon-science/esci-data ranking/train.py): ms-marco-MiniLM-L-12-v2, one output, no activation,
@@ -29,6 +30,9 @@ from shoprank.ltr.train import is_holdout, per_query_results
 
 MODELS = PROCESSED / "models"
 NO_DECAY = ("bias", "LayerNorm.weight", "LayerNorm.bias")  # old CrossEncoder.fit default
+CLASSES = ("E", "S", "C", "I")  # 4-class head: output i is the logit of CLASSES[i]
+CLASS_GAINS = (1.0, 0.1, 0.01, 0.0)  # same gains as nDCG, in CLASSES order
+LOSSES = ("mse", "ce")
 
 
 @dataclass(frozen=True)
@@ -44,6 +48,34 @@ class FitConfig:
     weight_decay: float = 0.01
     max_grad_norm: float = 1.0
     limit_steps: int | None = None  # stop early (timing / smoke runs only)
+    loss: str = "mse"  # "mse": 1 output, MSE on the gain; "ce": 4 outputs, cross-entropy on the class
+
+
+def class_ids(labels: pd.Series) -> np.ndarray:
+    """ESCI letters -> class index in CLASSES order (E 0, S 1, C 2, I 3)."""
+    ids = labels.map({c: i for i, c in enumerate(CLASSES)})
+    if ids.isna().any():
+        raise ValueError(f"unknown ESCI labels: {sorted(set(labels[ids.isna()]))}")
+    return ids.to_numpy(dtype=np.int64)
+
+
+def score_from_logits(logits: torch.Tensor) -> torch.Tensor:
+    """One ranking score per row. One output: the output itself. Four outputs: the expected gain,
+    P(E) * 1 + P(S) * 0.1 + P(C) * 0.01 + P(I) * 0, with probabilities from a softmax."""
+    logits = logits.float()
+    if logits.shape[-1] == 1:
+        return logits.reshape(-1)
+    gains = torch.tensor(CLASS_GAINS, device=logits.device)
+    return logits.softmax(dim=-1) @ gains
+
+
+def compute_loss(logits: torch.Tensor, targets: torch.Tensor, loss: str) -> torch.Tensor:
+    """"mse": targets are gains (float). "ce": targets are class indices (int)."""
+    if loss == "mse":
+        return torch.nn.functional.mse_loss(logits.float().reshape(-1), targets.float())
+    if loss == "ce":
+        return torch.nn.functional.cross_entropy(logits.float(), targets.long())
+    raise ValueError(f"loss must be one of {LOSSES}, got {loss!r}")
 
 
 def warmup_linear(step: int, warmup: int, total: int) -> float:
@@ -105,10 +137,15 @@ class Prepared4DMask(torch.nn.Module):
     With a 2D mask, transformers 5.23 runs `padding_mask.all()` inside a Python `if` to decide whether it
     can skip the mask (masking_utils.py:366). Reading that answer makes the CPU wait for the GPU every step.
     A 4D mask is used as-is (masking_utils.py:833), so there is no check and no wait. Same attention maths.
+    Only for SDPA attention: "eager" attention ADDS the mask to the scores (modeling_bert.py:128), so a
+    boolean mask would add 1 to real tokens and 0 to padding, i.e. no masking at all, silently.
     """
 
     def __init__(self, model: torch.nn.Module):
         super().__init__()
+        attn = getattr(getattr(model, "config", None), "_attn_implementation", "sdpa")
+        if attn != "sdpa":
+            raise ValueError(f"Prepared4DMask needs sdpa attention, got {attn!r}")
         self.model = model
 
     def forward(self, attention_mask: torch.Tensor, **inputs):
@@ -140,7 +177,7 @@ def predict(model, tokenizer, queries: Sequence[str], texts: Sequence[str], batc
         idx = order[i:i + batch_size]
         with _autocast(device, bf16):
             logits = model(**collate(feats, idx, _pad_id(tokenizer), device)).logits
-        scores[idx] = logits.float().reshape(-1).cpu().numpy()
+        scores[idx] = score_from_logits(logits).cpu().numpy()
     model.train(was_training)
     return scores
 
@@ -157,8 +194,9 @@ def _optimizer(model, cfg: FitConfig) -> torch.optim.AdamW:
 def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets: np.ndarray,
         cfg: FitConfig, device: str, evaluate: Callable[[torch.nn.Module], float],
         log: Callable[[str], None] = lambda s: None) -> dict:
-    """Train with MSE on the gain. Every `eval_every` steps, score the hold-out with `evaluate`
-    (higher is better). At the end the model holds the best-scoring weights."""
+    """Train with `cfg.loss` (targets: gains for "mse", class indices for "ce"). Every `eval_every`
+    steps, score the hold-out with `evaluate` (higher is better). At the end the model holds the
+    best-scoring weights."""
     torch.manual_seed(cfg.seed)
     feats = pretokenize(tokenizer, queries, texts, cfg.max_length)
     lengths = [len(x) for x in feats["input_ids"]]
@@ -169,7 +207,7 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
         total = min(total, cfg.limit_steps)
     opt = _optimizer(model, cfg)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: warmup_linear(s, cfg.warmup_steps, total))
-    y_all = torch.tensor(np.asarray(targets), dtype=torch.float32)
+    y_all = torch.as_tensor(np.asarray(targets))
 
     history = {"evals": [], "losses": [], "best_step": 0, "train_seconds": 0.0}
     best_score, best_state = -float("inf"), None
@@ -184,7 +222,7 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
             enc = collate(feats, idx, pad_id, device)
             with _autocast(device, cfg.bf16):
                 logits = model(**enc).logits
-            loss = torch.nn.functional.mse_loss(logits.float().reshape(-1), to_device(y_all[idx], device))
+            loss = compute_loss(logits, to_device(y_all[idx], device), cfg.loss)
             opt.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.max_grad_norm)
@@ -212,15 +250,17 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Fine-tune MiniLM cross-encoder on ESCI train (MSE on gain)")
-    p.add_argument("--name", default="minilm_ft_mse")
+    p = argparse.ArgumentParser(description="Fine-tune MiniLM cross-encoder on ESCI train")
+    p.add_argument("--loss", choices=LOSSES, default="mse")
+    p.add_argument("--name", default=None, help="default: minilm_ft_<loss>")
     p.add_argument("--limit-steps", type=int, default=None)
     p.add_argument("--eval-every", type=int, default=1000)
     args = p.parse_args()
+    name = args.name or f"minilm_ft_{args.loss}"
 
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-    cfg = FitConfig(eval_every=args.eval_every, limit_steps=args.limit_steps)
+    cfg = FitConfig(eval_every=args.eval_every, limit_steps=args.limit_steps, loss=args.loss)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     products = pd.read_parquet(PROCESSED / "products.parquet")
     cols = ["query_id", "query", "product_id", "esci_label", "gain"]
@@ -233,16 +273,20 @@ def main() -> None:
           f"hold-out {hold_part['query_id'].nunique():,} q / {len(hold_part):,} pairs; device {device}", flush=True)
 
     tokenizer = AutoTokenizer.from_pretrained(DEFAULT_MODEL)
-    model = AutoModelForSequenceClassification.from_pretrained(DEFAULT_MODEL, num_labels=1).to(device)
+    # "ce" needs 4 outputs; the MS MARCO head has 1, so it is replaced by a new, randomly initialised head.
+    num_labels = 1 if cfg.loss == "mse" else len(CLASSES)
+    model = AutoModelForSequenceClassification.from_pretrained(
+        DEFAULT_MODEL, num_labels=num_labels, ignore_mismatched_sizes=num_labels != 1).to(device)
+    targets = fit_part["gain"].to_numpy() if cfg.loss == "mse" else class_ids(fit_part["esci_label"])
     net = Prepared4DMask(model)  # same weights as `model`; only the mask format changes
 
     def holdout_ndcg(m) -> float:
         s = predict(m, tokenizer, hold_part["query"].tolist(), hold_texts, 128, cfg.max_length, device, cfg.bf16)
         return float(np.mean([r["ndcg_full"] for r in per_query_results(hold_part.assign(score=s), "score")]))
 
-    history = fit(net, tokenizer, fit_part["query"].tolist(), fit_texts, fit_part["gain"].to_numpy(),
+    history = fit(net, tokenizer, fit_part["query"].tolist(), fit_texts, targets,
                   cfg, device, holdout_ndcg, log=lambda s: print(s, flush=True))
-    out_dir = MODELS / args.name
+    out_dir = MODELS / name
     model.save_pretrained(out_dir)
     tokenizer.save_pretrained(out_dir)
     (out_dir / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
@@ -251,11 +295,12 @@ def main() -> None:
     start = time.perf_counter()
     scores = predict(net, tokenizer, dev["query"].tolist(), product_texts(dev, products, ["title"]),
                      128, cfg.max_length, device, cfg.bf16)
-    config = {**asdict(cfg), "model": DEFAULT_MODEL, "fields": ["title"], "loss": "mse_gain",
+    config = {**asdict(cfg), "model": DEFAULT_MODEL, "fields": ["title"],
+              "loss": "mse_gain" if cfg.loss == "mse" else "ce_4class_expected_gain",
               "best_step": history["best_step"], "train_seconds": history["train_seconds"],
               "fit_pairs": len(fit_part), "dev_score_seconds": round(time.perf_counter() - start, 1)}
-    summary = save(args.name, "dev", per_query_results(dev.assign(score=scores), "score"), config)
-    print(f"{args.name}: dev nDCG full {summary['ndcg_full']:.4f}  nDCG@10 {summary['ndcg10']:.4f}  "
+    summary = save(name, "dev", per_query_results(dev.assign(score=scores), "score"), config)
+    print(f"{name}: dev nDCG full {summary['ndcg_full']:.4f}  nDCG@10 {summary['ndcg10']:.4f}  "
           f"best step {history['best_step']}  train {history['train_seconds']:.0f}s", flush=True)
 
 

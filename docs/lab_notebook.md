@@ -159,3 +159,28 @@ Conclusion: prediction partly wrong. Padding was the biggest waste (47%), but re
 `.to(device)`, transformers' `padding_mask.all()`). Each fix moved the wait to the next point; only
 removing all three let the CPU run ahead. Lesson: re-profile after every fix. The GPU is now the limit
 (91% busy). 12b uses this same loop, and its baseline is `minilm_ft_mse_fast`, so only the loss changes.
+
+## 2026-11-20 — Section 12b: 4-class cross-entropy + expected gain (vs 12a MSE)
+Prediction (written before coding and running): dev 0.850-0.858; difference vs `minilm_ft_mse_fast`
+(same fast loop) inside [-0.004, +0.004], probably with a CI that covers zero. Reason: MSE on gains
+1 / 0.1 / 0.01 / 0 treats S, C and I as almost the same target (0.1 vs 0), while CE learns all four
+classes, so it could rank S above C/I better. Risk: the 4-class head starts from random weights (the
+pretrained MS MARCO head has one output), and lr 7e-6 is small for a new head, so early hold-out nDCG
+may start lower than 12a.
+Change: only the loss and the head. Head: 4 outputs (E, S, C, I), new random weights. Loss: cross-entropy
+on the class. Score: expected gain P(E) + 0.1 P(S) + 0.01 P(C). Everything else as 12a fast run:
+lr 7e-6, 5,000 warmup steps, batch 32, 1 epoch, seed 42, title only, max_length 128, bf16.
+Result (dev, 2,001 queries): full nDCG 0.8478 (nDCG@10 0.7430). Train 322 s, best hold-out step 9,000.
+vs 12a fast (same loop, MSE): -0.0056 [-0.0094, -0.0018], MSE better (nDCG@10 -0.0083 [-0.0137, -0.0028]).
+vs 12a original: -0.0071 [-0.0110, -0.0033]. vs LambdaMART +0.0136 [+0.0083, +0.0188]. vs zero-shot
++0.0147 [+0.0104, +0.0190].
+Hold-out nDCG CE vs MSE: step 1,000 0.7268 vs 0.7975; 5,000 0.8260 vs 0.8524; 9,000 0.8449 vs 0.8568.
+CE was behind at every checkpoint, and the gap shrank from 0.071 to 0.012 but never closed.
+Conclusion: prediction wrong. Under Amazon's recipe (lr 7e-6, 5,000 warmup, 1 epoch), 4-class CE loses
+to MSE with a CI below zero. This is not a clean "MSE beats CE" result: CE also starts from a new random
+head, while MSE keeps the pretrained MS MARCO relevance head, and lr 7e-6 is small for a new head.
+The hold-out curve says the CE model was still catching up. Fair re-test (not run): give the new head a
+higher LR (for example 1e-3) or train longer, then compare again. Winner for section 13 for now: MSE.
+Code review (python-reviewer agent, Sonnet, then checked by hand): Prepared4DMask is only correct with
+sdpa attention (eager attention adds the mask, modeling_bert.py:128). Added a guard and a tiny-BERT test:
+wrapper logits = 2D-mask logits, padding ignored. 71 tests pass.
