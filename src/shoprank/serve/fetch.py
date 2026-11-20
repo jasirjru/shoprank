@@ -20,9 +20,9 @@ from pathlib import Path
 DEST = Path("data/processed/models/onnx/minilm_distil_w10_bullets")
 SOURCES = {
     "github": "https://github.com/jasirjru/shoprank/releases/download/v1.1/",
-    # pinned to the commit of the v1.0 upload, not the moving main branch
+    # pinned to the commit of the v1.1 upload, not the moving main branch
     "huggingface": "https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8/resolve/"
-                   "ab467f4119cfb6c6acaecc4fbdcf9a52dbacbcd6/",
+                   "756c9cfa2f5ff7c1d54ff6a58e79fd688d834119/",
 }
 # SHA-256 of the v1.1 files, also published as SHA256SUMS next to them (model files unchanged since v1.0; v1.1
 # adds spell_vocab.json). The checksum, not the URL, is the trust anchor: a changed file on either host is rejected.
