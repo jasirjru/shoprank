@@ -44,10 +44,13 @@ def info_nce(q: torch.Tensor, p: torch.Tensor, temperature: float,
 
     same_query[i, j] = True when rows i and j come from the same query. Then product j is ALSO a
     correct answer for query i, so it must not be punished as a negative ("false negative") -> masked.
+
+    p may have MORE rows than q (section 12c): rows len(q).. are extra negatives, e.g. the same query's
+    non-Exact products ("hard negatives"). They are never the correct answer, so their mask is False.
     """
     logits = q @ p.T / temperature
     if same_query is not None:
-        off_diagonal = ~torch.eye(len(q), dtype=torch.bool, device=q.device)
+        off_diagonal = ~torch.eye(len(q), len(p), dtype=torch.bool, device=q.device)
         logits = logits.masked_fill(same_query & off_diagonal, float("-inf"))
     log_probs = logits - torch.logsumexp(logits, dim=1, keepdim=True)  # log softmax, numerically safe
     return -log_probs.diagonal().mean()

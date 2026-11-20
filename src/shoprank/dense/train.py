@@ -4,6 +4,7 @@ Usage:
     uv run python -m shoprank.dense.train --name twotower_b256
     uv run python -m shoprank.dense.train --batch-size 32 --name twotower_b32
     uv run python -m shoprank.dense.train --overfit-one-batch       # sanity check: loss must go ~0
+    uv run python -m shoprank.dense.train --hard-negatives --name twotower_hn   # 12c
 """
 from __future__ import annotations
 
@@ -50,14 +51,44 @@ def load_positives() -> tuple[list[int], list[list[int]], list[list[int]]]:
     return qids, queries, products
 
 
+def load_hard_negatives() -> dict[int, list[list[int]]]:
+    """query_id -> token ids of that query's TRAIN non-Exact (S/C/I) products: section 12c hard negatives."""
+    rows = duckdb.sql(f"""
+        SELECT j.query_id, p.title, p.brand
+        FROM '{(PROCESSED / "judgments.parquet").as_posix()}' j
+        JOIN '{(PROCESSED / "products.parquet").as_posix()}' p USING (product_id)
+        WHERE j.small_version = 1 AND j.split = 'train' AND j.esci_label <> 'E'
+        ORDER BY j.query_id, j.product_id
+    """).fetchall()
+    out: dict[int, list[list[int]]] = {}
+    for qid, title, brand in rows:
+        out.setdefault(qid, []).append(text_ids(product_text({"title": title, "brand": brand})))
+    return out
+
+
+def sample_hard_negatives(batch_qids: list[int], hard_by_qid: dict[int, list[list[int]]],
+                          rng: random.Random) -> tuple[list[int], list[list[int]]]:
+    """One random non-Exact product of the same query per batch row. Rows whose query has none are
+    skipped. Returns (row positions that got one, their product token ids)."""
+    rows, ids = [], []
+    for row, qid in enumerate(batch_qids):
+        options = hard_by_qid.get(qid)
+        if options:
+            rows.append(row)
+            ids.append(rng.choice(options))
+    return rows, ids
+
+
 def train(args: argparse.Namespace, device: torch.device) -> TwoTower:
     torch.manual_seed(SEED)
     rng = random.Random(SEED)
     qids, queries, products = load_positives()
+    hard_by_qid = load_hard_negatives() if args.hard_negatives else {}
     order = list(range(len(qids)))
     if args.overfit_one_batch:
         order = order[: args.batch_size]
-    print(f"{len(order):,} positive pairs | batch {args.batch_size} | temperature {args.temperature}")
+    print(f"{len(order):,} positive pairs | batch {args.batch_size} | temperature {args.temperature} | "
+          f"hard negatives: {sum(map(len, hard_by_qid.values())):,} non-Exact products")
 
     model = TwoTower(args.dim).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr)
@@ -69,10 +100,15 @@ def train(args: argparse.Namespace, device: torch.device) -> TwoTower:
         total, steps = 0.0, 0
         for i in range(0, len(order) - args.batch_size + 1, args.batch_size):
             batch = order[i:i + args.batch_size]
+            batch_qids = [qids[j] for j in batch]
+            _, hard_ids = sample_hard_negatives(batch_qids, hard_by_qid, rng)
             q = model.query(*pack([queries[j] for j in batch], device))
-            p = model.product(*pack([products[j] for j in batch], device))
-            bq = torch.tensor([qids[j] for j in batch], device=device)
-            loss = info_nce(q, p, args.temperature, same_query=bq[:, None] == bq[None, :])
+            # Columns: the batch's Exact products, then one same-query hard negative per row (if any).
+            p = model.product(*pack([products[j] for j in batch] + hard_ids, device))
+            bq = torch.tensor(batch_qids, device=device)
+            same = bq[:, None] == bq[None, :]
+            same = torch.cat([same, same.new_zeros(len(batch), len(hard_ids))], dim=1)  # hard negs: never correct
+            loss = info_nce(q, p, args.temperature, same_query=same)
             opt.zero_grad()      # forget the previous step's gradients
             loss.backward()      # autograd: same idea as our scratch engine, on GPU tensors
             opt.step()           # AdamW update
@@ -111,6 +147,8 @@ def main() -> None:
     ap.add_argument("--dim", type=int, default=128)
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--overfit-one-batch", action="store_true")
+    ap.add_argument("--hard-negatives", action="store_true",
+                    help="add one same-query non-Exact product per positive as an extra negative (12c)")
     args = ap.parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

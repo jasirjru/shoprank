@@ -184,3 +184,25 @@ higher LR (for example 1e-3) or train longer, then compare again. Winner for sec
 Code review (python-reviewer agent, Sonnet, then checked by hand): Prepared4DMask is only correct with
 sdpa attention (eager attention adds the mask, modeling_bert.py:128). Added a guard and a tiny-BERT test:
 wrapper logits = 2D-mask logits, padding ignored. 71 tests pass.
+
+## 2026-11-20 — Section 12c: two-tower re-run on the new dev, then same-query hard negatives
+Prediction, re-run (written before running): same settings as Week 3 (batch 256, temp 0.05, 3 epochs, AdamW
+1e-3), now on the text split (154,614 train Exact pairs, was 163,125). Dev full nDCG 0.775-0.795, still
+below BM25 0.8163 with a CI below zero. The split fix removes leaked near-duplicate queries, so a small
+drop vs the old 0.7849 is possible.
+Result, re-run: 0.7865 (nDCG@10 0.6445), 56 s; vs BM25 -0.0298 [-0.0362, -0.0237]. Prediction right
+(old split 0.7849: the split fix barely changed it). Still well below BM25.
+Prediction, hard negatives (written before running): change only one thing, `--hard-negatives`: each
+positive also brings one random non-Exact (S/C/I) product of the SAME query as an extra negative column
+(never masked). Dev training now matches the test task (re-rank one query's candidates). Expect +0.015 to
++0.035 vs 0.7865 with a CI above zero, dev 0.800-0.820, probably still below BM25 0.8163 (no pretraining,
+no word order). Caveat: the shared RNG also changes the batch order, not only the negatives.
+Result, hard negatives: 0.7904 (nDCG@10 0.6494), 56 s, 203,145 non-Exact train products available.
+vs in-batch only (0.7865): +0.0039 [+0.0009, +0.0069], a small real gain (nDCG@10 +0.0049 [+0.0007, +0.0091]).
+vs BM25: -0.0259 [-0.0324, -0.0197], still clearly worse.
+Conclusion: prediction wrong (expected +0.015 to +0.035). Same-query hard negatives help, but explain only
+about 0.004 of the 0.030 gap to BM25 (~13%). Most of the gap comes from the model itself: no pretrained
+knowledge, a bag of character trigrams averaged into one vector (no word order), and a small MLP. Note each
+positive gets only 1 hard negative next to 255 easy in-batch columns, so the hard signal is diluted; more
+hard negatives per positive was not tested. Review hypothesis 1 ("easy negatives explain the loss"):
+partly true, not the main cause. Section 12 gate met: MSE beats CE (-0.0056 [-0.0094, -0.0018]).
