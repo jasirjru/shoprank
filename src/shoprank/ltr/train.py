@@ -55,9 +55,14 @@ def groups(df: pd.DataFrame) -> np.ndarray:
     return df.groupby("query_id", sort=False).size().to_numpy()
 
 
+def is_holdout(query_ids: pd.Series) -> pd.Series:
+    """True for the 1-in-10 TRAIN queries held out for early stopping / checkpoint choice."""
+    return pd.util.hash_pandas_object(query_ids, index=False) % VALID_BUCKETS == 0
+
+
 def train_lambdamart(train: pd.DataFrame, feats: list[str]) -> lgb.LGBMRanker:
     # Early stopping on held-out TRAIN queries, so dev stays a clean measurement.
-    is_valid = pd.util.hash_pandas_object(train["query_id"], index=False) % VALID_BUCKETS == 0
+    is_valid = is_holdout(train["query_id"])
     fit_part, valid_part = train[~is_valid], train[is_valid]
     model = lgb.LGBMRanker(
         objective="lambdarank", label_gain=ESCI_LABEL_GAIN, n_estimators=2000, learning_rate=0.05,

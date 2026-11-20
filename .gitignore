@@ -1,5 +1,4 @@
 
 # data is downloaded, never committed
-data/raw/
-data/processed/
+data/
 mlruns/

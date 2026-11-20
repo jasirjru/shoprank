@@ -101,3 +101,22 @@ tie 69; per-query nDCG correlation 0.734.
 Conclusion: prediction half wrong. With zero ESCI labels it TIES LambdaMART trained on 357,759 labelled
 pairs. Low per-query correlation = different mistakes, so a blend (Week 6) should help. Next: fine-tune on
 ESCI train (Week 5), target ~0.857 (Amazon's fine-tuned MiniLM, test set, not directly comparable).
+
+## 2026-11-20 — Section 12a: fine-tune MiniLM, Amazon's recipe (MSE on gain)
+Prediction (written before the run): dev full nDCG 0.845-0.855, above zero-shot 0.8332 and LambdaMART
+0.8342 with CIs above zero. Amazon's 0.857 is on the official test set, so not directly comparable.
+Change: cross-encoder/ms-marco-MiniLM-L-12-v2, one output, MSE on the gain (E 1, S 0.1, C 0.01, I 0),
+1 epoch, lr 7e-6, 5,000 warmup steps then linear decay, batch 32, AdamW wd 0.01, grad clip 1.0, seed 42,
+title only, max_length 128 (<0.01% of train pairs longer; p99 69 tokens), bf16 autocast. Fit on 16,091
+train queries / 323,302 pairs; checkpoint chosen every 1,000 steps on the 1,732-query train hold-out
+(same hash as LambdaMART), never on dev. Code: src/shoprank/cross/finetune.py.
+Measured speed (300-step smoke run): 14 s per 300 steps = ~690 pairs/s, so ~8 min per epoch.
+Start loss 38.9: zero-shot logits are on a ±10 scale, gains on 0-1, so MSE first has to shrink the scale.
+Result (full-list nDCG, dev 2,001 queries): 0.8549 (nDCG@10 0.7534). vs zero-shot +0.0218
+[+0.0176, +0.0260]; vs LambdaMART +0.0207 [+0.0154, +0.0260]; vs BM25 +0.0386 [+0.0331, +0.0443].
+Training: 444 s for 10,104 steps (measured, ~730 pairs/s). Hold-out nDCG: 0.8357 at step 300, dipped to
+0.7999 at step 1,000 (output scale shrinking, loss 18.3), 0.8501 at 5,000, best 0.8581 at step 10,000.
+Hold-out still rising slowly at the end, so 1 epoch may be under-trained (not tested).
+Conclusion: prediction right (inside 0.845-0.855, near the top). Fine-tuned MiniLM is the new best single
+model, clearly above LambdaMART. Model saved in data/processed/models/minilm_ft_mse/. Next: 12b, same
+setup with 4-class cross-entropy + expected gain.
