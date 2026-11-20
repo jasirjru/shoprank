@@ -120,3 +120,42 @@ Hold-out still rising slowly at the end, so 1 epoch may be under-trained (not te
 Conclusion: prediction right (inside 0.845-0.855, near the top). Fine-tuned MiniLM is the new best single
 model, clearly above LambdaMART. Model saved in data/processed/models/minilm_ft_mse/. Next: 12b, same
 setup with 4-class cross-entropy + expected gain.
+
+## 2026-11-20 — Section 12a speed-up: profile, pre-tokenise, length-bucketed batches
+Prediction (written before profiling): the main waste is padding. Random batches pad every pair to the
+longest pair in the batch, so about 40-50% of processed tokens are padding. Tokenising on the CPU inside
+the loop costs about 10-15% of each step (explains the 78-87% GPU busy). After pre-tokenising once and
+length-bucketed batches: epoch 444 s -> about 220-280 s. Dev nDCG within about ±0.003 of 0.8549 (batches
+differ, so the result cannot be bit-identical).
+Profile 1 (old loop; py-spy 40 s at 200 Hz on the training thread, nvidia-smi every 1 s): 46 ms/step.
+Of the loop: 51% `loss.item()` (CPU waiting for the GPU), 27% forward (Python launching kernels), 7%
+AdamW step, 6% tokenising, 4% grad clip. GPU 83% busy (76-90), 2.1 GB VRAM, 65 W. Padding measured on all
+323,302 fit pairs: random batches 47.1% padding tokens, length-bucketed (100-batch chunks) 1.7%: 1.86x
+fewer tokens. Tokenising everything once takes 7.8 s. (Tokenising guess 10-15% was too high: 6%.)
+Run 2 (pre-tokenise + length-bucketed + loss kept on GPU): train 396 s (was 444 s, only 1.12x).
+Dev 0.8535; vs old 12a -0.0014 [-0.0034, +0.0005], no clear difference. Dev scoring 12.9 s -> 7.0 s
+(1.84x, matches the token cut). GPU busy fell to 72% (55-83).
+Profile 2 (new loop, 30 s): `collate` 48% of the loop, and 98% of that is one line, `.to(device)`.
+A copy from pageable RAM waits for all queued GPU work, so it became the new wait point; after it the
+GPU queue is empty and the CPU launches small forward kernels one by one (GPU idles between them).
+Prediction for run 3 (pinned memory + non_blocking copies for inputs and labels): GPU busy above 90%,
+train 230-280 s, dev nDCG again within the noise of 0.8549.
+Run 3 (pinned + non_blocking only): train 404 s, dev 0.8530, GPU 69% busy. No gain: prediction wrong.
+Profile 3 (20 s): collate fell to 1%, but forward rose to 47.5%; the deepest frame is
+transformers 5.23 masking_utils.py:366 `padding_mask.all()` inside a Python `if` (decides whether the
+mask can be skipped). Reading that answer is a third wait point. Fix: `Prepared4DMask` passes a ready 4D
+boolean mask, which transformers uses as-is. Checked on 5,000 real dev pairs with the 12a model: max score
+difference 0.00e+00 (fp32 and bf16).
+Prediction for run 4 (all three fixes): GPU busy above 90%, train 230-280 s, dev within noise of 0.8549.
+Result run 4 (pre-tokenise + length-bucketed + loss on GPU + pinned copies + Prepared4DMask): train
+316 s per epoch (was 444 s: 1.41x faster). GPU 91% SM busy (nvitop), 68 C, 66 W, 2.2 GB VRAM. Training
+process ~5 GB RAM (pre-tokenised lists add ~0.8 GB). Dev 0.8534 (nDCG@10 0.7512); vs old 12a
+-0.0015 [-0.0035, +0.0003], no clear difference. Dev scoring 12.9 s -> 7.0 s.
+The three new-loop runs gave 0.8535 / 0.8530 / 0.8534 (same seed; GPU kernels are not bit-exact), all a
+little under 0.8549. A small real cost from length-bucketed batches cannot be ruled out (CI upper end
++0.0003); separating it from batch-order luck needs several seeds (not done).
+Conclusion: prediction partly wrong. Padding was the biggest waste (47%), but removing it alone gave only
+1.12x, because the loop was also waiting for the GPU at three hidden sync points (`loss.item()`, pageable
+`.to(device)`, transformers' `padding_mask.all()`). Each fix moved the wait to the next point; only
+removing all three let the CPU run ahead. Lesson: re-profile after every fix. The GPU is now the limit
+(91% busy). 12b uses this same loop, and its baseline is `minilm_ft_mse_fast`, so only the loss changes.

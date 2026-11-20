@@ -53,16 +53,70 @@ def warmup_linear(step: int, warmup: int, total: int) -> float:
     return max(0.0, (total - step) / max(1, total - warmup))
 
 
-def batch_indices(n: int, batch_size: int, seed: int) -> list[np.ndarray]:
-    """One shuffled pass over n rows, cut into batches (the last one may be short)."""
-    order = np.random.default_rng(seed).permutation(n)
-    return [order[i:i + batch_size] for i in range(0, n, batch_size)]
+def length_bucketed_batches(lengths: Sequence[int] | np.ndarray, batch_size: int, seed: int,
+                            chunk_batches: int = 100) -> list[np.ndarray]:
+    """One shuffled pass where each batch holds pairs of similar length, so little padding.
+
+    Shuffle all rows, cut them into chunks of `chunk_batches` batches, sort each chunk by length, cut it
+    into batches, then shuffle the batch order. Sorting only inside a chunk keeps batches random; the
+    final shuffle stops the model seeing short pairs first and long pairs last.
+    """
+    lens = np.asarray(lengths)
+    rng = np.random.default_rng(seed)
+    order = rng.permutation(len(lens))
+    chunk = batch_size * chunk_batches
+    batches = []
+    for start in range(0, len(order), chunk):
+        part = order[start:start + chunk]
+        part = part[np.argsort(lens[part], kind="stable")]
+        batches.extend(part[i:i + batch_size] for i in range(0, len(part), batch_size))
+    return [batches[i] for i in rng.permutation(len(batches))]
 
 
-def _encode(tokenizer, queries: Sequence[str], texts: Sequence[str], max_length: int, device: str) -> dict:
-    enc = tokenizer(list(queries), list(texts), padding=True, truncation=True,
-                    max_length=max_length, return_tensors="pt")
-    return {k: v.to(device) for k, v in enc.items()}
+def pretokenize(tokenizer, queries: Sequence[str], texts: Sequence[str], max_length: int) -> dict:
+    """Tokenise every (query, text) pair once, unpadded. Padding happens per batch in `collate`."""
+    enc = tokenizer(list(queries), list(texts), truncation=True, max_length=max_length)
+    return {k: list(v) for k, v in enc.items()}
+
+
+def collate(features: dict, idx: np.ndarray, pad_id: int, device: str) -> dict:
+    """Pad the rows in `idx` to the longest of them (not to max_length), as tensors on `device`."""
+    width = max(len(features["input_ids"][i]) for i in idx)
+    out = {}
+    for key, rows in features.items():
+        arr = np.full((len(idx), width), pad_id if key == "input_ids" else 0, dtype=np.int64)
+        for r, i in enumerate(idx):
+            arr[r, :len(rows[i])] = rows[i]
+        out[key] = to_device(torch.from_numpy(arr), device)
+    return out
+
+
+def to_device(t: torch.Tensor, device: str) -> torch.Tensor:
+    """Copy to the GPU without making the CPU wait. A copy from normal (pageable) RAM waits for all
+    queued GPU work to finish; a copy from pinned RAM with non_blocking=True is queued like a kernel."""
+    if not device.startswith("cuda"):
+        return t.to(device)
+    return t.pin_memory().to(device, non_blocking=True)
+
+
+class Prepared4DMask(torch.nn.Module):
+    """Gives a Hugging Face encoder a ready 4D boolean mask (batch, 1, 1, length), True = real token.
+
+    With a 2D mask, transformers 5.23 runs `padding_mask.all()` inside a Python `if` to decide whether it
+    can skip the mask (masking_utils.py:366). Reading that answer makes the CPU wait for the GPU every step.
+    A 4D mask is used as-is (masking_utils.py:833), so there is no check and no wait. Same attention maths.
+    """
+
+    def __init__(self, model: torch.nn.Module):
+        super().__init__()
+        self.model = model
+
+    def forward(self, attention_mask: torch.Tensor, **inputs):
+        return self.model(attention_mask=attention_mask[:, None, None, :].bool(), **inputs)
+
+
+def _pad_id(tokenizer) -> int:
+    return getattr(tokenizer, "pad_token_id", None) or 0
 
 
 def _autocast(device: str, bf16: bool):
@@ -73,16 +127,22 @@ def _autocast(device: str, bf16: bool):
 @torch.no_grad()
 def predict(model, tokenizer, queries: Sequence[str], texts: Sequence[str], batch_size: int,
             max_length: int, device: str, bf16: bool = False) -> np.ndarray:
-    """One relevance score per (query, text) pair, in input order."""
+    """One relevance score per (query, text) pair, in input order. Pairs are scored in length order
+    (less padding, same scores) and written back to their input positions."""
+    if len(texts) == 0:
+        return np.zeros(0)
     was_training = model.training
     model.eval()
-    out = []
-    for i in range(0, len(texts), batch_size):
-        enc = _encode(tokenizer, queries[i:i + batch_size], texts[i:i + batch_size], max_length, device)
+    feats = pretokenize(tokenizer, queries, texts, max_length)
+    order = np.argsort([len(x) for x in feats["input_ids"]], kind="stable")
+    scores = np.zeros(len(order), dtype=np.float32)
+    for i in range(0, len(order), batch_size):
+        idx = order[i:i + batch_size]
         with _autocast(device, bf16):
-            out.append(model(**enc).logits.float().reshape(-1).cpu())
+            logits = model(**collate(feats, idx, _pad_id(tokenizer), device)).logits
+        scores[idx] = logits.float().reshape(-1).cpu().numpy()
     model.train(was_training)
-    return torch.cat(out).numpy() if out else np.zeros(0)
+    return scores
 
 
 def _optimizer(model, cfg: FitConfig) -> torch.optim.AdamW:
@@ -100,7 +160,10 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
     """Train with MSE on the gain. Every `eval_every` steps, score the hold-out with `evaluate`
     (higher is better). At the end the model holds the best-scoring weights."""
     torch.manual_seed(cfg.seed)
-    epochs = [batch_indices(len(texts), cfg.batch_size, cfg.seed + e) for e in range(cfg.epochs)]
+    feats = pretokenize(tokenizer, queries, texts, cfg.max_length)
+    lengths = [len(x) for x in feats["input_ids"]]
+    pad_id = _pad_id(tokenizer)
+    epochs = [length_bucketed_batches(lengths, cfg.batch_size, cfg.seed + e) for e in range(cfg.epochs)]
     total = sum(len(b) for b in epochs)
     if cfg.limit_steps is not None:
         total = min(total, cfg.limit_steps)
@@ -110,31 +173,34 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
 
     history = {"evals": [], "losses": [], "best_step": 0, "train_seconds": 0.0}
     best_score, best_state = -float("inf"), None
-    step, run_loss, start = 0, 0.0, time.perf_counter()
+    # The running loss stays on the device: calling .item() every step would make the CPU wait for the
+    # GPU each step, so it could not prepare the next batch while the GPU works.
+    step, run_loss, start = 0, torch.zeros((), device=device), time.perf_counter()
     model.train()
     for batches in epochs:
         for idx in batches:
             if step >= total:
                 break
-            enc = _encode(tokenizer, [queries[i] for i in idx], [texts[i] for i in idx], cfg.max_length, device)
+            enc = collate(feats, idx, pad_id, device)
             with _autocast(device, cfg.bf16):
                 logits = model(**enc).logits
-            loss = torch.nn.functional.mse_loss(logits.float().reshape(-1), y_all[idx].to(device))
+            loss = torch.nn.functional.mse_loss(logits.float().reshape(-1), to_device(y_all[idx], device))
             opt.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.max_grad_norm)
             opt.step()
             sched.step()
             step += 1
-            run_loss += loss.item()
+            run_loss += loss.detach()
 
             if step % cfg.eval_every == 0 or step == total:
+                mean_loss = run_loss.item() / cfg.eval_every  # .item() waits for the GPU to finish
                 train_seconds = time.perf_counter() - start
                 score = evaluate(model)
-                history["evals"].append({"step": step, "score": score, "loss": run_loss / cfg.eval_every})
-                log(f"step {step}/{total}  loss {run_loss / cfg.eval_every:.4f}  holdout nDCG {score:.4f}  "
+                history["evals"].append({"step": step, "score": score, "loss": mean_loss})
+                log(f"step {step}/{total}  loss {mean_loss:.4f}  holdout nDCG {score:.4f}  "
                     f"lr {sched.get_last_lr()[0]:.2e}  {train_seconds:.0f}s")
-                run_loss = 0.0
+                run_loss.zero_()
                 if score > best_score:
                     best_score, history["best_step"] = score, step
                     best_state = copy.deepcopy({k: v.detach().cpu() for k, v in model.state_dict().items()})
@@ -168,12 +234,13 @@ def main() -> None:
 
     tokenizer = AutoTokenizer.from_pretrained(DEFAULT_MODEL)
     model = AutoModelForSequenceClassification.from_pretrained(DEFAULT_MODEL, num_labels=1).to(device)
+    net = Prepared4DMask(model)  # same weights as `model`; only the mask format changes
 
     def holdout_ndcg(m) -> float:
         s = predict(m, tokenizer, hold_part["query"].tolist(), hold_texts, 128, cfg.max_length, device, cfg.bf16)
         return float(np.mean([r["ndcg_full"] for r in per_query_results(hold_part.assign(score=s), "score")]))
 
-    history = fit(model, tokenizer, fit_part["query"].tolist(), fit_texts, fit_part["gain"].to_numpy(),
+    history = fit(net, tokenizer, fit_part["query"].tolist(), fit_texts, fit_part["gain"].to_numpy(),
                   cfg, device, holdout_ndcg, log=lambda s: print(s, flush=True))
     out_dir = MODELS / args.name
     model.save_pretrained(out_dir)
@@ -182,7 +249,7 @@ def main() -> None:
 
     dev = cached("dev")[cols]
     start = time.perf_counter()
-    scores = predict(model, tokenizer, dev["query"].tolist(), product_texts(dev, products, ["title"]),
+    scores = predict(net, tokenizer, dev["query"].tolist(), product_texts(dev, products, ["title"]),
                      128, cfg.max_length, device, cfg.bf16)
     config = {**asdict(cfg), "model": DEFAULT_MODEL, "fields": ["title"], "loss": "mse_gain",
               "best_step": history["best_step"], "train_seconds": history["train_seconds"],
