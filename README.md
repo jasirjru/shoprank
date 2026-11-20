@@ -103,6 +103,8 @@ first and the scoring time (about 10 ms for 4 products).
 | Typo queries: spell correction before ranking (v1.1) | +0.0252 [+0.0211, +0.0292], 89% of the typo loss; dev2 +0.0287 |
 | Clean queries: spell correction before ranking | +0.0003 [-0.0008, +0.0015] (no harm); dev2 +0.0020 |
 | Typo queries: train the ranker on misspelled queries instead | +0.0041 [+0.0019, +0.0062], 14% (rejected) |
+| Ready-made BGE-reranker-v2-m3 (568M, zero-shot) vs our served 33M MiniLM | -0.0081 [-0.0130, -0.0032] (0.8585 vs 0.8667) |
+| Ready-made Qwen3-Reranker-0.6B (596M, zero-shot) vs our served MiniLM | -0.0127 [-0.0178, -0.0076] (0.8540) |
 
 Seed noise (3 seeds): DeBERTa spread 0.0016, MiniLM 0.0003 (title only) and 0.0017 (distilled + bullets); no
 change smaller than that is claimed.

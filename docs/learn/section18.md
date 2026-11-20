@@ -253,3 +253,28 @@ changelog, and I recorded two incidents: a 10 GB memory blow-up I fixed by loadi
 4. **B.** Digits and symbols are never touched, and the 5x and 10x rules guard against false corrections; the lookup uses a deletion index.
 5. **A.** Fixing the input removes the cause; the 33M-parameter student cannot learn to undo a typo's sub-word split.
 6. **B.** A clean scanner proves the vulnerabilities are gone, not that the results are unchanged; the re-score proves that.
+
+---
+
+## Part 5 (added): Why train your own? Ready-made rerankers, measured
+
+**Picture:** a famous general doctor against a local specialist who has seen thousands of your exact cases.
+The general doctor knows more medicine; the specialist knows your problem.
+
+**Real numbers (dev, zero-shot, same product text, paired 95% CIs):**
+
+| Model | Size | dev nDCG | vs our served model | Speed |
+|---|---|---|---|---|
+| ours: distilled MiniLM | 33M | 0.8667 | | ~230 pairs/s on a laptop CPU |
+| BGE-reranker-v2-m3 | 568M | 0.8585 | -0.0081 [-0.0130, -0.0032] | 212 pairs/s on the GPU |
+| Qwen3-Reranker-0.6B | 596M | 0.8540 | -0.0127 [-0.0178, -0.0076] | 47 pairs/s on the GPU |
+
+The ready-made models are 17x bigger and never saw ESCI labels ("zero-shot"). Our small model learned from
+Amazon's labels and from the DeBERTa teacher, so it knows what "Exact" means for product search.
+
+**Honest limit:** if we fine-tuned BGE on ESCI, it would probably catch up or win, at 17x the serving cost.
+
+**Interview answer:** "I checked whether training my own was worth it. Two strong 2025-26 rerankers, about 600M
+parameters each, used zero-shot, scored 0.854-0.859 on dev, below my 33M distilled model at 0.867, with
+confidence intervals that exclude zero, and they need a GPU while mine runs on a CPU. In-domain data beat
+model size here."

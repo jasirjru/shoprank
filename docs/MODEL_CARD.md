@@ -21,6 +21,8 @@ scores each product's relevance so the list can be sorted best first. It re-rank
 | dev (2,001 held-out training queries), INT8 ONNX | nDCG, full list | 0.8654 (fp32 ONNX 0.8662) |
 Gains: Exact 1, Substitute 0.1, Complement 0.01, Irrelevant 0. 95% CIs: query bootstrap.
 For comparison on the same test: BM25 0.8202, Amazon's MiniLM recipe 0.8544, the DeBERTa teacher 0.8877.
+Ready-made rerankers, zero-shot on dev (same product text): BGE-reranker-v2-m3 (568M) 0.8585 and
+Qwen3-Reranker-0.6B (596M) 0.8540, both below this model's 0.8667 (paired CIs exclude 0), and both need a GPU.
 
 ## Speed (laptop CPU, 16 threads, one model call at a time)
 p50 69 ms, p95 232 ms for one request of ~16 candidates; ~230 pairs/s (~11 requests/s) per process.

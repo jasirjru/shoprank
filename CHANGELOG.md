@@ -20,6 +20,10 @@ Independent code review (separate reviewer agent) of v1.0..v1.1: no defect in th
 - Documented, not changed (the evaluated corrector stays exactly as measured): words with attached punctuation
   or digits are not corrected; the vocabulary uses all catalogue products' text, incl. products in test pairs.
 - Apache-2.0 LICENSE; package version 1.1.1; repo topics and Hugging Face link; lesson 18; stale v1.0 wording.
+- Serving-only install without torch (`scripts/serve_requirements.sh`, shared by Dockerfile and README), after
+  the WSL fresh-clone test showed the old README path pulled the full CUDA training stack.
+- `eval/baseline_rerankers.py`: zero-shot BGE-reranker-v2-m3 (dev 0.8585) and Qwen3-Reranker-0.6B (0.8540)
+  vs our served 33M MiniLM (0.8667): -0.0081 [-0.0130, -0.0032] and -0.0127 [-0.0178, -0.0076].
 
 ## v1.1 — 22 Nov 2026: query spell correction
 - `serve/spell.py`: catalogue vocabulary (titles, brands, colours of 1.2M US products, 184,594 words) and

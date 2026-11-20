@@ -809,3 +809,21 @@ evaluated, so the published 87-90% describes exactly what is served; the limit i
 One behaviour change with no effect on scores: `query_used` returns the input unchanged (spacing included) when
 no word was corrected; the tokenizer ignores spacing, so the model input is identical.
 Also: Apache-2.0 licence, package version 1.1.1, repo topics + Hugging Face link, lesson 18 written.
+
+## 2026-11-22 — Modern rerankers, zero-shot, on dev (does training our own pay off?)
+Prediction (written in the plan as the interview question, no numbers fixed beforehand; recorded as a gap):
+a strong 2025-26 general reranker should be close to, but below, an in-domain fine-tuned model.
+Setup: same product text as the served model (title, brand, colour, bullets), dev only (2,001 queries),
+models pinned by commit; paired bootstrap vs our per-query results. Script: `eval/baseline_rerankers.py`.
+| Model (zero-shot) | params | max len | dev nDCG | nDCG@10 | vs served MiniLM [95% CI] | vs DeBERTa teacher | GPU pairs/s |
+|---|---|---|---|---|---|---|---|
+| BAAI/bge-reranker-v2-m3 @953dc6f | 568M | 256 | 0.8585 | 0.7584 | -0.0081 [-0.0130, -0.0032] | -0.0293 [-0.0342, -0.0245] | 212 |
+| Qwen3-Reranker-0.6B (tomaarsen seq-cls) @6a5829f | 596M | 512 | 0.8540 | 0.7510 | -0.0127 [-0.0178, -0.0076] | -0.0339 [-0.0391, -0.0288] | 47 |
+| ours: served MiniLM (distilled) | 33M | 128 | 0.8667 | 0.7717 | | | (CPU INT8: ~230) |
+| ours: DeBERTa-v3-base x5 | 5 x 184M | 128 | 0.8879 | | | | |
+Qwen3 used the generic instruction from its model card ("Given a web search query, retrieve relevant passages
+that answer the query"); product text cut to 1,200 characters.
+Reading: both 17x-larger general rerankers lose to our 33M in-domain distilled model, and by ~0.03 to the
+in-domain teacher. In-domain fine-tuning on ESCI labels is worth more than model size here. Caveats: zero-shot
+only (fine-tuning them on ESCI would likely close or reverse the gap, at 17x the serving cost); dev only, the
+test set stays spent; the Qwen3 prompt was not tuned.

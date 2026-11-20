@@ -28,12 +28,13 @@ what would come next. Details: `README.md`, `docs/MODEL_CARD.md`, `docs/lab_note
 - Serving: p50 69 ms, p95 232 ms per request (~16 candidates), ~230 pairs/s per CPU process.
 - Typos: one typo costs the ranker ~0.028 (dev); spell correction wins back 87-90% (dev and dev2), no loss on
   clean queries.
-- Modern ready-made rerankers (zero-shot, dev): see the "Modern rerankers" entry in the lab notebook.
+- Ready-made rerankers, zero-shot on dev: BGE-reranker-v2-m3 (568M) 0.8585 and Qwen3-Reranker-0.6B (596M) 0.8540,
+  both below our served 33M model (0.8667; paired CIs exclude 0). In-domain distillation beats size here.
 
 ## How to run it (no GPU, no training)
 ```bash
 docker build -t shoprank . && docker run --rm -p 8000:8000 shoprank
-# or: uv sync --locked && uv run python -m shoprank.serve.fetch && uv run uvicorn shoprank.serve.app:app
+# or, without Docker and without torch: see README "Serving", Option 2 (scripts/serve_requirements.sh)
 ```
 
 ## Known limits (also in README and model card)
