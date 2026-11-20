@@ -14,7 +14,9 @@ from shoprank.cross.finetune import (
     compute_loss,
     fit,
     length_bucketed_batches,
+    model_tag,
     predict,
+    pretokenize,
     score_from_logits,
     warmup_linear,
 )
@@ -72,6 +74,17 @@ def test_length_bucketed_batches_cut_padding_but_keep_batch_order_random():
     assert padded_tokens(bucketed, lengths) < 0.7 * padded_tokens(random_batches, lengths)
     means = [lengths[b].mean() for b in bucketed]
     assert means != sorted(means)  # not short-first: the model still sees lengths in random order
+
+
+def test_pretokenize_stores_compact_int32_arrays_unpadded():
+    feats = pretokenize(FakeTokenizer(), ["q", "q"], ["ab", "abcd"], max_length=3)
+    assert [x.dtype for x in feats["input_ids"]] == [np.int32, np.int32]  # 4 bytes per id, not a Python int
+    assert [len(x) for x in feats["input_ids"]] == [2, 3]  # truncated to max_length, no padding
+
+
+def test_model_tag_keeps_minilm_names_and_shortens_others():
+    assert model_tag("cross-encoder/ms-marco-MiniLM-L-12-v2") == "minilm"
+    assert model_tag("microsoft/deberta-v3-base") == "deberta_v3_base"
 
 
 def test_collate_pads_to_the_longest_row_in_the_batch_not_to_max_length():
@@ -168,6 +181,13 @@ def test_fit_with_cross_entropy_learns_the_classes():
     fit(model, FakeTokenizer(), [""] * 40, texts, classes, cfg, "cpu", lambda m: 0.0)
     scores = predict(model, FakeTokenizer(), [""] * 40, texts, 8, 64, "cpu")
     assert scores[classes == 0].min() > scores[classes == 3].max()  # every Exact ranked above every Irrelevant
+
+
+def test_fit_refuses_half_precision_weights_because_adamw_would_produce_nan():
+    model = FakeModel().half()  # e.g. a checkpoint stored in fp16 and loaded as-is
+    cfg = FitConfig(batch_size=2, epochs=1, eval_every=10, max_length=8, bf16=False)
+    with pytest.raises(ValueError, match="float32"):
+        fit(model, FakeTokenizer(), ["q"] * 4, ["ab"] * 4, np.zeros(4), cfg, "cpu", lambda m: 0.0)
 
 
 def test_is_holdout_is_one_in_ten_queries_and_keeps_query_rows_together():

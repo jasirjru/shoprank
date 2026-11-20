@@ -90,3 +90,54 @@ Sizes are from the Hugging Face API, checked 17 Nov 2026. Training times are **e
 - Same-setup project: https://github.com/Anankin77/esci-search-reranking
 - arXiv search of 2024-2026 ESCI papers (export.arxiv.org API, 17 Nov 2026)
 - Model sizes: Hugging Face API (huggingface.co/api/models/...)
+
+## Primary-source digest, 20 Nov 2026 (research agent, every item read from the source)
+
+**ESCI paper** (https://arxiv.org/pdf/2206.06588):
+- Labels: >=3 annotators, majority vote.
+- Agreement: author audit of 100 pairs per language gave 91%. 50% of disagreements are I judged as S; 15% are extreme (E vs I). Binary E vs not-E agreement is >96%.
+- Baselines (public test): fine-tuned MS MARCO cross-encoder 0.857 (US) / 0.852 (all); BM25 (Terrier, all locales) 0.675 (US).
+
+**Official scoring** (https://github.com/amazon-science/esci-data/blob/main/ranking/launch-predictions-task1.sh):
+- `trec_eval -c -J -m 'ndcg.1=0,2=0.01,3=0.1,4=1'`: full-list nDCG, no cutoff.
+- qrels come from `small_version==1 & split==test` (prepare_trec_eval_files.py).
+
+**Amazon baseline** (ranking/train.py): MiniLM-L12 MS MARCO, title only, max_length 512, 1 epoch, lr 7e-6, 5,000 warmup steps, MSE on gain, batch 32.
+
+**KDD Cup 2022 Task 1** (multi-locale; none of the papers report a US-only score):
+
+1st, www (https://arxiv.org/pdf/2208.02958):
+- Models: mDeBERTa, DeBERTa-v3-large (EN), InfoXLM, XLM-R, RemBERT.
+- Input: `query [SEP] color: brand: description: <title+bullets+desc>`, max_len 128, lr 3e-5.
+- Loss: 4-class CE with label smoothing, ranked by expected gain.
+- Tricks: self-distillation (3-fold OOF soft labels, 0.7 hard / 0.3 soft), pseudo-labels, AWP.
+- Ensemble: weighted average.
+- Ablation (public test): base 0.8930 -> clean+tune 0.8960 -> +self-distil/pseudo 0.8982 -> +label smoothing 0.8990 -> +DeBERTa-large+AWP 0.9022 -> ensemble 0.9057.
+
+2nd, qinpersevere (https://amazonkddcup.github.io/papers/8408.pdf):
+- Models: DeBERTa-v3-large and RoBERTa-large (US).
+- Input: title + brand + colour, max_len 400.
+- Loss: MSE on gain (beat pairwise, converged faster).
+- Training: lr 7e-6 (large), 5-fold CV, extra Task 2/3 data, domain-adaptive pretraining.
+- Ablation: 1 fold 0.8946 -> 5 folds 0.9003 -> ensemble 0.9047.
+
+3rd, day-day-up (https://amazonkddcup.github.io/papers/3782.pdf):
+- Model: InfoXLM-large trained on Task 1+2+3 data; score is expected gain.
+- Gains: query-level keyword context (>0.01 on Task 2, smaller on Task 1); 10-fold self-distillation (+0.003, Task 2).
+- Ensemble: 8 models. Notes a fixed leak of Task 2/3 test samples into Task 1 train.
+
+6th, ETS-Lab (https://amazonkddcup.github.io/papers/8572.pdf):
+- Pipeline: cross-encoder class probabilities -> LightGBM.
+- Gains (Task 2 only): per-query min/median/max of probabilities +0.008; other query/brand features +0.001 to +0.005.
+
+Public US project, Anankin77 (https://github.com/Anankin77/esci-search-reranking):
+- Method: LightGBM on BM25, attribute, numeric, negation features and MiniLM-L6 cosine.
+- Result: 0.854 [0.851, 0.857] on US small test (8,956 queries).
+
+**Consequences for ShopRank (single 8 GB GPU, US only):**
+1. Keep MSE.
+2. Bullets ablation at max_len 128 (1st place's format).
+3. Section 14 stacking adds per-query score statistics.
+4. OOF folds can double as self-distillation targets.
+5. Extra large_version data only after a query-overlap check.
+6. DeBERTa-large is the costliest item; decide after the seed spread is known.

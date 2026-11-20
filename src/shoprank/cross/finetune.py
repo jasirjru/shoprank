@@ -1,8 +1,10 @@
-"""Section 12a: fine-tune the MiniLM cross-encoder on ESCI train (Amazon's baseline recipe).
+"""Sections 12-13: fine-tune a cross-encoder (MiniLM, DeBERTa) on ESCI train.
 
 Usage:
     uv run python -m shoprank.cross.finetune                          # 12a: MSE on gain, then scores dev
     uv run python -m shoprank.cross.finetune --loss ce                # 12b: 4-class CE + expected gain
+    uv run python -m shoprank.cross.finetune --model microsoft/deberta-v3-base \
+        --fields title,brand,color --lr 2e-5 --warmup-steps 1000 --eval-every 2500   # 13: DeBERTa
     uv run python -m shoprank.cross.finetune --limit-steps 200 --name minilm_ft_smoke   # timing check
 
 Recipe (amazon-science/esci-data ranking/train.py): ms-marco-MiniLM-L-12-v2, one output, no activation,
@@ -106,9 +108,18 @@ def length_bucketed_batches(lengths: Sequence[int] | np.ndarray, batch_size: int
 
 
 def pretokenize(tokenizer, queries: Sequence[str], texts: Sequence[str], max_length: int) -> dict:
-    """Tokenise every (query, text) pair once, unpadded. Padding happens per batch in `collate`."""
+    """Tokenise every (query, text) pair once, unpadded. Padding happens per batch in `collate`.
+    Rows are stored as small int32 numpy arrays: 4 bytes per id instead of a Python int object + list
+    pointer (about 36 bytes), which matters with 323k pairs on a 16 GB machine."""
     enc = tokenizer(list(queries), list(texts), truncation=True, max_length=max_length)
-    return {k: list(v) for k, v in enc.items()}
+    return {k: [np.asarray(row, dtype=np.int32) for row in v] for k, v in enc.items()}
+
+
+def model_tag(model_name: str) -> str:
+    """Short run-name prefix: 'minilm' for the default model (keeps old run names), else the repo name."""
+    if model_name == DEFAULT_MODEL:
+        return "minilm"
+    return model_name.split("/")[-1].lower().replace("-", "_")
 
 
 def collate(features: dict, idx: np.ndarray, pad_id: int, device: str) -> dict:
@@ -197,6 +208,13 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
     """Train with `cfg.loss` (targets: gains for "mse", class indices for "ce"). Every `eval_every`
     steps, score the hold-out with `evaluate` (higher is better). At the end the model holds the
     best-scoring weights."""
+    half = sorted({str(p.dtype) for p in model.parameters() if p.requires_grad and p.dtype != torch.float32})
+    if half:
+        # AdamW's eps (1e-8) rounds to 0 in fp16 and tiny squared gradients underflow, so the update is
+        # 0/0 = NaN even at lr 0 (found with DeBERTa-v3, whose checkpoint is stored in fp16). Keep fp32
+        # weights and let bf16 autocast speed up the maths.
+        raise ValueError(f"trainable weights must be float32 for AdamW, found {half}; "
+                         "load with from_pretrained(..., dtype=torch.float32)")
     torch.manual_seed(cfg.seed)
     feats = pretokenize(tokenizer, queries, texts, cfg.max_length)
     lengths = [len(x) for x in feats["input_ids"]]
@@ -207,7 +225,7 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
         total = min(total, cfg.limit_steps)
     opt = _optimizer(model, cfg)
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: warmup_linear(s, cfg.warmup_steps, total))
-    y_all = torch.as_tensor(np.asarray(targets))
+    y_all = torch.tensor(np.asarray(targets))  # a copy: pandas may hand over a read-only array
 
     history = {"evals": [], "losses": [], "best_step": 0, "train_seconds": 0.0}
     best_score, best_state = -float("inf"), None
@@ -250,35 +268,48 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Fine-tune MiniLM cross-encoder on ESCI train")
+    p = argparse.ArgumentParser(description="Fine-tune a cross-encoder on ESCI train")
+    p.add_argument("--model", default=DEFAULT_MODEL, help="Hugging Face model id")
+    p.add_argument("--fields", default="title", help="product fields joined by commas, e.g. title,brand,color")
     p.add_argument("--loss", choices=LOSSES, default="mse")
-    p.add_argument("--name", default=None, help="default: minilm_ft_<loss>")
+    p.add_argument("--lr", type=float, default=FitConfig.lr)
+    p.add_argument("--warmup-steps", type=int, default=FitConfig.warmup_steps)
+    p.add_argument("--name", default=None, help="default: <model tag>_ft_<loss>")
     p.add_argument("--limit-steps", type=int, default=None)
     p.add_argument("--eval-every", type=int, default=1000)
     args = p.parse_args()
-    name = args.name or f"minilm_ft_{args.loss}"
+    fields = args.fields.split(",")
+    name = args.name or f"{model_tag(args.model)}_ft_{args.loss}"
 
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-    cfg = FitConfig(eval_every=args.eval_every, limit_steps=args.limit_steps, loss=args.loss)
+    cfg = FitConfig(lr=args.lr, warmup_steps=args.warmup_steps, eval_every=args.eval_every,
+                    limit_steps=args.limit_steps, loss=args.loss)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    products = pd.read_parquet(PROCESSED / "products.parquet")
+    # Only the needed columns: descriptions and bullets are large and unused (saves RAM).
+    products = pd.read_parquet(PROCESSED / "products.parquet", columns=["product_id", *fields])
     cols = ["query_id", "query", "product_id", "esci_label", "gain"]
     train = cached("train")[cols]
     hold = is_holdout(train["query_id"])
     fit_part, hold_part = train[~hold].reset_index(drop=True), train[hold].reset_index(drop=True)
-    fit_texts = product_texts(fit_part, products, ["title"])
-    hold_texts = product_texts(hold_part, products, ["title"])
-    print(f"fit {fit_part['query_id'].nunique():,} q / {len(fit_part):,} pairs; "
+    fit_texts = product_texts(fit_part, products, fields)
+    hold_texts = product_texts(hold_part, products, fields)
+    print(f"{args.model} | fields {fields} | fit {fit_part['query_id'].nunique():,} q / {len(fit_part):,} pairs; "
           f"hold-out {hold_part['query_id'].nunique():,} q / {len(hold_part):,} pairs; device {device}", flush=True)
 
-    tokenizer = AutoTokenizer.from_pretrained(DEFAULT_MODEL)
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
     # "ce" needs 4 outputs; the MS MARCO head has 1, so it is replaced by a new, randomly initialised head.
+    # A model without a ranking head (DeBERTa) always gets a new random head.
     num_labels = 1 if cfg.loss == "mse" else len(CLASSES)
     model = AutoModelForSequenceClassification.from_pretrained(
-        DEFAULT_MODEL, num_labels=num_labels, ignore_mismatched_sizes=num_labels != 1).to(device)
+        args.model, num_labels=num_labels, ignore_mismatched_sizes=num_labels != 1,
+        dtype=torch.float32).to(device)  # fp32 master weights; DeBERTa-v3 is stored in fp16
     targets = fit_part["gain"].to_numpy() if cfg.loss == "mse" else class_ids(fit_part["esci_label"])
-    net = Prepared4DMask(model)  # same weights as `model`; only the mask format changes
+    # The 4D-mask trick only applies to sdpa attention (BERT/MiniLM). DeBERTa has its own attention code,
+    # which has no hidden GPU wait, so it runs unwrapped.
+    sdpa = getattr(model.config, "_attn_implementation", None) == "sdpa"
+    net = Prepared4DMask(model) if sdpa else model
+    print(f"attention: {model.config._attn_implementation} | 4D-mask wrapper: {sdpa}", flush=True)
 
     def holdout_ndcg(m) -> float:
         s = predict(m, tokenizer, hold_part["query"].tolist(), hold_texts, 128, cfg.max_length, device, cfg.bf16)
@@ -293,15 +324,17 @@ def main() -> None:
 
     dev = cached("dev")[cols]
     start = time.perf_counter()
-    scores = predict(net, tokenizer, dev["query"].tolist(), product_texts(dev, products, ["title"]),
+    scores = predict(net, tokenizer, dev["query"].tolist(), product_texts(dev, products, fields),
                      128, cfg.max_length, device, cfg.bf16)
-    config = {**asdict(cfg), "model": DEFAULT_MODEL, "fields": ["title"],
+    config = {**asdict(cfg), "model": args.model, "fields": fields,
               "loss": "mse_gain" if cfg.loss == "mse" else "ce_4class_expected_gain",
               "best_step": history["best_step"], "train_seconds": history["train_seconds"],
-              "fit_pairs": len(fit_part), "dev_score_seconds": round(time.perf_counter() - start, 1)}
+              "fit_pairs": len(fit_part), "dev_score_seconds": round(time.perf_counter() - start, 1),
+              "peak_vram_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0}
     summary = save(name, "dev", per_query_results(dev.assign(score=scores), "score"), config)
     print(f"{name}: dev nDCG full {summary['ndcg_full']:.4f}  nDCG@10 {summary['ndcg10']:.4f}  "
-          f"best step {history['best_step']}  train {history['train_seconds']:.0f}s", flush=True)
+          f"best step {history['best_step']}  train {history['train_seconds']:.0f}s  "
+          f"peak VRAM {config['peak_vram_gb']} GB", flush=True)
 
 
 if __name__ == "__main__":

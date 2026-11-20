@@ -206,3 +206,27 @@ knowledge, a bag of character trigrams averaged into one vector (no word order),
 positive gets only 1 hard negative next to 255 easy in-batch columns, so the hard signal is diluted; more
 hard negatives per positive was not tested. Review hypothesis 1 ("easy negatives explain the loss"):
 partly true, not the main cause. Section 12 gate met: MSE beats CE (-0.0056 [-0.0094, -0.0018]).
+
+## 2026-11-20 — Section 13: DeBERTa-v3-base cross-encoder (MSE on gain)
+Setup bug found first (smoke run): loss NaN from step 2, even at lr ~0, also in fp32 autocast. Probes: grads
+finite, weights finite, but after ONE AdamW step at lr 0, 201 of 202 weights were NaN. Root cause: the
+DeBERTa-v3 checkpoint is stored in fp16 and transformers 5 loads it as fp16; in fp16 AdamW's eps (1e-8)
+rounds to 0 and 99.7% of word-embedding grads are 0, so the update is 0/0 = NaN. Fused AdamW and SGD
+were fine (fp32 inside). Fix: load with dtype=float32 (fp32 master weights, bf16 autocast for the maths)
+plus a guard in fit() that refuses non-fp32 trainable weights (test added). MiniLM's checkpoint is fp32.
+Smoke run after the fix (500 steps, measurement only): hold-out 0.8652, 75 s per 500 steps, peak VRAM
+6.95 GB of 8. Also: tokens stored as int32 arrays and only needed product columns read; training process
+3.7 GB RAM (MiniLM 12a used ~5 GB).
+Prediction (written before the full run): dev full nDCG 0.865-0.880, above fine-tuned MiniLM 0.8534
+(same loop) with a CI above zero. Epoch ~25 min train time.
+Change: microsoft/deberta-v3-base, new 1-output head, MSE on gain (12a/12b winner), query + title + brand
++ color, max_length 128, batch 32, bf16 autocast, lr 2e-5, 1,000 warmup steps then linear decay, 1 epoch,
+seed 42, checkpoint on the train hold-out every 2,500 steps.
+Result (dev, 2,001 queries): full nDCG 0.8778 (nDCG@10 0.7952). Train 1,461 s (24 min), peak VRAM 6.95 GB
+(nvidia-smi showed 7.9 GB reserved, no slowdown: ~145 s per 1,000 steps throughout). Hold-out: 0.8772 at
+step 2,500, 0.8791 at 5,000, 0.8796 at 7,500, 0.8804 at 10,104 (best = last; rising slowly, no overfit).
+vs MiniLM fine-tuned (fast loop) +0.0244 [+0.0197, +0.0292]; vs LambdaMART +0.0436 [+0.0377, +0.0495];
+vs BM25 +0.0616 [+0.0554, +0.0678].
+Conclusion: prediction right (0.865-0.880, near the top). New best single model. Not yet attributed: this
+run changes model, fields (+brand+colour) and LR (2e-5, 1,000 warmup) together; the section 13 ablations
+separate them. Seed spread still unknown (next step), so no claim below that spread.
