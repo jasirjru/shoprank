@@ -6,6 +6,8 @@ Usage:
 Models:
     logreg_scratch   our NumPy logistic regression, pointwise: "is this product Exact?"
     logreg_sklearn   scikit-learn's version, as a check on ours
+    logreg_graded    multinomial LR on all 4 labels, ranked by expected gain sum_k p(k) * gain(k):
+                     same label information as LambdaMART, so the LR-vs-LambdaMART gap is about model type
     lambdamart       LightGBM LambdaMART, listwise: optimizes nDCG of each query's list directly
     lambdamart_no_bm25 / lambdamart_bm25_only   ablations: which features carry the signal?
 
@@ -61,18 +63,20 @@ def train_lambdamart(train: pd.DataFrame, feats: list[str]) -> lgb.LGBMRanker:
         objective="lambdarank", label_gain=ESCI_LABEL_GAIN, n_estimators=2000, learning_rate=0.05,
         num_leaves=31, min_child_samples=50, random_state=SEED, verbose=-1,
     )
+    # Stop on FULL-list nDCG (the headline metric): eval_at = longest list, so no list is cut at K.
+    valid_groups = groups(valid_part)
     model.fit(
         fit_part[feats], fit_part["label"], group=groups(fit_part),
-        eval_X=(valid_part[feats],), eval_y=(valid_part["label"],), eval_group=[groups(valid_part)],
-        eval_at=[K], callbacks=[lgb.early_stopping(100, verbose=False)],
+        eval_X=(valid_part[feats],), eval_y=(valid_part["label"],), eval_group=[valid_groups],
+        eval_at=[int(valid_groups.max())], callbacks=[lgb.early_stopping(100, verbose=False)],
     )
     return model
 
 
-def report(name: str, dev: pd.DataFrame, scores: np.ndarray, config: dict) -> dict:
-    scored = dev.assign(score=scores)
-    summary = save(name, "dev", per_query_results(scored, "score"), config)
-    print(f"{name:<22} nDCG full {summary['ndcg_full']:.4f}   nDCG@10 {summary['ndcg10']:.4f}")
+def report(name: str, df: pd.DataFrame, scores: np.ndarray, config: dict, split: str = "dev") -> dict:
+    scored = df.assign(score=scores)
+    summary = save(name, split, per_query_results(scored, "score"), config)
+    print(f"{name:<22} [{split}] nDCG full {summary['ndcg_full']:.4f}   nDCG@10 {summary['ndcg10']:.4f}")
     return summary
 
 
@@ -90,6 +94,11 @@ def main() -> None:
     sk = SkLogReg(C=1 / (1e-4 * len(y_train)), max_iter=2000).fit(X_train, y_train)
     report("logreg_sklearn", dev, sk.predict_proba(X_dev)[:, 1], {"model": "logreg_sklearn"})
 
+    # Graded LR: all 4 labels, ranked by expected gain.
+    graded = SkLogReg(C=1 / (1e-4 * len(y_train)), max_iter=2000).fit(X_train, train["label"].to_numpy())
+    label_gain = np.array([ESCI_LABEL_GAIN[c] for c in graded.classes_])
+    report("logreg_graded", dev, graded.predict_proba(X_dev) @ label_gain, {"model": "logreg_graded"})
+
     # Listwise LambdaMART + two ablations.
     bm25_feats = [f for f in FEATURES if f.startswith("bm25_")]
     variants = {
@@ -97,9 +106,9 @@ def main() -> None:
         "lambdamart_no_bm25": [f for f in FEATURES if f not in bm25_feats],
         "lambdamart_bm25_only": bm25_feats,
     }
-    importances = {}
+    importances, models = {}, {}
     for name, feats in variants.items():
-        model = train_lambdamart(train, feats)
+        model = models[name] = train_lambdamart(train, feats)
         report(name, dev, model.predict(dev[feats]),
                {"model": "lambdamart", "features": feats, "trees": model.best_iteration_})
         importances[name] = dict(sorted(
@@ -107,6 +116,13 @@ def main() -> None:
             key=lambda kv: -kv[1]))
     (RUNS / "week2_feature_importance.json").write_text(json.dumps(importances, indent=2), encoding="utf-8")
     print("feature importance (gain), full model:", importances["lambdamart"])
+
+    # dev2: a second held-out bucket, scored ONCE to confirm the choice made on dev (selection bias check).
+    dev2 = cached("dev2")
+    report("logreg_graded_dev2", dev2, graded.predict_proba(scaler.transform(dev2[FEATURES].to_numpy())) @ label_gain,
+           {"model": "logreg_graded"}, split="dev2")
+    report("lambdamart_dev2", dev2, models["lambdamart"].predict(dev2[FEATURES]),
+           {"model": "lambdamart", "trees": models["lambdamart"].best_iteration_}, split="dev2")
 
 
 if __name__ == "__main__":

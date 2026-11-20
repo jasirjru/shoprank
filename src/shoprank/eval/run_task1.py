@@ -131,7 +131,7 @@ def main() -> None:
     p.add_argument("--fields", default="title", help="comma list from: title,brand,bullets,color")
     p.add_argument("--k1", type=float, default=1.5)
     p.add_argument("--b", type=float, default=0.75)
-    p.add_argument("--split", default="dev", choices=["train", "dev", "test"])
+    p.add_argument("--split", default="dev", choices=["train", "dev", "dev2", "test"])
     p.add_argument("--allow-test", action="store_true")
     p.add_argument("--name")
     p.add_argument("--compare", nargs=2, metavar=("A", "B"))

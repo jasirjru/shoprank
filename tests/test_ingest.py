@@ -19,6 +19,9 @@ def built(tmp_path):
                CASE WHEN q >= 40 THEN 'test' ELSE 'train' END AS split
         FROM (SELECT i, i // 2 AS q FROM range(90) t(i))
         UNION ALL SELECT 999, 'zapato', 999, 'PES', 'es', 'E', 1, 1, 'train'
+        -- near-duplicate of 'query 1' under a different id, and a train copy of test query 'query 41'
+        UNION ALL SELECT 500, 'QUERY 1 !', 500, 'P1', 'us', 'E', 1, 1, 'train'
+        UNION ALL SELECT 501, 'Query  41', 501, 'P2', 'us', 'E', 1, 1, 'train'
     """)
     con.execute("""
         CREATE TABLE pr AS
@@ -44,9 +47,12 @@ def test_no_query_in_two_splits(built):
 
 def test_official_test_split_is_preserved_and_dev_comes_from_train(built):
     _, stats = built
-    assert stats["queries_by_split"]["test"] == 5
-    assert stats["queries_by_split"]["train"] + stats["queries_by_split"].get("dev", 0) == 40
-    assert stats["queries_by_split"].get("dev", 0) > 0
+    q = stats["queries_by_split"]
+    assert q["test"] == 5
+    # 40 original train queries + the 'QUERY 1 !' near-duplicate; the copy of a test query is dropped.
+    assert q["train"] + q.get("dev", 0) + q.get("dev2", 0) == 41
+    assert q.get("dev", 0) > 0 and q.get("dev2", 0) > 0
+    assert q.get("dropped", 0) == 1
 
 
 def test_split_is_deterministic(built, tmp_path):
@@ -74,3 +80,20 @@ def test_every_judged_product_has_catalog_entry(built):
         ANTI JOIN '{(out / 'products.parquet').as_posix()}' p USING (product_id)
     """).fetchall()[0][0]
     assert missing == 0
+
+
+def test_near_duplicate_texts_share_one_split(built):
+    out, _ = built
+    n = duckdb.sql(f"""
+        SELECT count(*) FROM (
+            SELECT trim(regexp_replace(lower(query), '[^a-z0-9]+', ' ', 'g')) AS t
+            FROM '{(out / 'judgments.parquet').as_posix()}' WHERE split <> 'dropped'
+            GROUP BY t HAVING count(DISTINCT split) > 1)
+    """).fetchall()[0][0]
+    assert n == 0
+
+
+def test_train_copies_of_test_queries_are_dropped(built):
+    out, _ = built
+    rows = duckdb.sql(f"SELECT DISTINCT split FROM '{(out / 'judgments.parquet').as_posix()}' WHERE query_id = 501").fetchall()
+    assert rows == [("dropped",)]

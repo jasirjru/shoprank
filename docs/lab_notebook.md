@@ -57,3 +57,24 @@ Peak GPU 1.3 GB. Overfit-one-batch plateau 0.37 explained by 41/256 duplicate pr
 Conclusion: prediction right. Causes: no pretrained knowledge, easy in-batch vs hard Task-1 negatives,
 no word order. Next: pretrained transformer (Week 4), hard negatives (Week 5).
 Note: temp 1.0 run took 5,554 s because a game shared the GPU (55 s normally).
+
+## 2026-11-20 — Rigour fixes (split by query text, graded LR, full-list early stopping, dev-2)
+Prediction: numbers move only slightly; graded LR narrows the LR-vs-LambdaMART gap (it now sees S/C labels).
+Change:
+- Split by normalised query text (lowercase, non-[a-z0-9] runs to one space, trim), MD5 into 20 buckets:
+  0-1 dev (~10%), 2 dev2 (~5%), rest train. Official-train rows whose text also occurs in test: dropped.
+- Recount (Task 1, lowercase BEFORE the regex): 6 texts spanned two splits; 12 texts had >1 query_id
+  (the earlier "103" was a counting bug). 15 Task-1 queries (367 rows) dropped. Cross-split texts now 0 (test added).
+- logreg_graded: multinomial LR on 4 labels, ranked by expected gain sum_k p(k) * gain(k).
+- LambdaMART early stopping on full-list nDCG (eval_at = longest list), not nDCG@10.
+- Sizes (Task 1): train 17,819 q / 357,702 pairs; dev 2,000 / 40,294; dev2 1,054 / 21,290; test 8,956 unchanged.
+Result (full-list nDCG, NEW dev, 2,000 queries; only 178 overlap the old dev, so not paired with old runs):
+random 0.7479; BM25 0.8165; logreg 0.8258 (+0.0093 [+0.0053, +0.0133] vs BM25); logreg_graded 0.8258
+(+0.0000 [−0.0011, +0.0011] vs logreg); LambdaMART 0.8342 (+0.0177 [+0.0137, +0.0216] vs BM25;
++0.0084 [+0.0052, +0.0117] vs graded LR), 231 trees. Ablations: no BM25 0.8268, BM25 only 0.8216.
+dev2 (1,054 queries, scored once): BM25 0.8190; graded LR 0.8258; LambdaMART 0.8355
+(+0.0165 [+0.0104, +0.0226] vs BM25; +0.0097 [+0.0050, +0.0146] vs graded LR).
+Conclusion: graded-LR prediction WRONG: S/C labels add nothing to a linear model, so the gap to LambdaMART
+is model type (non-linear feature interactions + listwise loss), not label information. Ranking of models
+holds on dev2, so dev selection bias did not change the decision. Old runs: data/archive_pre_textsplit/.
+Two-tower runs not re-run yet (old dev); re-run in the transformer section.

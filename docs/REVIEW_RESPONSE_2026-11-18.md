@@ -28,6 +28,9 @@ Each item was checked against the code and the processed data on 18 Nov 2026. **
 5. **Selection on dev.** About 15 configurations were compared on the same 2,099 dev queries, so the "best" dev number carries mild selection bias. Mitigation: freeze the final model choice on a second held-out bucket (dev-2) and run the test set once.
 6. **Spanish queries inside the US set** (found in week-1 error analysis). Their effect on scores has not been measured.
 
+## Status, 20 Nov 2026
+Issues 1, 2, 3 and 5 fixed; see `lab_notebook.md` (2026-11-20). Correction to issue 1: Task 1 had 12 (not 103) multi-id texts; the 6 cross-split texts were right. New dev: LambdaMART 0.8342, dev2 0.8355. Graded LR = binary LR (0.8258), so the gap is model type, not labels.
+
 ## Is 0.836 trustworthy?
 
 Yes, **as a dev-set number**:

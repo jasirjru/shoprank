@@ -108,7 +108,7 @@ def cached(split: str, processed: Path = PROCESSED) -> pd.DataFrame:
 
 
 def main() -> None:
-    for split in ("train", "dev"):
+    for split in ("train", "dev", "dev2"):
         df = cached(split)
         print(f"{split}: {len(df):,} pairs, {df['query_id'].nunique():,} queries, {len(FEATURES)} features")
 
