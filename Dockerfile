@@ -8,12 +8,10 @@ COPY --from=ghcr.io/astral-sh/uv:0.12.17@sha256:10787c682e4184e4f290de1171fd4703
 
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
-# Serving subset of the lock: drop the training stack (torch, LightGBM, pandas, ...) and its dependencies.
-RUN uv export --frozen --no-dev --no-emit-project \
-        --prune torch --prune sentence-transformers --prune accelerate --prune lightgbm --prune datasets \
-        --prune scikit-learn --prune pytrec-eval-terrier --prune duckdb --prune pandas --prune pyarrow \
-        --prune onnx --prune sentencepiece \
-        -o requirements-serve.txt \
+COPY scripts/serve_requirements.sh ./scripts/
+# Serving subset of the lock (scripts/serve_requirements.sh, also used by the README's serving-only install):
+# the training stack (torch, LightGBM, pandas, ...) is pruned together with its dependencies.
+RUN sh scripts/serve_requirements.sh requirements-serve.txt \
     && uv pip install --system --no-cache --require-hashes -r requirements-serve.txt
 
 COPY src ./src

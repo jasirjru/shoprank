@@ -11,3 +11,5 @@ docs/HANDOFF.md
 
 # Private drafts (resume, career notes; never published)
 docs/private/
+requirements-serve.txt
+.venv-serve/

@@ -59,10 +59,14 @@ v1.1 on the [GitHub release](https://github.com/jasirjru/shoprank/releases/tag/v
 # Option 1: Docker (CPU image, ~45 packages, no torch; the build downloads and verifies the model)
 docker build -t shoprank . && docker run --rm -p 8000:8000 shoprank
 
-# Option 2: uv
-uv sync --locked
-uv run python -m shoprank.serve.fetch            # or --source huggingface
-uv run uvicorn shoprank.serve.app:app --port 8000
+# Option 2: uv, serving packages only (~45 packages, ~200 MB, no torch; Linux/macOS shell)
+uv venv .venv-serve && sh scripts/serve_requirements.sh
+VIRTUAL_ENV=.venv-serve uv pip install --require-hashes -r requirements-serve.txt
+PYTHONPATH=src .venv-serve/bin/python -m shoprank.serve.fetch      # or --source huggingface
+PYTHONPATH=src .venv-serve/bin/uvicorn shoprank.serve.app:app --port 8000
+
+# Option 3: the full environment (also trains; installs CUDA torch, several GB)
+uv sync --locked && uv run python -m shoprank.serve.fetch && uv run uvicorn shoprank.serve.app:app --port 8000
 
 curl -X POST localhost:8000/rank -H "Content-Type: application/json" \
   -d '{"query": "usb c cable 6ft", "products": [{"product_id": "a", "title": "Anker USB C cable, 6 ft"},
