@@ -46,6 +46,7 @@ MAX_LONG_FIELD_CHARS = 5000  # long text is truncated to 128 tokens by the token
 MAX_BODY_BYTES = 1_000_000   # rejected before JSON parsing (a full valid request is far below this)
 QUEUE_TIMEOUT_S = 10.0       # a request that waits longer for the model gets 503 instead of piling up
 DEFAULT_MODEL_DIR = Path("data/processed/models/onnx/minilm_distil_w10_bullets")
+SPELL_VOCAB_FILE = "spell_vocab.json"
 
 
 class Scorer(Protocol):
@@ -53,6 +54,10 @@ class Scorer(Protocol):
     name: str
 
     def score(self, queries: Sequence[str], texts: Sequence[str]) -> np.ndarray: ...
+
+
+class Speller(Protocol):
+    def correct(self, query: str) -> str: ...
 
 
 class Product(BaseModel):
@@ -98,6 +103,7 @@ class Ranked(BaseModel):
 
 class RankResponse(BaseModel):
     model: str
+    query_used: str  # the query after spell correction (equal to the input when nothing was corrected)
     results: list[Ranked]
     latency_ms: float
 
@@ -122,6 +128,20 @@ def scorer_from_env() -> Scorer:
                       os.environ.get("SHOPRANK_MODEL_FILE", "model_int8.onnx"), int(threads) if threads else None)
 
 
+def speller_from_env() -> Speller | None:
+    """Catalogue spell correction (section 18) if the model folder has spell_vocab.json; SHOPRANK_SPELL=0 turns
+    it off. Without the file the API still works, ranking the query as typed."""
+    if os.environ.get("SHOPRANK_SPELL", "1") == "0":
+        return None
+    path = Path(os.environ.get("SHOPRANK_MODEL_DIR", DEFAULT_MODEL_DIR)) / SPELL_VOCAB_FILE
+    if not path.exists():
+        LOG.warning("no %s: spell correction off", path)
+        return None
+    from shoprank.serve.spell import load_corrector
+
+    return load_corrector(path)
+
+
 def get_scorer(request: Request) -> Scorer:
     return request.app.state.scorer
 
@@ -129,12 +149,14 @@ def get_scorer(request: Request) -> Scorer:
 ScorerDep = Annotated[Scorer, Depends(get_scorer)]  # module level: FastAPI resolves string annotations here
 
 
-def create_app(make_scorer: Callable[[], Scorer] = scorer_from_env, max_concurrent: int | None = None) -> FastAPI:
+def create_app(make_scorer: Callable[[], Scorer] = scorer_from_env, max_concurrent: int | None = None,
+               make_speller: Callable[[], Speller | None] = speller_from_env) -> FastAPI:
     limit = threading.BoundedSemaphore(max_concurrent or int(os.environ.get("SHOPRANK_MAX_CONCURRENT", "1")))
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.scorer = make_scorer()  # load once at start-up, not per request
+        app.state.speller = make_speller()
         yield
 
     app = FastAPI(title="ShopRank", version="0.1.0", lifespan=lifespan)
@@ -149,17 +171,19 @@ def create_app(make_scorer: Callable[[], Scorer] = scorer_from_env, max_concurre
         return await call_next(request)
 
     @app.get("/health")
-    def health(scorer: ScorerDep) -> dict:
-        return {"status": "ok", "model": scorer.name}
+    def health(request: Request, scorer: ScorerDep) -> dict:
+        return {"status": "ok", "model": scorer.name, "spell_correction": request.app.state.speller is not None}
 
     @app.post("/rank", response_model=RankResponse)
-    def rank(req: RankRequest, scorer: ScorerDep) -> RankResponse:
+    def rank(req: RankRequest, request: Request, scorer: ScorerDep) -> RankResponse:
         start = time.perf_counter()
+        speller = request.app.state.speller
+        query = speller.correct(req.query) if speller is not None else req.query
         texts = [serving_text(p.model_dump(), scorer.fields) for p in req.products]
         if not limit.acquire(timeout=QUEUE_TIMEOUT_S):
             raise HTTPException(status_code=503, detail="server busy, retry later")
         try:
-            scores = np.asarray(scorer.score([req.query] * len(texts), texts), dtype=float)
+            scores = np.asarray(scorer.score([query] * len(texts), texts), dtype=float)
         except Exception:
             LOG.exception("scoring failed for a request with %d products", len(texts))
             raise HTTPException(status_code=500, detail="scoring failed") from None
@@ -169,7 +193,7 @@ def create_app(make_scorer: Callable[[], Scorer] = scorer_from_env, max_concurre
             LOG.error("scorer returned shape %s / non-finite values", scores.shape)
             raise HTTPException(status_code=500, detail="scoring failed")
         order = sorted(range(len(texts)), key=lambda i: (-scores[i], req.products[i].product_id))
-        return RankResponse(model=scorer.name,
+        return RankResponse(model=scorer.name, query_used=query,
                             results=[Ranked(product_id=req.products[i].product_id, score=float(scores[i]))
                                      for i in order],
                             latency_ms=round((time.perf_counter() - start) * 1000, 2))

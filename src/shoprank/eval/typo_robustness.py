@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -52,7 +52,9 @@ def seed_spread(table: dict[str, dict[str, np.ndarray]], names: Sequence[str], c
     return max(means) - min(means)
 
 
-def score_models(names: Sequence[str], pairs: pd.DataFrame) -> dict[str, dict[str, np.ndarray]]:
+def score_models(names: Sequence[str], pairs: pd.DataFrame,
+                 query_sets: Mapping[str, list[str]] | None = None) -> dict[str, dict[str, np.ndarray]]:
+    """Per-query nDCG of every model under every query set (default: the three CONDITIONS)."""
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
@@ -60,7 +62,7 @@ def score_models(names: Sequence[str], pairs: pd.DataFrame) -> dict[str, dict[st
     from shoprank.cross.zero_shot import product_texts, read_products
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    queries = {c: condition_queries(pairs, c) for c in CONDITIONS}
+    queries = dict(query_sets) if query_sets is not None else {c: condition_queries(pairs, c) for c in CONDITIONS}
     table, texts_by_fields = {}, {}
     for name in names:
         cfg = json.loads((PROCESSED / "runs" / f"{name}.json").read_text(encoding="utf-8"))
@@ -74,7 +76,7 @@ def score_models(names: Sequence[str], pairs: pd.DataFrame) -> dict[str, dict[st
         net = Prepared4DMask(model) if model.config._attn_implementation == "sdpa" else model
         table[name] = {c: per_query_ndcg(pairs, predict(net, tokenizer, queries[c], texts_by_fields[fields], 128,
                                                          cfg.get("max_length", 128), device, bf16=True))
-                       for c in CONDITIONS}
+                       for c in queries}
         print(name, {c: round(float(v.mean()), 4) for c, v in table[name].items()}, flush=True)
         del model, net
         if device == "cuda":

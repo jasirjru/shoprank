@@ -51,3 +51,14 @@ def test_rank_rows_orders_best_first_with_training_text():
 def test_rank_rows_rejects_bad_input_with_the_api_rules(query, products, message):
     with pytest.raises(ValueError, match=message):
         rank_rows(FakeScorer(), query, products)
+
+
+def test_rank_rows_uses_and_reports_the_corrected_query():
+    class Speller:
+        def correct(self, q):
+            return q.replace("cbale", "cable")
+
+    scorer = FakeScorer()
+    rows, status = rank_rows(scorer, "usb cbale", "Charger | Apple\nUSB cable | Anker", Speller())
+    assert rows[0][2] == "USB cable"
+    assert "corrected to **usb cable**" in status

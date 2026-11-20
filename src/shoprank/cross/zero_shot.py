@@ -29,8 +29,8 @@ DEFAULT_MODEL = "cross-encoder/ms-marco-MiniLM-L-12-v2"  # Amazon's ESCI baselin
 def read_products(fields: Sequence[str], product_ids: Iterable[str] | None = None,
                   path: Path = PROCESSED / "products.parquet") -> pd.DataFrame:
     """The product table with only `fields`, and only the rows in `product_ids` if given.
-    The full table holds 1.2M products of three locales (~2.5 GB in memory with bullets); a training run needs
-    the few hundred thousand its pairs use. Filtering happens inside the parquet reader, so the rest is never
+    The full table holds 1.2M US products (every product of the small AND large ESCI versions; ~2.5 GB in memory
+    with bullets); a training run on the small version needs the few hundred thousand its pairs use. Filtering happens inside the parquet reader, so the rest is never
     loaded. The texts built from it are identical."""
     filters = None if product_ids is None else [("product_id", "in", sorted(set(product_ids)))]
     return pd.read_parquet(path, columns=["product_id", *fields], filters=filters)

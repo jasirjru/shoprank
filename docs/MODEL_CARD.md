@@ -27,9 +27,10 @@ p50 69 ms, p95 232 ms for one request of ~16 candidates; ~230 pairs/s (~11 reque
 
 ## Download and use
 Published files (identical in both places, SHA-256 in `SHA256SUMS`): `model_int8.onnx`, `tokenizer.json`,
-`tokenizer_config.json`, `serving.json` (input fields, max length), `quality.json` (dev results).
+`tokenizer_config.json`, `serving.json` (input fields, max length), `quality.json` (dev results), and since
+v1.1 `spell_vocab.json` (catalogue word counts for query spell correction).
 - Hugging Face: https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8
-- GitHub release v1.0: https://github.com/jasirjru/shoprank/releases/tag/v1.0
+- GitHub release v1.1: https://github.com/jasirjru/shoprank/releases/tag/v1.1
 - In this repo: `uv run python -m shoprank.serve.fetch` downloads them into the folder the API reads and
   checks every SHA-256.
 
@@ -60,8 +61,11 @@ keyword or vector retrieval step. A teaching and portfolio project, not a produc
 ## Not intended / known limits
 - Other languages (ES, JP data exist in ESCI but were not used), other domains than Amazon-style products.
 - Retrieval from a full catalogue: it must be given candidates.
-- Sensitive to typos: one swapped letter pair in the longest query word lowers dev nDCG from 0.8654 to
-  0.8392 (INT8). Missing brand, colour and bullets cost ~0.01; upper/lower case makes no difference.
+- The ranker alone is sensitive to typos: one swapped letter pair in the longest query word lowers dev nDCG
+  from 0.8654 to 0.8392 (INT8). Since v1.1 the API corrects the query first against the catalogue vocabulary
+  (`spell_vocab.json`, one-edit corrections), which wins back 87-90% of the loss on dev and dev2 with no harm
+  to clean queries; misspellings common in titles are not fixed, and rare non-English words can be wrongly
+  "corrected". Missing brand, colour and bullets cost ~0.01; upper/lower case makes no difference.
 - Weaker on negation queries ("without", "not"): dev nDCG 0.8378 on 158 such queries vs 0.8667 overall. The
   model does read the negation word (deleting it changes the ranking a lot), so the cause is something else.
 - Labels are noisy (ESCI paper: 91% annotator agreement). In a 100-pair sample chosen to find errors (the

@@ -8,3 +8,6 @@ __pycache__/
 
 # Private session notes (personal details; never published)
 docs/HANDOFF.md
+
+# Private drafts (resume, career notes; never published)
+docs/private/

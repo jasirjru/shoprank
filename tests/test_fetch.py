@@ -53,6 +53,6 @@ def test_different_local_model_is_kept_unless_forced(tmp_path):
 
 
 def test_published_manifest_covers_what_the_server_reads():
-    assert {"model_int8.onnx", "tokenizer.json", "tokenizer_config.json", "serving.json"} <= set(FILES)
+    assert {"model_int8.onnx", "tokenizer.json", "tokenizer_config.json", "serving.json", "spell_vocab.json"} <= set(FILES)
     assert all(len(s) == 64 for s in FILES.values())
-    assert fetch_mod.SOURCES["github"].endswith("/v1.0/")
+    assert fetch_mod.SOURCES["github"].endswith("/v1.1/")

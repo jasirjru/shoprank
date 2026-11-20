@@ -1,4 +1,4 @@
-"""Download the served model (INT8 ONNX + tokenizer) published with v1.0 and verify every file's SHA-256.
+"""Download the served model (INT8 ONNX + tokenizer + spell vocabulary) published with v1.1; verify every SHA-256.
 
 Usage:
     uv run python -m shoprank.serve.fetch                      # from the GitHub release (default)
@@ -19,13 +19,13 @@ from pathlib import Path
 
 DEST = Path("data/processed/models/onnx/minilm_distil_w10_bullets")
 SOURCES = {
-    "github": "https://github.com/jasirjru/shoprank/releases/download/v1.0/",
+    "github": "https://github.com/jasirjru/shoprank/releases/download/v1.1/",
     # pinned to the commit of the v1.0 upload, not the moving main branch
     "huggingface": "https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8/resolve/"
                    "ab467f4119cfb6c6acaecc4fbdcf9a52dbacbcd6/",
 }
-# SHA-256 of the v1.0 files (also published as SHA256SUMS next to them). The checksum, not the URL, is the trust
-# anchor: a changed file on either host is rejected.
+# SHA-256 of the v1.1 files, also published as SHA256SUMS next to them (model files unchanged since v1.0; v1.1
+# adds spell_vocab.json). The checksum, not the URL, is the trust anchor: a changed file on either host is rejected.
 FILES: dict[str, str] = {
     "model_int8.onnx": "14d506b276a74efa42259977df8741e3d153c1160b71b751d6219ea3a06692b8",
     # gitleaks reads "token" + 64 hex characters as an API key; these are SHA-256 hashes of public files.
@@ -33,6 +33,7 @@ FILES: dict[str, str] = {
     "tokenizer_config.json": "eb1312d29a13ef3bf49cab31c4d2460ba215c4b53a3fc85afb6773ada597174d",  # gitleaks:allow
     "serving.json": "f668c64a98d7646f7bf1eed3794d28965995f10ca72c638676b50a732bd3b9cf",
     "quality.json": "c3c2b11c686262ecf702ac00c5c753ee1ac145a49eab10f20f536a45030fe904",
+    "spell_vocab.json": "ee3a96f2a3dc834e0272a42743d730698ab64839bb707cae577aaf96c42258d6",  # gitleaks:allow
 }
 CHUNK = 1 << 20
 TIMEOUT_S = 60
@@ -85,7 +86,7 @@ def fetch(dest: Path = DEST, base_url: str = SOURCES["github"], files: Mapping[s
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Download and verify the served ShopRank model (v1.0)")
+    ap = argparse.ArgumentParser(description="Download and verify the served ShopRank model (v1.1)")
     ap.add_argument("--source", choices=sorted(SOURCES), default="github")
     ap.add_argument("--dest", type=Path, default=DEST)
     ap.add_argument("--force", action="store_true", help="replace existing files whose checksum differs")

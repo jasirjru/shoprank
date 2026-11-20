@@ -761,6 +761,40 @@ small clean cost (-0.0015). A 33M-parameter student that sees each misspelled qu
 the subword split a typo causes ("cbale" -> different word pieces). Likely better fix, not yet tested: correct
 the query BEFORE ranking (spell correction against the catalogue vocabulary), which is how production search
 handles typos; its ceiling is the clean score (0.8657), i.e. up to the full 0.028.
-Incident: first attempt thrashed (process 10.3 GB, 1.9 GB resident: all 1.2M products of three locales were
+Incident: first attempt thrashed (process 10.3 GB, 1.9 GB resident: all 1.2M US products (small + large ESCI versions; not three locales, corrected 22 Nov) were
 loaded); fixed by reading only the 336k products the pairs use (`cross.zero_shot.read_products`, identical
 texts, tested). The laptop also slept ~11 h mid-run; runs resumed, results unaffected.
+
+## 2026-11-22 — Phase D2: query spell correction before ranking (pre-registered before any dev look)
+Idea: fix the typo before the ranker sees it, the way production search does. `serve/spell.py`: vocabulary =
+word counts from titles, brands and colours of the 1.2M US products (product text only, no labels, no
+queries). A query word (letters only, 4+ chars) seen < 5 times in the catalogue is replaced by the most
+frequent catalogue word exactly one Damerau-Levenshtein edit away, if that word is at least 10x more frequent.
+Settings fixed now (5, 10x, one edit), not tuned on dev. The corrector does not know the evaluation typo
+generator (it may also change first letters).
+Measurement (dev, the 3 baseline v1.0-recipe models, seed-averaged, PyTorch bf16): clean, clean+spell,
+typo_transpose, typo_transpose+spell, typo_neighbour, typo_neighbour+spell. Also: share of clean dev queries
+the corrector changes (false corrections), share of typo queries restored exactly, time per query.
+Pass rules:
+1. clean+spell - clean >= -0.0010 (it must not hurt correct queries; paired CI reported).
+2. typo+spell recovers >= 50% of the typo gap for BOTH typo kinds.
+3. dev2 once (same rules' signs): clean change >= -0.002, typo gain > 0 for both kinds.
+Predictions: restores 60-80% of typo queries exactly; changes 1-4% of clean queries (brand names, model
+words, Spanish/garbled queries); clean change -0.0010 to +0.0005; recovers 50-75% of both gaps (above the 14%
+of typo training); under 1 ms per query on CPU.
+
+Result (Phase D2; `data/processed/runs/spell_eval_dev.json`, `spell_eval_dev2.json`; 3 baseline models averaged):
+| | dev as typed | dev +spell | dev change [95% CI] | recovered | dev2 change [95% CI] | dev2 recovered |
+|---|---|---|---|---|---|---|
+| clean | 0.8657 | 0.8661 | +0.0003 [-0.0008, +0.0015] | | +0.0020 [-0.0002, +0.0042] | |
+| typo_transpose | 0.8374 | 0.8626 | +0.0252 [+0.0211, +0.0292] | 89% of 0.0283 | +0.0287 [+0.0229, +0.0349] | 87% of 0.0330 |
+| typo_neighbour | 0.8400 | 0.8627 | +0.0226 [+0.0185, +0.0267] | 88% of 0.0257 | +0.0263 [+0.0203, +0.0323] | 90% of 0.0293 |
+Corrector statistics (dev / dev2): changes 5.9% / 4.9% of clean queries; restores 79.6% / 81.1% (transpose) and
+80.3% / 84.6% (neighbour) of typo queries exactly; 0.003-0.01 ms per query.
+Prediction check: restores 60-80%: right (80-85%, top of the range); changes 1-4% of clean queries: wrong
+(5-6%), but those changes did not hurt (clean +0.0003 dev, +0.0020 dev2); clean change -0.0010..+0.0005: right
+on dev; recovers 50-75%: wrong, better (87-90%); under 1 ms: right (0.01 ms).
+Verdict: all three pre-registered rules pass, on dev and once on dev2. Spell correction before ranking goes
+into serving (v1.1). It beats typo-consistency training (14%) by a wide margin at zero training cost.
+Known misses seen while building (not tuned): misspellings frequent in titles stay ("wirless" occurs 5+ times),
+and rare non-English words can be "corrected" into English ("llaves" -> "leaves").

@@ -4,6 +4,17 @@ Versions are git tags. Every quality number below is on the split named next to 
 was scored once, for v1.0.
 
 ## Unreleased
+
+## v1.1 — 22 Nov 2026: query spell correction
+- `serve/spell.py`: catalogue vocabulary (titles, brands, colours of 1.2M US products, 184,594 words) and
+  one-edit (Damerau-Levenshtein, SymSpell-style) correction of rare query words; 0.01 ms per query.
+- Dev (3 models): typo queries +0.0252 [+0.0211, +0.0292] and +0.0226 [+0.0185, +0.0267], 88-89% of the typo
+  loss; clean +0.0003 [-0.0008, +0.0015]. Confirmed once on dev2: +0.0287 / +0.0263 (87% / 90%), clean +0.0020.
+- API and demo correct the query before ranking (`query_used` in the response, `spell_correction` in /health,
+  `SHOPRANK_SPELL=0` turns it off); `spell_vocab.json` published next to the model; fetch points at v1.1.
+- Docs: products.parquet is US-only (1.2M products, small + large versions); an earlier note said three locales.
+
+### Before v1.1 (since v1.0)
 Phase A, supply chain and code health (plan: `docs/analysis/completion_plan_2026-11-21.md`).
 - Security: torch 2.11.0+cu128 -> 2.13.0+cu126 (GHSA-rrmf-rvhw-rf47), setuptools 81.0.0 -> 84.2.1
   (PYSEC-2026-3447, GHSA-xmj3-9gf7-h52w); osv-scanner now reports none. Results unchanged: served MiniLM dev

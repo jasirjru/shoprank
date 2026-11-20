@@ -36,7 +36,8 @@ locales (US, ES, JP) with large ensembles, so that number is not comparable.
 
 ## Serving
 
-`POST /rank` (FastAPI) re-ranks a query's candidates with the distilled MiniLM, exported to ONNX and quantised
+`POST /rank` (FastAPI) first fixes typos in the query against the catalogue vocabulary (v1.1, see below), then
+re-ranks the candidates with the distilled MiniLM, exported to ONNX and quantised
 to INT8 (32 MB; dev nDCG 0.8654 vs 0.8662 fp32). Load test with real dev queries (median 16 candidates, title
 + brand + colour + bullets), laptop CPU (16 cores), client and server on the same machine:
 
@@ -92,8 +93,12 @@ first and the scoring time (about 10 ms for 4 products).
 | MiniLM: + bullets | +0.0068 [+0.0032, +0.0104] |
 | MiniLM: + learn DeBERTa's out-of-fold scores (distillation) | +0.0064 [+0.0038, +0.0090] |
 | 4-class cross-entropy instead of MSE on the gain | -0.0056 [-0.0094, -0.0018] |
+| Typo queries: spell correction before ranking (v1.1) | +0.0252 [+0.0211, +0.0292], 89% of the typo loss; dev2 +0.0287 |
+| Clean queries: spell correction before ranking | +0.0003 [-0.0008, +0.0015] (no harm); dev2 +0.0020 |
+| Typo queries: train the ranker on misspelled queries instead | +0.0041 [+0.0019, +0.0062], 14% (rejected) |
 
-Seed noise (3 seeds): DeBERTa spread 0.0016, MiniLM 0.0003; no change smaller than that is claimed.
+Seed noise (3 seeds): DeBERTa spread 0.0016, MiniLM 0.0003 (title only) and 0.0017 (distilled + bullets); no
+change smaller than that is claimed.
 Hardest queries: negation ("without", "not"); BM25 0.748, DeBERTa 0.839 on dev.
 
 ## Honest limits
@@ -112,8 +117,10 @@ Hardest queries: negation ("without", "not"); BM25 0.748, DeBERTa 0.839 on dev.
 - Scores pass through bf16, so 14% of a query's products can tie; the tie order moves nDCG by ~0.00005.
 - The INT8 model was not scored on test (the test set is spent); its dev loss is 0.0008.
 - Latency is from one laptop, client on the same machine; no network, no autoscaling.
-- The served model is sensitive to typos: one swapped letter pair in a query costs 0.026 dev nDCG
-  (behavioural tests in `docs/analysis/audit_2026-11-21.md`).
+- Typos: one mistake in a query costs the ranker ~0.028 dev nDCG. Catalogue spell correction (v1.1) wins back
+  87-90% of that on dev and dev2 (synthetic one-edit typos), but misses misspellings that are common in product
+  titles and can turn rare non-English words into English ones ("llaves" -> "leaves"). Real typo logs were not
+  available, so the typos are synthetic.
 
 ## Reproduce
 

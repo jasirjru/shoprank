@@ -25,8 +25,8 @@ class FakeScorer:
         return np.array([sum(w in t.lower() for w in q.lower().split()) for q, t in zip(queries, texts)], float)
 
 
-def client(scorer=None) -> TestClient:
-    return TestClient(create_app(lambda: scorer or FakeScorer()))
+def client(scorer=None, speller=None) -> TestClient:
+    return TestClient(create_app(lambda: scorer or FakeScorer(), make_speller=lambda: speller))
 
 
 def body(query="red usb cable", n=3):
@@ -46,7 +46,7 @@ def test_rank_returns_every_product_best_first():
 
 def test_health_reports_the_model():
     with client() as c:
-        assert c.get("/health").json() == {"status": "ok", "model": "fake"}
+        assert c.get("/health").json() == {"status": "ok", "model": "fake", "spell_correction": False}
 
 
 @pytest.mark.parametrize("bad", [
@@ -113,7 +113,8 @@ def test_model_calls_never_overlap_beyond_the_limit():
 
     from concurrent.futures import ThreadPoolExecutor
 
-    with TestClient(create_app(SlowScorer, max_concurrent=1)) as c, ThreadPoolExecutor(8) as pool:
+    app = create_app(SlowScorer, max_concurrent=1, make_speller=lambda: None)
+    with TestClient(app) as c, ThreadPoolExecutor(8) as pool:
         codes = list(pool.map(lambda _: c.post("/rank", json=body()).status_code, range(8)))
     assert codes == [200] * 8 and SlowScorer.peak == 1
 
@@ -131,3 +132,26 @@ def test_blank_title_is_rejected():
     with client() as c:
         r = c.post("/rank", json={"query": "cable", "products": [{"product_id": "a", "title": "   "}]})
     assert r.status_code == 422
+
+
+class FakeSpeller:
+    def correct(self, query):
+        return query.replace("cbale", "cable")
+
+
+def test_spell_correction_is_applied_before_scoring_and_reported():
+    scorer = FakeScorer()
+    with client(scorer, FakeSpeller()) as c:
+        r = c.post("/rank", json=body("red usb cbale"))
+        health = c.get("/health").json()
+    assert r.status_code == 200
+    assert r.json()["query_used"] == "red usb cable"
+    assert r.json()["results"][0]["product_id"] == "b"  # 'cable' now matches
+    assert health["spell_correction"] is True
+
+
+def test_without_speller_the_query_is_used_as_typed():
+    with client() as c:
+        r = c.post("/rank", json=body("red usb cbale"))
+        assert c.get("/health").json()["spell_correction"] is False
+    assert r.json()["query_used"] == "red usb cbale"

@@ -17,7 +17,13 @@ from collections.abc import Sequence
 import numpy as np
 from pydantic import ValidationError
 
-from shoprank.serve.app import RankRequest, Scorer, scorer_from_env
+from shoprank.serve.app import (
+    RankRequest,
+    Scorer,
+    Speller,
+    scorer_from_env,
+    speller_from_env,
+)
 from shoprank.serve.ranker import serving_text
 
 LINE_FIELDS = ("title", "brand", "color", "bullets")
@@ -53,7 +59,8 @@ def validation_message(err: ValidationError) -> str:
     return f"{where}: {first['msg']}"
 
 
-def rank_rows(scorer: Scorer, query: str, products_text: str) -> tuple[list[list], str]:
+def rank_rows(scorer: Scorer, query: str, products_text: str,
+              speller: Speller | None = None) -> tuple[list[list], str]:
     """Rows [rank, score, title, brand, colour] best first, and a one-line status. Raises ValueError on bad input."""
     try:
         req = RankRequest(query=query, products=parse_products(products_text))
@@ -61,20 +68,22 @@ def rank_rows(scorer: Scorer, query: str, products_text: str) -> tuple[list[list
         raise ValueError(validation_message(err)) from None
     start = time.perf_counter()
     texts = [serving_text(p.model_dump(), scorer.fields) for p in req.products]
-    scores = np.asarray(scorer.score([req.query] * len(texts), texts), dtype=float)
+    used = speller.correct(req.query) if speller is not None else req.query
+    scores = np.asarray(scorer.score([used] * len(texts), texts), dtype=float)
     ms = (time.perf_counter() - start) * 1000
     order = sorted(range(len(texts)), key=lambda i: (-scores[i], req.products[i].product_id))
     rows = [[rank, round(float(scores[i]), 3), req.products[i].title, req.products[i].brand or "",
              req.products[i].color or ""] for rank, i in enumerate(order, start=1)]
-    return rows, f"{len(rows)} products scored in {ms:.0f} ms by {scorer.name} (CPU)"
+    note = f" Query corrected to **{used}**." if used != req.query else ""
+    return rows, f"{len(rows)} products scored in {ms:.0f} ms by {scorer.name} (CPU).{note}"
 
 
-def build_demo(scorer: Scorer, examples: Sequence[Sequence[str]] = EXAMPLES):
+def build_demo(scorer: Scorer, examples: Sequence[Sequence[str]] = EXAMPLES, speller: Speller | None = None):
     import gradio as gr
 
     def run(query: str, products_text: str) -> tuple[list[list], str]:
         try:
-            return rank_rows(scorer, query, products_text)
+            return rank_rows(scorer, query, products_text, speller)
         except ValueError as err:
             raise gr.Error(str(err)) from None
 
@@ -96,7 +105,7 @@ def build_demo(scorer: Scorer, examples: Sequence[Sequence[str]] = EXAMPLES):
 
 
 def main() -> None:
-    build_demo(scorer_from_env()).launch(server_name=HOST, server_port=PORT, share=False)
+    build_demo(scorer_from_env(), speller=speller_from_env()).launch(server_name=HOST, server_port=PORT, share=False)
 
 
 if __name__ == "__main__":
