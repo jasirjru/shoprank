@@ -1,11 +1,13 @@
 [project]
 name = "shoprank"
-version = "0.1.0"
+version = "1.1.1"
 description = "Learned product search ranking on the Amazon ESCI dataset"
 authors = [
     { name = "Jasir Abdul Hameed", email = "144598391+jasirjru@users.noreply.github.com" }
 ]
 requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 dependencies = [
     "accelerate>=1.16",
     "datasets>=5.2",

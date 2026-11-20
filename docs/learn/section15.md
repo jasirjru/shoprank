@@ -48,6 +48,7 @@ reason; the cashier's time is never wasted on it.
  "products": [{"product_id": "B01", "title": "Anker USB C cable", "brand": "Anker", "bullets": "6 ft ..."}, ...]}
 -> {"model": "...", "results": [{"product_id": "B01", "score": 0.93}, ...], "latency_ms": 64.2}
 ```
+(Since v1.1 the response also has `"query_used"`: the query after spell correction, see section 18.)
 - Rejected with 422 before any model call: blank or > 200-character query, 0 or > 200 products, missing title,
   duplicate ids, unknown fields, over-long text.
 - A model failure returns 500 "scoring failed"; the details go to the server log only.

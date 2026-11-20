@@ -62,9 +62,10 @@ def http_get(url: str) -> bytes:
 
 def fetch(dest: Path = DEST, base_url: str = SOURCES["github"], files: Mapping[str, str] = FILES,
           opener: Opener = http_get, force: bool = False) -> list[str]:
-    """Download missing files, verify each SHA-256, return the names written. Raises SystemExit on a mismatch."""
+    """Download missing files, verify each SHA-256, return the names written. Raises SystemExit on a mismatch.
+    Existing files are checked BEFORE any download, so a refusal never leaves the folder half-updated."""
     dest.mkdir(parents=True, exist_ok=True)
-    written = []
+    todo = []
     for name, expected in files.items():
         target = dest / name
         if target.exists():
@@ -72,8 +73,14 @@ def fetch(dest: Path = DEST, base_url: str = SOURCES["github"], files: Mapping[s
                 print(f"  ok (already present): {name}")
                 continue
             if not force:
-                raise SystemExit(f"{target} exists with a different checksum; not overwriting (use --force).")
-        data = opener(base_url + name)
+                raise SystemExit(f"{target} exists with a different checksum; nothing changed (use --force).")
+        todo.append((name, expected, target))
+    written = []
+    for name, expected, target in todo:
+        try:
+            data = opener(base_url + name)
+        except OSError as err:  # URLError, HTTPError, timeouts: all OSError subclasses
+            raise SystemExit(f"download failed for {base_url + name}: {err}; written so far: {written}") from None
         actual = sha256_bytes(data)
         if actual != expected:
             raise SystemExit(f"checksum mismatch for {name}: expected {expected}, got {actual}; nothing written.")

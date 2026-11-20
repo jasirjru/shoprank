@@ -28,7 +28,7 @@ jobs:
       - run: uv run --frozen pytest -q
 
   docker:
-    # Serving smoke test: build the CPU image (downloads the v1.0 model, checks SHA-256), start it, rank the
+    # Serving smoke test: build the CPU image (downloads the v1.1 model and spell vocabulary, checks SHA-256), start it, rank the
     # README example and assert the right product comes first.
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -43,6 +43,12 @@ jobs:
             -d '{"query": "usb c cable 6ft", "products": [{"product_id": "b", "title": "HDMI cable 10 ft"},
                  {"product_id": "a", "title": "Anker USB C to USB C cable, 6 ft", "brand": "Anker"}]}' | tee out.json
           python3 -c "import json; r = json.load(open('out.json'))['results']; assert r[0]['product_id'] == 'a', r"
+          curl -sf localhost:8000/health | tee health.json
+          python3 -c "import json; h = json.load(open('health.json')); assert h['spell_correction'] is True, h"
+          curl -sf -X POST localhost:8000/rank -H "Content-Type: application/json" \
+            -d '{"query": "usb c cbale 6ft", "products": [{"product_id": "b", "title": "HDMI cable 10 ft"},
+                 {"product_id": "a", "title": "Anker USB C to USB C cable, 6 ft", "brand": "Anker"}]}' | tee typo.json
+          python3 -c "import json; r = json.load(open('typo.json')); assert r['query_used'] == 'usb c cable 6ft', r; assert r['results'][0]['product_id'] == 'a', r"
           docker image ls shoprank:ci --format 'image size {{.Size}}'
       - if: failure()
         run: docker logs shoprank

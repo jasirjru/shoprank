@@ -51,8 +51,8 @@ At high load, latency is queueing: one process handles about 11 requests/s. The 
 0.020 nDCG better but scores ~89 pairs/s on an RTX 4060 GPU vs 230 pairs/s for the INT8 MiniLM on CPU, so it
 is used offline as the teacher.
 
-**Run it without training or a GPU.** The served model (INT8 ONNX, 32 MB) is published with v1.0 on the
-[GitHub release](https://github.com/jasirjru/shoprank/releases/tag/v1.0) and on
+**Run it without training or a GPU.** The served model (INT8 ONNX, 32 MB) and the spell vocabulary are published with
+v1.1 on the [GitHub release](https://github.com/jasirjru/shoprank/releases/tag/v1.1) and on
 [Hugging Face](https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8); every file is checked by SHA-256.
 
 ```bash
@@ -68,6 +68,9 @@ curl -X POST localhost:8000/rank -H "Content-Type: application/json" \
   -d '{"query": "usb c cable 6ft", "products": [{"product_id": "a", "title": "Anker USB C cable, 6 ft"},
        {"product_id": "b", "title": "HDMI cable 10 ft"}]}'
 ```
+The response's `query_used` is the query after spell correction. `/health` reports `"spell_correction": true`
+when the vocabulary was found (in the model folder, else `data/processed/spell_vocab.json`); without it the API
+ranks the query as typed. `SHOPRANK_SPELL=0` turns correction off.
 
 ### Demo
 
@@ -120,7 +123,9 @@ Hardest queries: negation ("without", "not"); BM25 0.748, DeBERTa 0.839 on dev.
 - Typos: one mistake in a query costs the ranker ~0.028 dev nDCG. Catalogue spell correction (v1.1) wins back
   87-90% of that on dev and dev2 (synthetic one-edit typos), but misses misspellings that are common in product
   titles and can turn rare non-English words into English ones ("llaves" -> "leaves"). Real typo logs were not
-  available, so the typos are synthetic.
+  available, so the typos are synthetic. Words with attached punctuation ("cabel,") or digits are never
+  corrected. The vocabulary comes from all 1.2M catalogue products' titles, brands and colours, including
+  products that appear in test pairs (product text only, no labels or queries).
 
 ## Reproduce
 
@@ -140,7 +145,8 @@ done
 uv run python -m shoprank.ltr.stack                                    # blend + stack on dev
 uv run python -m shoprank.cross.finetune --teacher deberta_oof --teacher-weight 1.0 \
     --fields title,brand,color,bullets --name minilm_distil_w10_bullets
-uv run python -m shoprank.serve.onnx_export minilm_distil_w10_bullets  # ONNX + INT8 + dev check
+uv run python -m shoprank.serve.spell build                            # spell vocabulary (needed before export)
+uv run python -m shoprank.serve.onnx_export minilm_distil_w10_bullets  # ONNX + INT8 + dev check; copies the vocabulary
 ```
 The test split is locked in code; `--allow-test` exists for the one final run (`shoprank.eval.final_test`).
 
@@ -148,6 +154,7 @@ The test split is locked in code; `--allow-test` exists for the one final run (`
 
 - `docs/lab_notebook.md`: every run, with the prediction written before it.
 - `docs/learn/`: lessons per section (beginner level, with check questions and answers).
+- `docs/analysis/project_status_2026-11-22.md`: final status, known limits, what would come next.
 - `docs/analysis/`: error analysis, label audit and the 21 Nov 2026 audit (leakage, claims, robustness).
 
 ## Data

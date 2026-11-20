@@ -65,7 +65,9 @@ keyword or vector retrieval step. A teaching and portfolio project, not a produc
   from 0.8654 to 0.8392 (INT8). Since v1.1 the API corrects the query first against the catalogue vocabulary
   (`spell_vocab.json`, one-edit corrections), which wins back 87-90% of the loss on dev and dev2 with no harm
   to clean queries; misspellings common in titles are not fixed, and rare non-English words can be wrongly
-  "corrected". Missing brand, colour and bullets cost ~0.01; upper/lower case makes no difference.
+  "corrected"; words with attached punctuation or digits are left alone. The vocabulary is built from the
+  titles, brands and colours of all 1.2M catalogue products (product text only, no labels or queries). Missing
+  brand, colour and bullets cost ~0.01; upper/lower case makes no difference.
 - Weaker on negation queries ("without", "not"): dev nDCG 0.8378 on 158 such queries vs 0.8667 overall. The
   model does read the negation word (deleting it changes the ranking a lot), so the cause is something else.
 - Labels are noisy (ESCI paper: 91% annotator agreement). In a 100-pair sample chosen to find errors (the

@@ -45,7 +45,7 @@ def test_correct_local_files_are_not_downloaded_again(tmp_path):
 
 def test_different_local_model_is_kept_unless_forced(tmp_path):
     (tmp_path / "model.onnx").write_bytes(b"my own trained model")
-    with pytest.raises(SystemExit, match="not overwriting"):
+    with pytest.raises(SystemExit, match="nothing changed"):
         fetch(tmp_path, "https://host/", SUMS, server(PAYLOADS, []))
     assert (tmp_path / "model.onnx").read_bytes() == b"my own trained model"
     fetch(tmp_path, "https://host/", SUMS, server(PAYLOADS, []), force=True)
@@ -56,3 +56,18 @@ def test_published_manifest_covers_what_the_server_reads():
     assert {"model_int8.onnx", "tokenizer.json", "tokenizer_config.json", "serving.json", "spell_vocab.json"} <= set(FILES)
     assert all(len(s) == 64 for s in FILES.values())
     assert fetch_mod.SOURCES["github"].endswith("/v1.1/")
+
+
+def test_refusal_happens_before_any_download(tmp_path):
+    (tmp_path / "tokenizer.json").write_bytes(b"different")  # second file in the manifest is wrong
+    calls = []
+    with pytest.raises(SystemExit, match="nothing changed"):
+        fetch(tmp_path, "https://host/", SUMS, server(PAYLOADS, calls))
+    assert calls == [] and not (tmp_path / "model.onnx").exists()
+
+
+def test_network_error_is_a_clear_message(tmp_path):
+    def broken(url):
+        raise TimeoutError("timed out")
+    with pytest.raises(SystemExit, match="download failed for https://host/model.onnx"):
+        fetch(tmp_path, "https://host/", SUMS, broken)

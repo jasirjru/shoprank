@@ -155,3 +155,27 @@ def test_without_speller_the_query_is_used_as_typed():
         r = c.post("/rank", json=body("red usb cbale"))
         assert c.get("/health").json()["spell_correction"] is False
     assert r.json()["query_used"] == "red usb cbale"
+
+
+def test_speller_from_env_finds_vocab_in_model_folder_and_can_be_turned_off(tmp_path, monkeypatch):
+    import json
+
+    from shoprank.serve import app as app_mod
+
+    (tmp_path / "spell_vocab.json").write_text(json.dumps({"cable": 100}), encoding="utf-8")
+    monkeypatch.setenv("SHOPRANK_MODEL_DIR", str(tmp_path))
+    monkeypatch.delenv("SHOPRANK_SPELL", raising=False)
+    assert app_mod.speller_from_env().correct("usb cbale") == "usb cable"
+    for off in ("0", "false", "OFF", "no"):
+        monkeypatch.setenv("SHOPRANK_SPELL", off)
+        assert app_mod.speller_from_env() is None
+
+
+def test_speller_from_env_without_any_vocab_is_off(tmp_path, monkeypatch):
+    from shoprank.serve import app as app_mod
+    from shoprank.serve import spell
+
+    monkeypatch.setenv("SHOPRANK_MODEL_DIR", str(tmp_path))
+    monkeypatch.delenv("SHOPRANK_SPELL", raising=False)
+    monkeypatch.setattr(spell, "VOCAB_PATH", tmp_path / "missing.json")
+    assert app_mod.speller_from_env() is None

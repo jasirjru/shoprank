@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import time
 from pathlib import Path
 
@@ -94,6 +95,11 @@ def main() -> None:
 
     mc = AutoConfig.from_pretrained(MODELS / args.run)
     opt, int8 = optimise_and_quantise(fp32, mc.hidden_size, mc.num_attention_heads)
+    vocab = PROCESSED / "spell_vocab.json"  # `serve.spell build`; the API reads it from the model folder
+    if vocab.exists():
+        shutil.copyfile(vocab, out / vocab.name)
+    else:
+        print(f"note: no {vocab}; run `python -m shoprank.serve.spell build` to enable spell correction", flush=True)
     (out / "serving.json").write_text(json.dumps({"run": args.run, "fields": fields,
                                                   "max_length": max_length}, indent=2), encoding="utf-8")
     for p in (fp32, opt, int8):

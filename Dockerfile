@@ -1,4 +1,4 @@
-# CPU serving image: FastAPI + ONNX Runtime + the INT8 re-ranker published with v1.0. No torch, no GPU:
+# CPU serving image: FastAPI + ONNX Runtime + the INT8 re-ranker and spell vocabulary published with v1.1. No torch, no GPU:
 # only the ~45 packages the API imports (about 200 MB instead of ~7 GB for the training environment).
 #   docker build -t shoprank .
 #   docker run --rm -p 8000:8000 shoprank
@@ -18,7 +18,7 @@ RUN uv export --frozen --no-dev --no-emit-project \
 
 COPY src ./src
 ENV PYTHONPATH=/app/src PYTHONUNBUFFERED=1
-# Model files from the v1.0 GitHub release; the build fails if any checksum differs.
+# Model files and spell vocabulary from the v1.1 GitHub release; the build fails if any checksum differs.
 RUN python -m shoprank.serve.fetch
 
 RUN useradd --create-home --uid 10001 app && chown -R app /app

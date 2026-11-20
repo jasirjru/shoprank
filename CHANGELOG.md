@@ -5,6 +5,22 @@ was scored once, for v1.0.
 
 ## Unreleased
 
+## v1.1.1 — 22 Nov 2026: release hardening (no change to any reported number)
+Independent code review (separate reviewer agent) of v1.0..v1.1: no defect in the ranking path; fixed:
+- Spell correction could be silently off after the README "Reproduce" steps (vocabulary not in the model
+  folder): `onnx_export` now copies `spell_vocab.json`, the API also looks at `data/processed/spell_vocab.json`,
+  and the README lists `serve.spell build` and how `/health` shows the state.
+- CI Docker smoke test now asserts `spell_correction: true` and that "usb c cbale 6ft" is corrected.
+- Tests for `speller_from_env` (vocabulary found / missing / switched off).
+- `query_used` keeps the input exactly (spacing too) when nothing was corrected; the demo no longer reports a
+  "correction" for a double space. Model input is unchanged (the tokenizer ignores spacing).
+- `SHOPRANK_SPELL` accepts 0/false/off/no.
+- `fetch` checks every existing file before downloading anything (a refusal never leaves the folder
+  half-updated) and reports network errors clearly.
+- Documented, not changed (the evaluated corrector stays exactly as measured): words with attached punctuation
+  or digits are not corrected; the vocabulary uses all catalogue products' text, incl. products in test pairs.
+- Apache-2.0 LICENSE; package version 1.1.1; repo topics and Hugging Face link; lesson 18; stale v1.0 wording.
+
 ## v1.1 — 22 Nov 2026: query spell correction
 - `serve/spell.py`: catalogue vocabulary (titles, brands, colours of 1.2M US products, 184,594 words) and
   one-edit (Damerau-Levenshtein, SymSpell-style) correction of rare query words; 0.01 ms per query.

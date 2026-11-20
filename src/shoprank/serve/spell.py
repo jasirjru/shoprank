@@ -90,7 +90,10 @@ class SpellCorrector:
         return best if self.freq[best] >= CANDIDATE_RATIO * max(1, self.freq.get(low, 0)) else word
 
     def correct(self, query: str) -> str:
-        return " ".join(self.correct_word(w) for w in query.split())
+        """The query with misspelled words replaced; the input unchanged (spacing kept) if no word changed."""
+        words = query.split()
+        fixed = [self.correct_word(w) for w in words]
+        return query if fixed == words else " ".join(fixed)
 
 
 def count_words(texts: Iterable[str]) -> Counter:

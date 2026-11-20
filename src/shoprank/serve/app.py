@@ -128,18 +128,23 @@ def scorer_from_env() -> Scorer:
                       os.environ.get("SHOPRANK_MODEL_FILE", "model_int8.onnx"), int(threads) if threads else None)
 
 
-def speller_from_env() -> Speller | None:
-    """Catalogue spell correction (section 18) if the model folder has spell_vocab.json; SHOPRANK_SPELL=0 turns
-    it off. Without the file the API still works, ranking the query as typed."""
-    if os.environ.get("SHOPRANK_SPELL", "1") == "0":
-        return None
-    path = Path(os.environ.get("SHOPRANK_MODEL_DIR", DEFAULT_MODEL_DIR)) / SPELL_VOCAB_FILE
-    if not path.exists():
-        LOG.warning("no %s: spell correction off", path)
-        return None
-    from shoprank.serve.spell import load_corrector
+SPELL_OFF_VALUES = {"0", "false", "off", "no"}
 
-    return load_corrector(path)
+
+def speller_from_env() -> Speller | None:
+    """Catalogue spell correction (section 18). Looks for spell_vocab.json in the model folder (where
+    `serve.fetch` and `serve.onnx_export` put it), then at data/processed/spell_vocab.json (written by
+    `serve.spell build`). SHOPRANK_SPELL=0/false/off/no turns it off. Without a vocabulary the API still works,
+    ranking the query as typed, and /health reports spell_correction: false."""
+    if os.environ.get("SHOPRANK_SPELL", "1").strip().lower() in SPELL_OFF_VALUES:
+        return None
+    from shoprank.serve.spell import VOCAB_PATH, load_corrector
+
+    for path in (Path(os.environ.get("SHOPRANK_MODEL_DIR", DEFAULT_MODEL_DIR)) / SPELL_VOCAB_FILE, VOCAB_PATH):
+        if path.exists():
+            return load_corrector(path)
+    LOG.warning("no %s in the model folder or at %s: spell correction off", SPELL_VOCAB_FILE, VOCAB_PATH)
+    return None
 
 
 def get_scorer(request: Request) -> Scorer:

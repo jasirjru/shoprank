@@ -798,3 +798,14 @@ Verdict: all three pre-registered rules pass, on dev and once on dev2. Spell cor
 into serving (v1.1). It beats typo-consistency training (14%) by a wide margin at zero training cost.
 Known misses seen while building (not tuned): misspellings frequent in titles stay ("wirless" occurs 5+ times),
 and rare non-English words can be "corrected" into English ("llaves" -> "leaves").
+
+## 2026-11-22 — Release hardening (v1.1.1): independent review, fixes, licence
+Independent reviewer agent (Sonnet) on everything since v1.0: no defect in the ranking path; 8 findings, all
+fixed or documented (CHANGELOG v1.1.1). The most important: following the README "Reproduce" steps gave an API
+with spell correction silently OFF (vocabulary not in the model folder), and the CI Docker smoke test used a
+query without a typo, so it could not catch that. Both fixed; tests added for the vocabulary lookup.
+Deliberately NOT changed: the corrector's behaviour on words with attached punctuation ("cabel,") is left as
+evaluated, so the published 87-90% describes exactly what is served; the limit is documented instead.
+One behaviour change with no effect on scores: `query_used` returns the input unchanged (spacing included) when
+no word was corrected; the tokenizer ignores spacing, so the model input is identical.
+Also: Apache-2.0 licence, package version 1.1.1, repo topics + Hugging Face link, lesson 18 written.

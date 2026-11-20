@@ -78,3 +78,9 @@ def test_spell_eval_query_sets_and_summary():
     assert out["typo_transpose"]["recovered_share"] == pytest.approx(0.75, abs=1e-3)
     assert out["typo_neighbour"]["recovered_share"] == pytest.approx(0.0, abs=1e-3)
     assert out["clean"]["spell_minus_typed"][0] == pytest.approx(0.0)
+
+
+def test_query_with_nothing_to_fix_is_returned_unchanged_including_spacing():
+    sc = SpellCorrector(VOCAB)
+    assert sc.correct("wireless  mouse") == "wireless  mouse"
+    assert sc.correct("wireless  mosue") == "wireless mouse"  # corrected: spacing normalised
