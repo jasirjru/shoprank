@@ -14,7 +14,7 @@ Split rules (see docs/learn/week01.md):
     - dev2  = another ~5% bucket, touched only once to confirm the final model choice
     - train = the rest of official train
     - dropped = official-train rows whose normalised text also occurs in official test
-    Normalised text = lowercase, non [a-z0-9] runs -> one space, trimmed. Splitting on it means
+    Normalised text = lowercase, runs of non letter/digit characters (any script) -> one space, trimmed. Splitting on it means
     near-duplicates ("iPhone Case!" / "iphone case") under different query_ids share one split.
 """
 from __future__ import annotations
@@ -28,7 +28,9 @@ RAW_DIR = Path("data/raw")
 OUT_DIR = Path("data/processed")
 LOCALE = "us"
 SPLIT_BUCKETS = 20  # buckets 0-1 -> dev (~10%), bucket 2 -> dev2 (~5%), rest -> train
-NORM_SQL = "trim(regexp_replace(lower(query), '[^a-z0-9]+', ' ', 'g'))"  # lower BEFORE the regex
+# Keep letters/digits of ANY script (\p{L}, \p{N}): with [a-z0-9] only, every Korean/Chinese/Arabic
+# query became '' and they all collapsed into one "text". Lowercase BEFORE the regex.
+NORM_SQL = r"trim(regexp_replace(lower(query), '[^\p{L}\p{N}]+', ' ', 'g'))"
 
 # Gain per label, as used for ESCI Task 1 nDCG (Exact > Substitute > Complement > Irrelevant).
 ESCI_GAINS = {"E": 1.0, "S": 0.1, "C": 0.01, "I": 0.0}
