@@ -86,3 +86,6 @@ BM25 0.8163; logreg 0.8256 (+0.0093 [+0.0054, +0.0133]); logreg_graded 0.8254 (â
 vs logreg); LambdaMART 0.8342 (+0.0180 [+0.0140, +0.0219] vs BM25; +0.0088 [+0.0055, +0.0121] vs graded
 LR), 259 trees; no BM25 0.8266; BM25 only 0.8213. dev2: BM25 0.8191; graded LR 0.8260; LambdaMART 0.8364
 (+0.0173 [+0.0113, +0.0234] vs BM25; +0.0104 [+0.0056, +0.0152] vs graded LR). Conclusions unchanged.
+Early-stopping check (same data, same seed): eval_at=10 and eval_at=136 (full list) both stop at
+259 trees, so dev full nDCG is identical (0.8342). The metric fix is correct but has no measured effect
+here; the earlier 274 -> 231/259 tree change came from the new split, not from the stopping metric.
