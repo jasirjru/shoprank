@@ -89,3 +89,15 @@ LR), 259 trees; no BM25 0.8266; BM25 only 0.8213. dev2: BM25 0.8191; graded LR 0
 Early-stopping check (same data, same seed): eval_at=10 and eval_at=136 (full list) both stop at
 259 trees, so dev full nDCG is identical (0.8342). The metric fix is correct but has no measured effect
 here; the earlier 274 -> 231/259 tree change came from the new split, not from the stopping metric.
+
+## 2026-11-20 — Week 4 zero-shot cross-encoder (dev, 2,001 queries)
+Prediction: beats BM25 (pretrained meaning), below LambdaMART (never saw ESCI labels).
+Change: cross-encoder/ms-marco-MiniLM-L-12-v2 (MS MARCO web passages, no ESCI training), input
+"[CLS] query [SEP] product title [SEP]", max_length 128, RTX 4060, batch 64.
+Result (full-list nDCG): title 0.8332 (+0.0169 [+0.0124, +0.0214] vs BM25; LambdaMART − it = +0.0011
+[−0.0037, +0.0058], no clear difference). Title+brand 0.8334 (+0.0003 [−0.0014, +0.0019], no gain).
+Speed: 40,304 pairs in 15.9 s = 2,534 pairs/s. Per query: MiniLM better on 897, LambdaMART on 1,035,
+tie 69; per-query nDCG correlation 0.734.
+Conclusion: prediction half wrong. With zero ESCI labels it TIES LambdaMART trained on 357,759 labelled
+pairs. Low per-query correlation = different mistakes, so a blend (Week 6) should help. Next: fine-tune on
+ESCI train (Week 5), target ~0.857 (Amazon's fine-tuned MiniLM, test set, not directly comparable).
