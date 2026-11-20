@@ -27,7 +27,8 @@ import numpy as np
 import pandas as pd
 import torch
 
-from shoprank.cross.zero_shot import DEFAULT_MODEL, product_texts
+from shoprank.cross.typos import augment_queries
+from shoprank.cross.zero_shot import DEFAULT_MODEL, product_texts, read_products
 from shoprank.eval.run_task1 import save
 from shoprank.features.build import PROCESSED, cached
 from shoprank.hub import revision_for
@@ -293,6 +294,8 @@ def main() -> None:
     p.add_argument("--eval-every", type=int, default=1000)
     p.add_argument("--teacher", default=None, help="OOF score set to distil from, e.g. deberta_oof (MSE only)")
     p.add_argument("--teacher-weight", type=float, default=1.0)
+    p.add_argument("--typo-rate", type=float, default=0.0,
+                   help="share of training QUERIES given one synthetic typo; targets stay those of the clean query")
     args = p.parse_args()
     if args.teacher and args.loss != "mse":
         p.error("--teacher needs --loss mse")
@@ -304,10 +307,11 @@ def main() -> None:
     cfg = FitConfig(lr=args.lr, warmup_steps=args.warmup_steps, eval_every=args.eval_every, seed=args.seed,
                     limit_steps=args.limit_steps, loss=args.loss)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    # Only the needed columns: descriptions and bullets are large and unused (saves RAM).
-    products = pd.read_parquet(PROCESSED / "products.parquet", columns=["product_id", *fields])
     cols = ["query_id", "query", "product_id", "esci_label", "gain"]
     train = cached("train")[cols]
+    dev = cached("dev")[cols]
+    # Only the needed columns and only the products these pairs use (saves ~2.5 GB of RAM; same texts).
+    products = read_products(fields, pd.concat([train["product_id"], dev["product_id"]]))
     hold = is_holdout(train["query_id"])
     fit_part, hold_part = train[~hold].reset_index(drop=True), train[hold].reset_index(drop=True)
     fit_texts = product_texts(fit_part, products, fields)
@@ -341,14 +345,21 @@ def main() -> None:
         s = predict(m, tokenizer, hold_part["query"].tolist(), hold_texts, 128, cfg.max_length, device, cfg.bf16)
         return float(np.mean([r["ndcg_full"] for r in per_query_results(hold_part.assign(score=s), "score")]))
 
-    history = fit(net, tokenizer, fit_part["query"].tolist(), fit_texts, targets,
+    fit_queries = fit_part["query"].tolist()
+    if args.typo_rate > 0:
+        # Consistency training: a misspelled query keeps the target (teacher score) of the clean query, so the
+        # model learns that "cbale" should score like "cable". The hold-out stays clean (checkpoint choice).
+        fit_queries = augment_queries(fit_queries, fit_part["query_id"].tolist(), args.typo_rate, cfg.seed)
+        changed = sum(a != b for a, b in zip(fit_queries, fit_part["query"], strict=True))
+        print(f"typo augmentation: rate {args.typo_rate}, {changed:,} of {len(fit_queries):,} pairs changed",
+              flush=True)
+    history = fit(net, tokenizer, fit_queries, fit_texts, targets,
                   cfg, device, holdout_ndcg, log=lambda s: print(s, flush=True))
     out_dir = MODELS / name
     model.save_pretrained(out_dir)
     tokenizer.save_pretrained(out_dir)
     (out_dir / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
 
-    dev = cached("dev")[cols]
     start = time.perf_counter()
     scores = predict(net, tokenizer, dev["query"].tolist(), product_texts(dev, products, fields),
                      128, cfg.max_length, device, cfg.bf16)
@@ -356,6 +367,7 @@ def main() -> None:
               "loss": "mse_gain" if cfg.loss == "mse" else "ce_4class_expected_gain",
               "best_step": history["best_step"], "train_seconds": history["train_seconds"],
               "teacher": args.teacher, "teacher_weight": args.teacher_weight if args.teacher else None,
+              "typo_rate": args.typo_rate,
               "fit_pairs": len(fit_part), "dev_score_seconds": round(time.perf_counter() - start, 1),
               "peak_vram_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0}
     summary = save(name, "dev", per_query_results(dev.assign(score=scores), "score"), config)

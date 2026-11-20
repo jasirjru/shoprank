@@ -720,3 +720,47 @@ setup-uv v10.3.3, both over two weeks old); the placeholder `shoprank` console s
   ~7 GB). Fresh venv + fetched model: /health ok, /rank orders the USB-C cable first, 41 ms.
 - Dockerfile (python 3.12-slim and uv 0.12.17 pinned by digest, hashed requirements, model verified at build
   time, non-root user, health check). No Docker on this laptop: CI builds the image and runs a /rank smoke test.
+
+## 2026-11-21 — Phase D: typo-consistency distillation (pre-registered before any run)
+Problem (audit): one typo in a query costs the served model 0.026 dev nDCG (0.8654 -> 0.8392, INT8).
+Change (one change only): `--typo-rate 0.3` in `cross.finetune`. 30% of training QUERIES get one synthetic
+typo (`cross/typos.py`: transpose, delete, double, QWERTY-neighbour; one word of 4+ letters, never the first
+letter); every pair keeps the target of the clean query (the DeBERTa out-of-fold score), so the student learns
+that a misspelled query should score like the clean one. Everything else as `minilm_distil_w10_bullets`
+(teacher deberta_oof, weight 1.0, fields title/brand/colour/bullets, lr 7e-6, warmup 5000, 1 epoch, batch 32,
+checkpoint chosen on the CLEAN train hold-out). Rate 0.3 is set once, not tuned.
+Runs: baseline seeds 43, 44 (seed 42 exists) and typo seeds 42, 43, 44: 5 runs, ~10-12 min each.
+Measurement (dev, 2,001 queries, PyTorch bf16 scoring), per model: clean; `typo_transpose` and
+`typo_neighbour` (`eval_typo`: one fixed mistake in the longest word, position from the query id). Arms are
+compared on per-query nDCG averaged over the 3 seeds, paired bootstrap 95% CI over queries.
+Pass rules (all must hold):
+1. clean dev: mean change >= -max(0.0010, baseline 3-seed spread).
+2. typo_transpose: recovers >= 50% of the baseline gap (baseline clean - baseline typo_transpose).
+3. dev2 (1,053 queries, scored once, same models): the clean change is not below -0.002 and the typo gain
+   keeps the same sign.
+Predictions: baseline typo_transpose gap ~0.025 (audit: 0.026 on INT8); typo_neighbour gap similar or larger;
+typo arm recovers 50-80% of both gaps; clean change between -0.002 and +0.001; baseline seed spread <= 0.001.
+Caveat stated in advance: train and test typos come from the same generator family; this measures robustness to
+these synthetic mistakes, not to all real misspellings.
+
+Result (Phase D, dev; `data/processed/runs/typo_robustness_dev.json`):
+| Dev, 2,001 queries, mean of 3 seeds | baseline | typo 0.3 | typo - baseline [95% CI] |
+|---|---|---|---|
+| clean | 0.8657 | 0.8642 | -0.0015 [-0.0028, -0.0003] |
+| typo_transpose | 0.8374 | 0.8415 | +0.0041 [+0.0019, +0.0062] (14% of the 0.0283 gap) |
+| typo_neighbour | 0.8400 | 0.8433 | +0.0032 [+0.0011, +0.0052] (13% of the 0.0257 gap) |
+Per model (clean / transpose / neighbour): baseline s42 0.8667/0.8382/0.8404, s43 0.8650/0.8372/0.8402,
+s44 0.8655/0.8368/0.8394; typo s42 0.8639/0.8427/0.8438, s43 0.8641/0.8404/0.8425, s44 0.8645/0.8412/0.8434.
+Baseline seed spread (clean) 0.0017, larger than the 0.0003 measured for title-only MiniLM.
+Prediction check: gap ~0.025: right (0.028 / 0.026); recovery 50-80%: WRONG (13-14%); clean change between
+-0.002 and +0.001: right (-0.0015); baseline seed spread <= 0.001: wrong (0.0017).
+Verdict by the pre-registered rules: rule 1 passes narrowly (-0.0015 >= -0.0017), rule 2 FAILS (14% < 50%).
+dev2 is therefore not used (it stays unspent for a later candidate). The served model stays v1.0.
+What this means: consistency training buys a real but small robustness gain (+0.004 on typo queries) at a real
+small clean cost (-0.0015). A 33M-parameter student that sees each misspelled query once cannot learn to undo
+the subword split a typo causes ("cbale" -> different word pieces). Likely better fix, not yet tested: correct
+the query BEFORE ranking (spell correction against the catalogue vocabulary), which is how production search
+handles typos; its ceiling is the clean score (0.8657), i.e. up to the full 0.028.
+Incident: first attempt thrashed (process 10.3 GB, 1.9 GB resident: all 1.2M products of three locales were
+loaded); fixed by reading only the 336k products the pairs use (`cross.zero_shot.read_products`, identical
+texts, tested). The laptop also slept ~11 h mid-run; runs resumed, results unaffected.

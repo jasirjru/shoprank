@@ -21,6 +21,13 @@ Phase B, anyone can run it.
 - Dockerfile: CPU serving image without torch (45 packages); CI job builds it and checks `/rank`.
 - Model card: download and usage without this repo.
 
+Phase D, typo robustness (negative result, recorded).
+- `cross/typos.py` (synthetic typos), `--typo-rate` in `cross.finetune` (consistency distillation),
+  `eval/typo_robustness.py` (clean vs typo dev, seed-averaged paired CIs); `scripts/phase_d.sh`.
+- Result on dev (3 seeds each): typo queries +0.0041 [+0.0019, +0.0062], 14% of the 0.028 typo loss, at a clean
+  cost of -0.0015 [-0.0028, -0.0003]. Fails the pre-registered 50% rule: served model unchanged, dev2 unspent.
+- Training reads only the products its pairs use (`read_products`): 1.2M -> 336k rows, identical texts.
+
 ## v1.0 — 21 Nov 2026 (commit 3390899)
 Baseline for every later change.
 - Top model: DeBERTa-v3-base, mean of 5 fold models. Official test nDCG 0.8877 [0.8849, 0.8905].
