@@ -41,6 +41,24 @@ def score_frame(pairs: pd.DataFrame, scores: np.ndarray) -> pd.DataFrame:
     return out.reset_index(drop=True)
 
 
+def score_pairs(model_dir, pairs: pd.DataFrame, fields: list[str], max_length: int = 128,
+                batch_size: int = BATCH) -> np.ndarray:
+    """Score every pair with the saved model in `model_dir`, reading the same product fields as in training."""
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    products = pd.read_parquet(PROCESSED / "products.parquet", columns=["product_id", *fields])
+    texts = product_texts(pairs, products, fields)
+    tokenizer = AutoTokenizer.from_pretrained(model_dir)
+    model = AutoModelForSequenceClassification.from_pretrained(model_dir, dtype=torch.float32).to(device)
+    net = Prepared4DMask(model) if model.config._attn_implementation == "sdpa" else model
+    scores = predict(net, tokenizer, pairs["query"].tolist(), texts, batch_size, max_length, device, bf16=True)
+    del model, net
+    if device == "cuda":
+        torch.cuda.empty_cache()
+    return scores
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Per-pair scores for a saved cross-encoder run")
     ap.add_argument("run")
@@ -49,21 +67,10 @@ def main() -> None:
     args = ap.parse_args()
     check_split(args.split, args.allow_test)
 
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
-
     config = json.loads((PROCESSED / "runs" / f"{args.run}.json").read_text(encoding="utf-8"))  # flat summary
-    fields, max_length = config["fields"], config.get("max_length", 128)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     pairs, _ = load_split(args.split)
-    products = pd.read_parquet(PROCESSED / "products.parquet", columns=["product_id", *fields])
-    texts = product_texts(pairs, products, fields)
-    model_dir = MODELS / args.run
-    tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    model = AutoModelForSequenceClassification.from_pretrained(model_dir, dtype=torch.float32).to(device)
-    net = Prepared4DMask(model) if model.config._attn_implementation == "sdpa" else model
-
     start = time.perf_counter()
-    scores = predict(net, tokenizer, pairs["query"].tolist(), texts, BATCH, max_length, device, bf16=True)
+    scores = score_pairs(MODELS / args.run, pairs, config["fields"], config.get("max_length", 128))
     seconds = time.perf_counter() - start
     SCORES.mkdir(parents=True, exist_ok=True)
     path = SCORES / f"{args.run}_{args.split}.parquet"

@@ -474,3 +474,147 @@ The +0.0133 of the best student splits cleanly into two real, roughly equal part
 Caveat from the review: the teacher's OOF scores on the student's hold-out queries came from fold models that
 trained on other hold-out queries; this only affects the student's checkpoint choice (best step), not dev.
 Serving candidate for section 15: `minilm_distil_w10_bullets` (33M parameters, 26 s for 40k dev pairs on GPU).
+
+## 2026-11-21 — Pre-registration for the one-time official test run (section 16), decided by the learner
+Test split = official ESCI Task 1 test, US, small version: 8,956 queries / 181,701 pairs, never scored so far.
+Declared before any test score is seen (no choice will be made from test):
+- Primary system: `deberta_oof_avg5` (mean of the 5 DeBERTa-v3-base fold models; title, brand, colour, bullets).
+- Declared second system: `stack_lgbm` (LightGBM stack on the 14 features + DeBERTa/MiniLM OOF scores).
+- Also reported, not candidates: `bm25_title`, `lambdamart`, `minilm_ft_mse_fast`, and the serving model
+  `minilm_distil_w10_bullets` (its test number goes in the section 15 quality-vs-latency table).
+- External references: Amazon's fine-tuned MiniLM 0.857 (English, official test), public project 0.854.
+- Each system scored exactly once; nDCG with bootstrap 95% CIs; re-checked with pytrec_eval (trec_eval,
+  gains x100, which leaves nDCG unchanged).
+Prediction (before running): `deberta_oof_avg5` 0.878-0.886 (dev 0.8879 is a little optimistic, dev2 0.8812);
+`stack_lgbm` - `deberta_oof_avg5` between -0.001 and +0.003 (pooled dev+dev2 +0.0012); both above Amazon's
+0.857 by 0.02-0.03; `minilm_distil_w10_bullets` 0.860-0.868; BM25 and LambdaMART within 0.005 of dev.
+
+## 2026-11-21 — Section 15: ONNX export + INT8 of the served model (`minilm_distil_w10_bullets`)
+What the sources do: ONNX Runtime's own guide for BERT-family models is export -> transformer optimizer
+(fused attention / LayerNorm / GELU) -> dynamic INT8 quantisation; Amazon's esci-data baseline has no serving
+code. Copied as is; per-channel weight quantisation (usually loses less accuracy than per-tensor).
+Prediction (before running): ONNX fp32 matches PyTorch fp32 to < 1e-4 per score; INT8 model ~4x smaller
+(~127 MB -> ~32 MB); INT8 dev nDCG within 0.002 of fp32 (0.8667), and 2-3x more pairs/s than fp32 on CPU.
+(Timings in this step run while the GPU test scoring also uses the CPU; the load test later is the clean one.)
+Result (dev, 2,001 queries / 40,304 pairs; files in data/processed/models/onnx/minilm_distil_w10_bullets/):
+
+| Model | Size | dev nDCG full | Max abs score diff vs PyTorch fp32 (512 pairs) |
+|---|---|---|---|
+| PyTorch, bf16 autocast (training eval) | 127 MB | 0.8667 | |
+| ONNX fp32, fused (`model_opt.onnx`) | 127 MB | 0.8662 | 9.5e-07 |
+| ONNX INT8 dynamic, per-channel (`model_int8.onnx`) | **32 MB** | **0.8654** | 8.7e-02 |
+
+Prediction check: parity < 1e-4 right (9.5e-07: the ONNX graph computes the same function); 4x smaller
+right (127 -> 32 MB); INT8 within 0.002 right (-0.0008 vs ONNX fp32). The bf16 vs fp32 gap (0.0005) is
+numeric noise of the same size. Speed: 156 vs 207 pairs/s (1.3x), but measured while the GPU test run was
+also using the CPU, so not a fair number; the load test measures it cleanly.
+Fix needed on the way: quantize_dynamic failed on the fused graph ("Unable to find data type ... shape
+inference failed") because the fused ops are ONNX Runtime-only; extra_options DefaultTensorType=FLOAT fixed it,
+as the error message itself suggests.
+
+## 2026-11-21 — Section 15: ranking API load test (FastAPI + ONNX Runtime on CPU)
+Setup: `uvicorn shoprank.serve.app:app`, 1 process, ONNX Runtime default threads (32 logical CPUs, laptop on
+mains power, Turbo plan). Requests = real dev queries with their full candidate lists (median ~20 products,
+title + brand + colour + bullets). Client and server on the same laptop (no network cost). 300 timed requests
+per level after 20 warm-up requests. Run after the GPU test scoring finished, nothing else heavy running.
+Prediction (before running):
+- INT8 at concurrency 1: p50 30-80 ms, p95 < 150 ms per request (about 300-700 pairs/s).
+- INT8 vs fp32 (`model_opt.onnx`): 1.5-2.5x more pairs/s at the same concurrency.
+- Concurrency 16: throughput only +0-50% over concurrency 1 (one request already uses all cores), and
+  p95 grows to several hundred ms (requests wait in line).
+
+## 2026-11-21 — Section 16: official test results (scored once, 07:31-08:18, as pre-registered)
+Official ESCI Task 1 test, US, small version: 8,956 queries / 181,701 pairs. 95% CIs: query bootstrap, 10,000
+resamples. One incident: the first `final_test` attempt hit CUDA out-of-memory on the first DeBERTa fold at
+batch 128 before any score was written; re-run at batch 64. BM25 had been scored once before the crash and was
+not re-scored.
+
+| System | nDCG full [95% CI] | nDCG@10 [95% CI] | dev | dev2 |
+|---|---|---|---|---|
+| BM25 (title) | 0.8202 [0.8170, 0.8232] | 0.6942 [0.6899, 0.6986] | 0.8163 | |
+| LambdaMART (14 features) | 0.8337 [0.8305, 0.8368] | 0.7172 [0.7128, 0.7215] | 0.8342 | 0.8364 |
+| MiniLM, Amazon recipe (ours) | 0.8544 [0.8513, 0.8573] | 0.7527 [0.7487, 0.7568] | 0.8534 | |
+| MiniLM distilled + bullets (served) | 0.8674 [0.8643, 0.8703] | 0.7743 [0.7702, 0.7783] | 0.8667 | |
+| **DeBERTa-v3-base x5 mean (primary)** | **0.8877 [0.8849, 0.8905]** | **0.8092 [0.8053, 0.8131]** | 0.8879 | 0.8812 |
+| LightGBM stack (declared second) | 0.8883 [0.8855, 0.8910] | 0.8099 [0.8060, 0.8137] | 0.8879 | 0.8845 |
+
+Paired (test): primary - BM25 +0.0676 [+0.0646, +0.0705]; primary - LambdaMART +0.0541 [+0.0513, +0.0568];
+stack - primary +0.0006 [-0.0003, +0.0014] (no clear difference); served MiniLM - Amazon-recipe MiniLM
++0.0130 [+0.0112, +0.0148]; primary - served MiniLM +0.0204 [+0.0184, +0.0223].
+External references: Amazon's fine-tuned MiniLM 0.857 (English) and the public project 0.854 are both below
+the primary system's CI (+0.031 and +0.034). Our own run of Amazon's recipe gives 0.8544, close to their 0.857
+(we train on 80% of their training data: dev and dev2 are held out), which supports that the metric matches.
+Independent check: pytrec_eval (trec_eval) means equal ours within 0.0003 for every system. Per-query
+differences came only from tied scores: trec_eval orders ties by document id descending, we ascending. With
+trec_eval's tie rule our nDCG matches it exactly (max per-query diff 7.8e-16, served MiniLM). Ties are common
+(14.4% of the served model's pairs) because scores pass through bf16; the tie order moves the mean by 0.00005.
+Prediction check:
+- primary 0.878-0.886: wrong, slightly better (0.8877). dev was not optimistic after all; dev2 (1,053 queries)
+  was the low one. The selection-bias worry from dev2 did not show up on 8,956 test queries.
+- stack - primary in [-0.001, +0.003]: right (+0.0006, CI holds 0). Stacking adds nothing measurable.
+- above Amazon 0.857 by 0.02-0.03: right at the edge (+0.031).
+- served MiniLM 0.860-0.868: right (0.8674). BM25 and LambdaMART within 0.005 of dev: right (+0.0039, -0.0005).
+Test is now spent: no model, setting or choice changes because of these numbers.
+Follow-up idea (not done): score heads in fp32 instead of bf16 to remove ties.
+Result (dev requests: 2,001 queries, median 16 candidates, max 84; latency seen by the client):
+
+| Model | Concurrency | p50 ms | p95 ms | p99 ms | req/s | pairs/s |
+|---|---|---|---|---|---|---|
+| INT8 | 1 | 67.8 | 232.7 | 261.9 | 11.0 | 222 |
+| INT8 | 4 | 377.4 | 871.4 | 929.3 | 9.2 | 187 |
+| INT8 | 16 | 1,880 | 4,018 | 4,855 | 7.5 | 151 |
+| fp32 | 1 | 109.3 | 300.9 | 306.4 | 7.5 | 152 |
+| fp32 | 4 | 408.2 | 927.6 | 982.5 | 8.5 | 172 |
+| fp32 | 16 | 1,829 | 3,896 | 5,102 | 7.6 | 155 |
+
+No errors. Prediction check: INT8 c=1 p50 30-80 ms right (68); p95 < 150 ms wrong (233: long tail from
+requests with many candidates and long bullets); INT8 vs fp32 1.5-2.5x: just below (1.46x pairs/s at c=1);
+c=16 throughput +0-50%: wrong, it FELL 32% (222 -> 151 pairs/s) and INT8's lead vanished.
+Diagnosis: every request asks ONNX Runtime for all 32 logical CPUs, so 16 parallel requests run 16 x 32
+threads on 16 physical cores: the threads fight (context switches, cache thrashing).
+Next, one change: at most 1 model call at a time per process (a semaphore, others wait in line) and 16 threads
+(physical cores; hyper-threads add little to matrix maths).
+Prediction (before running): INT8 c=1 >= 222 pairs/s; c=4 and c=16 keep the c=1 throughput (within 10%),
+with p50 growing about linearly with concurrency (queueing, not fighting).
+Result (SHOPRANK_THREADS=16, SHOPRANK_MAX_CONCURRENT=1; same requests):
+
+| Model | Concurrency | p50 ms | p95 ms | p99 ms | req/s | pairs/s |
+|---|---|---|---|---|---|---|
+| INT8 | 1 | 69.1 | 232.4 | 254.7 | 10.7 | 217 |
+| INT8 | 4 | 327.7 | 572.2 | 704.7 | 11.3 | 229 |
+| INT8 | 16 | 1,436 | **1,784** (was 4,018) | **1,950** (was 4,855) | 11.3 | **230** (was 151) |
+| fp32 | 1 | 115.2 | 313.2 | 335.3 | 7.1 | 143 |
+| fp32 | 16 | 2,166 | 2,607 | 2,762 | 7.4 | 151 |
+
+Prediction check: right. Throughput no longer falls with load (INT8 217 -> 230 pairs/s, +6%), p95 at
+concurrency 16 is 2.3x lower, and INT8 keeps a 1.5x lead over fp32 under load. Latency at high load is now
+pure queueing (p50 grows ~linearly with concurrency), which is the honest capacity limit of one laptop
+process: ~11 requests/s of ~16 candidates with bullets. Kept as the default (MAX_CONCURRENT=1).
+
+Quality vs latency (served-model options; nDCG on test where it exists, else dev):
+
+| Option | Hardware | Test nDCG | Dev nDCG | Throughput | Latency (1 request, ~16 candidates) |
+|---|---|---|---|---|---|
+| BM25 title | CPU | 0.8202 | 0.8163 | not measured in the API (no neural model) | |
+| MiniLM distilled + bullets, INT8 ONNX (**served**) | CPU, 16 threads | (0.8674 PyTorch) | 0.8654 | 230 pairs/s | p50 69 ms, p95 232 ms |
+| same, fp32 ONNX | CPU, 16 threads | (0.8674 PyTorch) | 0.8662 | 151 pairs/s | p50 115 ms, p95 313 ms |
+| DeBERTa-v3-base x5 mean | GPU (RTX 4060), bf16 | 0.8877 | 0.8879 | ~89 pairs/s (443 per model, offline batches) | not served |
+
+The INT8 model was not scored on test (test is spent); its dev loss vs fp32 is 0.0008. The DeBERTa ensemble
+is 0.020 nDCG better on test but needs a GPU and is ~2.6x slower even there: the distilled MiniLM is the
+practical serving choice; DeBERTa stays the offline teacher.
+
+## 2026-11-21 — Reviewer agent (Sonnet) on sections 15-16 code
+No HIGH issues; serving input matches training input (text join, tokenizer call, pair order, truncation).
+Fixed: max_length taken from the run config in the ONNX export; ranker refuses a non-1-logit model; tokenizer
+calls under a lock (HF fast tokenizers are not thread-safe); 1 MB body limit (413) and Content-Length required
+for POST; 503 after 10 s waiting for the model instead of an unbounded queue; blank titles rejected; load test
+counts latency/throughput for successful requests only and survives client exceptions (the measured runs had 0
+errors, so their numbers are unchanged); CI limited to main + PRs, read-only token, cancel superseded runs.
+Not changed on purpose: `final_test.py` stays exactly as it ran (it is the record of the one-time test).
+Its known weaknesses, for an honest record: the once-guard file is written mid-run, so a crash before it would
+allow a silent re-write of earlier run files; the score cache is keyed by name only (no model hash); fields
+for the single MiniLM runs are hard-coded rather than read from their run files (they match:
+`minilm_ft_mse_fast` = title, `minilm_distil_w10_bullets` = title, brand, colour, bullets); the trec_eval check
+prints rather than asserts. None of these happened in this run (one crash, before any model score or guard).
+Load-test limits stated in the code: closed-loop clients, client and server on one CPU, p99 from 300 requests.

@@ -1,0 +1,26 @@
+# Lint + unit tests on pushes to main and on pull requests. The tests use tiny fakes: no data, no GPU.
+# torch comes from the CUDA 12.8 index (pyproject.toml), so the first run downloads several GB; the uv cache
+# keeps later runs fast. The wheel works on a CPU-only runner. `--locked` fails if uv.lock is out of date.
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - run: uv run --frozen ruff check src tests
+      - run: uv run --frozen pytest -q
