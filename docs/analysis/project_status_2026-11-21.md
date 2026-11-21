@@ -1,4 +1,4 @@
-# ShopRank: final status (21 Nov 2026, v1.1.1)
+# ShopRank: final status (21 Nov 2026, v1.1.2)
 
 The build is complete. This page says what exists, how good it is, how to run it, what is known to be weak, and
 what would come next. Details: `README.md`, `docs/MODEL_CARD.md`, `docs/lab_notebook.md`, `CHANGELOG.md`.
@@ -31,6 +31,9 @@ what would come next. Details: `README.md`, `docs/MODEL_CARD.md`, `docs/lab_note
 - Ready-made rerankers, zero-shot on dev: BGE-reranker-v2-m3 (568M) 0.8585 and Qwen3-Reranker-0.6B (596M) 0.8540,
   both below our served 33M model (0.8667; paired CIs exclude 0). In-domain distillation beats size here.
 
+- More labelled data (large ESCI version, 3.3x pairs) gives the small MiniLM +0.0052 [+0.0023, +0.0082] on dev,
+  about what distillation gave; distilling on the large version (needs ~7 GPU-hours of teacher folds) is untested.
+
 ## How to run it (no GPU, no training)
 ```bash
 docker build -t shoprank . && docker run --rm -p 8000:8000 shoprank
@@ -60,7 +63,8 @@ docker build -t shoprank . && docker run --rm -p 8000:8000 shoprank
   are backed up in a private Hugging Face repository.
 
 ## What would come next (not started)
-1. Random-sample label audit (200 pairs, two judges, kappa): the realistic ceiling.
+1. Human pass over the 57 contested rows of the random label audit (`label_audit_random200_dev.csv`,
+   column `your_label`): turns the AI-judge upper bound (28.5%) into a real label error rate.
 2. Retrieval stage on the large ESCI version: BM25 + embeddings over the 1.2M-product catalogue, then re-rank.
 3. Real typo logs (or mined misspellings) to replace synthetic typos; correct words with attached punctuation.
 4. Serving depth: /metrics, latency under a fixed arrival rate, authentication.
