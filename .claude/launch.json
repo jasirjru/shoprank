@@ -6,6 +6,12 @@
       "runtimeExecutable": "uv",
       "runtimeArgs": ["run", "--group", "demo", "python", "-m", "shoprank.serve.demo"],
       "port": 7860
+    },
+    {
+      "name": "shoprank-site",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "python", "-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "site/public"],
+      "port": 8765
     }
   ]
 }

@@ -1,6 +1,8 @@
 
 # data is downloaded, never committed
 data/
+# except the six public page examples (product titles from the Apache-2.0 dataset)
+!site/data/
 mlruns/
 
 # Python bytecode

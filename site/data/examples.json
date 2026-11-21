@@ -1,0 +1,1244 @@
+{
+ "split": "dev",
+ "metric": "nDCG over the full judged list (Exact 1, Substitute 0.1, Complement 0.01)",
+ "baseline": "BM25 on product titles",
+ "model": "ShopRank API: spell correction + INT8 MiniLM",
+ "examples": [
+  {
+   "query_id": 54672,
+   "query": "iphone xs pro",
+   "query_used": "iphone xs pro",
+   "note": "Keyword search sees 'iphone' and 'pro' in screen-protector titles. ShopRank knows the shopper wants a phone.",
+   "ndcg": {
+    "bm25": 0.377,
+    "shoprank": 1.0
+   },
+   "bm25": [
+    {
+     "product_id": "B07JFVM28K",
+     "title": "Fotbor for iPhone Xs Max/iPhone 11 Pro Max Privacy Screen Protector, 2 Pack iPhone Xs Max Screen Protector/iPhone 11 Pro Max Screen Portector 6.5 Inch 9H Hardness Tempered Glass Anti Spy Case Friendly",
+     "brand": "Fotbor",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QMZPV8M",
+     "title": "Purity Screen Protector for Apple iPhone 11 Pro/iPhone Xs/iPhone X - 3 Pack (w/Installation Frame) Tempered Glass Screen Protector Compatible iPhone XS/X/11Pro (3 Pack) [Fit with Most Cases]",
+     "brand": "Purity",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07515P7PT",
+     "title": "JETech Screen Protector for iPhone 11 Pro, for iPhone Xs, for iPhone X, 5.8-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07VLYNWX9",
+     "title": "Mkeke Compatible with iPhone 11 Pro Screen Protector, iPhone X Screen Protector, iPhone Xs Tempered Glass Screen Protector All 5.8 inch New iPhone [3-Pack]",
+     "brand": "Mkeke",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07GZQBVPC",
+     "title": "JETech Screen Protector for iPhone 11 Pro Max and iPhone Xs Max 6.5-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07YFYKVMZ",
+     "title": "Mkeke Compatible with iPhone 11 Pro Max Screen Protector, iPhone Xs Max Screen Protector Tempered Glass -3 Pack 6.5\"",
+     "brand": "Mkeke",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07H1DHJBV",
+     "title": "Ailun Screen Protector Compatible for iPhone 11 Pro Max/iPhone Xs Max 3 Pack 6.5 Inch 2019/2018 Release Case Friendly Tempered Glass",
+     "brand": "Ailun",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B075S8V728",
+     "title": "Ailun for Apple iPhone 11 Pro/iPhone Xs/iPhone X Screen Protector,3 Pack,5.8 Inch Display,Tempered Glass 2.5D Edge Work Most Case[NOT for iPhone 11,6.1 inch]",
+     "brand": "Ailun",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B073DLZWX7",
+     "title": "Maxboost Screen Protector for Apple iPhone Xs & iPhone X & iPhone 11 Pro (3 Packs, Clear) 0.25mm Tempered Glass Screen Protector with Advanced Clarity [3D Touch] Work w/Most Case 99% Touch Accurate",
+     "brand": "Maxboost",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07FQY28GR",
+     "title": "TETHYS Glass Screen Protector Designed for Apple iPhone 11 Pro Max/iPhone Xs Max (6.5\") [Edge to Edge Coverage] Full Protection Durable Tempered Glass [Guidance Frame Included] - Pack of 3",
+     "brand": "TETHYS",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07KMDX68M",
+     "title": "Mothca Matte Screen Protector for iPhone Xs Max/iPhone 11 Pro Max Anti-Glare & Anti-Fingerprint Tempered Glass Clear Film Case Friendly 3D Touch Easy Install Bubble Free - Smooth as Silk",
+     "brand": "Mothca",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SC58QBW",
+     "title": "(Renewed) Apple iPhone XS, US Version, 64GB, Space Gray - Unlocked",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07QC4K9BH",
+     "title": "(2 Pack) Supershieldz Designed for Apple iPhone 11 Pro Max and iPhone Xs Max (6.5 inch) (Privacy) Anti Spy Tempered Glass Screen Protector with (Easy Installation Tray) Anti Scratch, Bubble Free",
+     "brand": "Supershieldz",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07FP41MC5",
+     "title": "Trianium (3 Packs) Screen Protector Designed for Apple iPhone 11 Pro Max, iPhone XS Max (6.5\" 2018) Premium HD Clarity 0.25mm Tempered Glass Screen Protector Easy Installation Alignment Case (3-Pack)",
+     "brand": "Trianium",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07K8RNW7H",
+     "title": "(Renewed) Apple iPhone XS Max, US Version, 64GB, Space Gray - Unlocked",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07ZQSKGLZ",
+     "title": "Apple iPhone 11 Pro Max, US Version, 512GB, Midnight Green - Unlocked (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B07SC58QBW",
+     "title": "(Renewed) Apple iPhone XS, US Version, 64GB, Space Gray - Unlocked",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07K8RNW7H",
+     "title": "(Renewed) Apple iPhone XS Max, US Version, 64GB, Space Gray - Unlocked",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07ZQSKGLZ",
+     "title": "Apple iPhone 11 Pro Max, US Version, 512GB, Midnight Green - Unlocked (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B075S8V728",
+     "title": "Ailun for Apple iPhone 11 Pro/iPhone Xs/iPhone X Screen Protector,3 Pack,5.8 Inch Display,Tempered Glass 2.5D Edge Work Most Case[NOT for iPhone 11,6.1 inch]",
+     "brand": "Ailun",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07YFYKVMZ",
+     "title": "Mkeke Compatible with iPhone 11 Pro Max Screen Protector, iPhone Xs Max Screen Protector Tempered Glass -3 Pack 6.5\"",
+     "brand": "Mkeke",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07GZQBVPC",
+     "title": "JETech Screen Protector for iPhone 11 Pro Max and iPhone Xs Max 6.5-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07JFVM28K",
+     "title": "Fotbor for iPhone Xs Max/iPhone 11 Pro Max Privacy Screen Protector, 2 Pack iPhone Xs Max Screen Protector/iPhone 11 Pro Max Screen Portector 6.5 Inch 9H Hardness Tempered Glass Anti Spy Case Friendly",
+     "brand": "Fotbor",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07H1DHJBV",
+     "title": "Ailun Screen Protector Compatible for iPhone 11 Pro Max/iPhone Xs Max 3 Pack 6.5 Inch 2019/2018 Release Case Friendly Tempered Glass",
+     "brand": "Ailun",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07FQY28GR",
+     "title": "TETHYS Glass Screen Protector Designed for Apple iPhone 11 Pro Max/iPhone Xs Max (6.5\") [Edge to Edge Coverage] Full Protection Durable Tempered Glass [Guidance Frame Included] - Pack of 3",
+     "brand": "TETHYS",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07KMDX68M",
+     "title": "Mothca Matte Screen Protector for iPhone Xs Max/iPhone 11 Pro Max Anti-Glare & Anti-Fingerprint Tempered Glass Clear Film Case Friendly 3D Touch Easy Install Bubble Free - Smooth as Silk",
+     "brand": "Mothca",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B073DLZWX7",
+     "title": "Maxboost Screen Protector for Apple iPhone Xs & iPhone X & iPhone 11 Pro (3 Packs, Clear) 0.25mm Tempered Glass Screen Protector with Advanced Clarity [3D Touch] Work w/Most Case 99% Touch Accurate",
+     "brand": "Maxboost",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07FP41MC5",
+     "title": "Trianium (3 Packs) Screen Protector Designed for Apple iPhone 11 Pro Max, iPhone XS Max (6.5\" 2018) Premium HD Clarity 0.25mm Tempered Glass Screen Protector Easy Installation Alignment Case (3-Pack)",
+     "brand": "Trianium",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07515P7PT",
+     "title": "JETech Screen Protector for iPhone 11 Pro, for iPhone Xs, for iPhone X, 5.8-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QC4K9BH",
+     "title": "(2 Pack) Supershieldz Designed for Apple iPhone 11 Pro Max and iPhone Xs Max (6.5 inch) (Privacy) Anti Spy Tempered Glass Screen Protector with (Easy Installation Tray) Anti Scratch, Bubble Free",
+     "brand": "Supershieldz",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QMZPV8M",
+     "title": "Purity Screen Protector for Apple iPhone 11 Pro/iPhone Xs/iPhone X - 3 Pack (w/Installation Frame) Tempered Glass Screen Protector Compatible iPhone XS/X/11Pro (3 Pack) [Fit with Most Cases]",
+     "brand": "Purity",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07VLYNWX9",
+     "title": "Mkeke Compatible with iPhone 11 Pro Screen Protector, iPhone X Screen Protector, iPhone Xs Tempered Glass Screen Protector All 5.8 inch New iPhone [3-Pack]",
+     "brand": "Mkeke",
+     "label": "Complement"
+    }
+   ]
+  },
+  {
+   "query_id": 50847,
+   "query": "holey jeans for babys",
+   "query_used": "holey jeans for babys",
+   "note": "Casual words. Keyword search shows women's jeans; ShopRank finds ripped jeans for babies.",
+   "ndcg": {
+    "bm25": 0.4922,
+    "shoprank": 0.9927
+   },
+   "bm25": [
+    {
+     "product_id": "B07G8GJXN6",
+     "title": "Kardashian Jeans, Womens High Waisted Skinny Denim Stretch Slim Length Jeans Pants",
+     "brand": "TOPUNDER",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07G8FQM6T",
+     "title": "TOPUNDER High Waisted Skinny Elastic for Women Denim Pants\u2002 Holes Broken Pencil Jeans White",
+     "brand": "TOPUNDER",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07G8FD614",
+     "title": "TOPUNDER Plus Size High Waist Jeans for Women Trimmings Slim Denim Pants Belt Trousers Blue",
+     "brand": "TOPUNDER",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B079FRSPQW",
+     "title": "Kehen Kids Toddler Girls 3pcs Summer Outfits Ruffles Whirt T-Shirt Tops+Blue Denim Stretch Loose Jeans Destroy Ripped Jeans Distressed Pants+Headband Sets (White, 6-12 Months)",
+     "brand": "Kehen",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07DGH6BX6",
+     "title": "COVER GIRL Women's Skinny Jeans Distressed Fray Cropped, Step Hem/Inseam, 7 Junior",
+     "brand": "COVER GIRL",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B06Y2K57D8",
+     "title": "The Children's Place Baby Girls and Toddler Girls Basic Skinny Jeans, Blues Wash, 2T",
+     "brand": "The Children's Place",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B075B4ZHMG",
+     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Waist Ripped Denim Pants,Blue,6-12 Months",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07D38QB85",
+     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B00WGIA22K",
+     "title": "The Children's Place Baby Toddler Girls Basic Denim Jacket, China Blue, 2T",
+     "brand": "The Children's Place",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B073XJZPFH",
+     "title": "Signature by Levi Strauss & Co. Gold Label Women's Modern Skinny Jean, Mascara, 12",
+     "brand": "Signature by Levi Strauss & Co. Gold Label",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B078HF97NF",
+     "title": "KIDSCOOL SPACE Baby Ripped Jean,Toddler Elastic Distressed Waist Denim Pants,2-3 Years",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07FD45L8L",
+     "title": "Women's Stretch Pull-On Skinny Ripped Distressed Denim Jeggings Regular-Plus Size (XX-Large, Dark Denim)",
+     "brand": "Jvini",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07PK7R5N6",
+     "title": "KIDSCOOL SPACE Baby Girl Boy Jean,D Ring Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07PPLR8LF",
+     "title": "CARETOO Girls Clothes Outfits, Cute Baby Girl Floral Long Sleeve Pant Set Flower Ruffle Top Pink",
+     "brand": "CARETOO",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07VYHP8GL",
+     "title": "3PCS Infant Baby Girl Leopard Outfits Fly Sleeve Hollow Romper Bodysuit+Harem Pants+Headband Clothes Set (Jean Set, 12-24M)",
+     "brand": "Luckinbaby",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B087JMXVH7",
+     "title": "Toddler Baby Girls Ruffle Halter Crop Top Shirt+Ripped Jean Shorts Summer Outfits Clothes Sets (Yellow Top+Jean Shorts, 2T)",
+     "brand": "hunan",
+     "label": "Substitute"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B075B4ZHMG",
+     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Waist Ripped Denim Pants,Blue,6-12 Months",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07D38QB85",
+     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07PK7R5N6",
+     "title": "KIDSCOOL SPACE Baby Girl Boy Jean,D Ring Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B078HF97NF",
+     "title": "KIDSCOOL SPACE Baby Ripped Jean,Toddler Elastic Distressed Waist Denim Pants,2-3 Years",
+     "brand": "KIDSCOOL SPACE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07G8FQM6T",
+     "title": "TOPUNDER High Waisted Skinny Elastic for Women Denim Pants\u2002 Holes Broken Pencil Jeans White",
+     "brand": "TOPUNDER",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B087JMXVH7",
+     "title": "Toddler Baby Girls Ruffle Halter Crop Top Shirt+Ripped Jean Shorts Summer Outfits Clothes Sets (Yellow Top+Jean Shorts, 2T)",
+     "brand": "hunan",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B06Y2K57D8",
+     "title": "The Children's Place Baby Girls and Toddler Girls Basic Skinny Jeans, Blues Wash, 2T",
+     "brand": "The Children's Place",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07G8GJXN6",
+     "title": "Kardashian Jeans, Womens High Waisted Skinny Denim Stretch Slim Length Jeans Pants",
+     "brand": "TOPUNDER",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07G8FD614",
+     "title": "TOPUNDER Plus Size High Waist Jeans for Women Trimmings Slim Denim Pants Belt Trousers Blue",
+     "brand": "TOPUNDER",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07VYHP8GL",
+     "title": "3PCS Infant Baby Girl Leopard Outfits Fly Sleeve Hollow Romper Bodysuit+Harem Pants+Headband Clothes Set (Jean Set, 12-24M)",
+     "brand": "Luckinbaby",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07FD45L8L",
+     "title": "Women's Stretch Pull-On Skinny Ripped Distressed Denim Jeggings Regular-Plus Size (XX-Large, Dark Denim)",
+     "brand": "Jvini",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B079FRSPQW",
+     "title": "Kehen Kids Toddler Girls 3pcs Summer Outfits Ruffles Whirt T-Shirt Tops+Blue Denim Stretch Loose Jeans Destroy Ripped Jeans Distressed Pants+Headband Sets (White, 6-12 Months)",
+     "brand": "Kehen",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B00WGIA22K",
+     "title": "The Children's Place Baby Toddler Girls Basic Denim Jacket, China Blue, 2T",
+     "brand": "The Children's Place",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07DGH6BX6",
+     "title": "COVER GIRL Women's Skinny Jeans Distressed Fray Cropped, Step Hem/Inseam, 7 Junior",
+     "brand": "COVER GIRL",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B073XJZPFH",
+     "title": "Signature by Levi Strauss & Co. Gold Label Women's Modern Skinny Jean, Mascara, 12",
+     "brand": "Signature by Levi Strauss & Co. Gold Label",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07PPLR8LF",
+     "title": "CARETOO Girls Clothes Outfits, Cute Baby Girl Floral Long Sleeve Pant Set Flower Ruffle Top Pink",
+     "brand": "CARETOO",
+     "label": "Substitute"
+    }
+   ]
+  },
+  {
+   "query_id": 38711,
+   "query": "extendable ram for lenovo yoga",
+   "query_used": "extendable ram for lenovo yoga",
+   "note": "Keyword search sees 'lenovo' and shows Lenovo tablets. ShopRank shows memory that fits the laptop.",
+   "ndcg": {
+    "bm25": 0.4702,
+    "shoprank": 0.8494
+   },
+   "bm25": [
+    {
+     "product_id": "B0881HDRTH",
+     "title": "Lenovo Yoga Smart Tab, 10.1\" FHD Android Tablet, Octa-Core Processor, 64GB Storage, 4GB RAM, Iron Grey, ZA3V0005US",
+     "brand": "Lenovo",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B01AZC3HF2",
+     "title": "Lenovo Active Capacity Pens for Touchscreen Laptop for Lenovo Yoga 900S-12ISK, Miix 700-12ISK, Miix 510-12IKB, Miix 510-12ISK, Miix 720-12IKB,GX80K32882 - Black",
+     "brand": "Lenovo",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08NXSJVCR",
+     "title": "Lenovo IdeaPad 3 Intel i5-1035G1 Quad Core 12GB RAM 256GB SSD 15.6-inch Touch Screen Laptop",
+     "brand": "Lenovo",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07R68XHZ9",
+     "title": "Lenovo USA Lenovo ThinkPad USB-C Dock Gen 2 (40AS0090US)",
+     "brand": "Lenovo USA",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0762M2QF7",
+     "title": "Lenovo Active Pen 2, 4096 Levels of Pressure Sensitivity, Customized Shortcut Buttons, for ThinkPad X1 Tablet Gen 2, Miix 720, 510, 520, Yoga 720, 920, Replacement Tips Included, GX80N07825",
+     "brand": "Lenovo",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0091LG13O",
+     "title": "Crucial RAM 16GB Kit (2x8GB) DDR3 1600 MHz CL11 Desktop Memory CT2K102464BD160B",
+     "brand": "Crucial",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07M6S81CM",
+     "title": "Lenovo USA ThinkPad Thunderbolt 3 Dock Gen 2 135W (40AN0135US) Dual UHD 4K Display Capability, 2 HDMI, 2 DP, USB-C, USB 3.1, Black",
+     "brand": "Lenovo USA",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07L8C37DH",
+     "title": "Silicon Power Hynix IC Compatible for Apple DDR3 DDR3L 16GB (2 x 8GB) RAM 1600MHz (PC3 12800) 204 pin CL11 1.35V Non ECC Unbuffered SODIMM Laptop Memory Module - Low Voltage",
+     "brand": "SP Silicon Power",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0191WAGE2",
+     "title": "TEAMGROUP Elite DDR3L 16GB Kit (2 x 8GB) 1600MHz PC3-12800 CL11 Unbuffered Non-ECC 1.35V SODIMM 204-Pin Laptop Notebook PC Computer Memory Module Ram Upgrade - TED3L16G1600C11DC-S01",
+     "brand": "TEAMGROUP",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B00C5389HQ",
+     "title": "A-Tech RAM 8GB DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Module",
+     "brand": "A-Tech",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07JGSPGGZ",
+     "title": "A-Tech RAM 16GB Kit (2x8GB) DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Modules",
+     "brand": "A-Tech",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B00IV19HZE",
+     "title": "Timetec 16GB KIT(2x8GB) DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800 Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 240 Pin UDIMM Desktop PC Computer Memory RAM(SDRAM) Module Upgrade",
+     "brand": "Timetec",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0145WDNI4",
+     "title": "Timetec 8GB DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800(PC3L-12800S) Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 204 Pin SODIMM Laptop Notebook PC Computer Memory RAM Module Upgrade",
+     "brand": "Timetec",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07MJW5BXZ",
+     "title": "External DVD Drive, USB 3.0 Portable CD/DVD +/-RW Drive/DVD Player for Laptop CD ROM Burner Compatible with Laptop Desktop PC Windows Linux OS Apple Mac Black",
+     "brand": "Gotega",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B009WIW9GE",
+     "title": "Patriot 1.35V 8GB DDR3 1600MHz PC3-12800 CL11 SODIMM Memory PSD38G1600L2S",
+     "brand": "Patriot Memory",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B01BIWKP58",
+     "title": "Crucial 8GB Single DDR4 2400 MT/S (PC4-19200) SR x8 SODIMM 260-Pin Memory - CT8G4SFS824A",
+     "brand": "Crucial",
+     "label": "Irrelevant"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B009WIW9GE",
+     "title": "Patriot 1.35V 8GB DDR3 1600MHz PC3-12800 CL11 SODIMM Memory PSD38G1600L2S",
+     "brand": "Patriot Memory",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B0881HDRTH",
+     "title": "Lenovo Yoga Smart Tab, 10.1\" FHD Android Tablet, Octa-Core Processor, 64GB Storage, 4GB RAM, Iron Grey, ZA3V0005US",
+     "brand": "Lenovo",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00C5389HQ",
+     "title": "A-Tech RAM 8GB DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Module",
+     "brand": "A-Tech",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B00IV19HZE",
+     "title": "Timetec 16GB KIT(2x8GB) DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800 Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 240 Pin UDIMM Desktop PC Computer Memory RAM(SDRAM) Module Upgrade",
+     "brand": "Timetec",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08NXSJVCR",
+     "title": "Lenovo IdeaPad 3 Intel i5-1035G1 Quad Core 12GB RAM 256GB SSD 15.6-inch Touch Screen Laptop",
+     "brand": "Lenovo",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0191WAGE2",
+     "title": "TEAMGROUP Elite DDR3L 16GB Kit (2 x 8GB) 1600MHz PC3-12800 CL11 Unbuffered Non-ECC 1.35V SODIMM 204-Pin Laptop Notebook PC Computer Memory Module Ram Upgrade - TED3L16G1600C11DC-S01",
+     "brand": "TEAMGROUP",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B0145WDNI4",
+     "title": "Timetec 8GB DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800(PC3L-12800S) Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 204 Pin SODIMM Laptop Notebook PC Computer Memory RAM Module Upgrade",
+     "brand": "Timetec",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07JGSPGGZ",
+     "title": "A-Tech RAM 16GB Kit (2x8GB) DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Modules",
+     "brand": "A-Tech",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B01BIWKP58",
+     "title": "Crucial 8GB Single DDR4 2400 MT/S (PC4-19200) SR x8 SODIMM 260-Pin Memory - CT8G4SFS824A",
+     "brand": "Crucial",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0091LG13O",
+     "title": "Crucial RAM 16GB Kit (2x8GB) DDR3 1600 MHz CL11 Desktop Memory CT2K102464BD160B",
+     "brand": "Crucial",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07MJW5BXZ",
+     "title": "External DVD Drive, USB 3.0 Portable CD/DVD +/-RW Drive/DVD Player for Laptop CD ROM Burner Compatible with Laptop Desktop PC Windows Linux OS Apple Mac Black",
+     "brand": "Gotega",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07L8C37DH",
+     "title": "Silicon Power Hynix IC Compatible for Apple DDR3 DDR3L 16GB (2 x 8GB) RAM 1600MHz (PC3 12800) 204 pin CL11 1.35V Non ECC Unbuffered SODIMM Laptop Memory Module - Low Voltage",
+     "brand": "SP Silicon Power",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07M6S81CM",
+     "title": "Lenovo USA ThinkPad Thunderbolt 3 Dock Gen 2 135W (40AN0135US) Dual UHD 4K Display Capability, 2 HDMI, 2 DP, USB-C, USB 3.1, Black",
+     "brand": "Lenovo USA",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07R68XHZ9",
+     "title": "Lenovo USA Lenovo ThinkPad USB-C Dock Gen 2 (40AS0090US)",
+     "brand": "Lenovo USA",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B01AZC3HF2",
+     "title": "Lenovo Active Capacity Pens for Touchscreen Laptop for Lenovo Yoga 900S-12ISK, Miix 700-12ISK, Miix 510-12IKB, Miix 510-12ISK, Miix 720-12IKB,GX80K32882 - Black",
+     "brand": "Lenovo",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B0762M2QF7",
+     "title": "Lenovo Active Pen 2, 4096 Levels of Pressure Sensitivity, Customized Shortcut Buttons, for ThinkPad X1 Tablet Gen 2, Miix 720, 510, 520, Yoga 720, 920, Replacement Tips Included, GX80N07825",
+     "brand": "Lenovo",
+     "label": "Irrelevant"
+    }
+   ]
+  },
+  {
+   "query_id": 107191,
+   "query": "usb 3.0 type a to micro a",
+   "query_used": "usb 3.0 type a to micro a",
+   "note": "A technical cable spec. ShopRank puts the two matching cables on top.",
+   "ndcg": {
+    "bm25": 0.5903,
+    "shoprank": 0.972
+   },
+   "bm25": [
+    {
+     "product_id": "B00T4AX9VY",
+     "title": "UCEC USB 3.0 Cable - Right Angle Type A Male to USB 3.0 Micro B Male Cable - 0.2 feet (0.06 M)",
+     "brand": "UCEC",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00P0C4MGG",
+     "title": "UGREEN Micro USB 3.0 Cable USB 3.0 Type A Male to Micro B Cord Compatible with Samsung Galaxy S5 Note 3 Camera Hard Drive and More 6ft",
+     "brand": "UGREEN",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B01GGKYIHS",
+     "title": "Amazon Basics USB Type-C to Micro-B 3.1 Gen2 Charger Cable - 3 Feet (0.9 Meters) - Black",
+     "brand": "Amazon Basics",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B074V3GD2S",
+     "title": "Micro USB 3.0 Cable, CableCreation Short USB A to Micro B Cord 1ft USB 3.0 External Hard Drive Cable, Compatible for Samsung Galaxy S5, Note 3/N9000, Camera, Hard Drive and More",
+     "brand": "CableCreation",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00C7T78H0",
+     "title": "Cable Matters Long Micro USB 3.0 Cable 10 ft (External Hard Drive Cable, USB to USB Micro B Cable) in Black",
+     "brand": "Cable Matters",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B01C6032G0",
+     "title": "USB 2.0 Micro USB Male to USB Female OTG Adapter (2 Pack)",
+     "brand": "Ksmile",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07M6PCKRR",
+     "title": "USB A to Type C Cable, Cabepow [3-Pack 3ft]\u00a0Fast Charging USB Type C Cord for Samsung Galaxy A10/A20/A51/S10/S9/S8, Type C Charger Premium Nylon Braided USB Cable (Red)",
+     "brand": "Cabepow",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07KG4PNC2",
+     "title": "Micro USB 3.0 Cable, JSAUX USB A Male to Micro B Cable 2 Pack [3.3FT+6.6FT] External Hard Drive Cable Galaxy S5 Nylon Braided Cord for Samsung Galaxy S5, Note 3, Seagate Hard Drive, WD Hard Drive-Blue",
+     "brand": "JSAUX",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07VSG93G3",
+     "title": "2PACK AINOPE USB 3.0 Extension Cable Type A Male to Female Extension Cord Durable Braided Material Fast Data Transfer 3.3FT Compatible with USB Keyboard,Mouse,Flash Drive, Hard Drive,Printer",
+     "brand": "AINOPE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B012V56992",
+     "title": "CableCreation Short USB C Hard Drive Cable 1FT, USB 3.1 Micro B to USB C 10Gbps, USB C to Micro B External Hard Drive Cable for MacBook Pro Air Galaxy S5 My Passport Elements etc, 0.3m Black",
+     "brand": "CableCreation",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07WG2TPC8",
+     "title": "2 Pack (3.3FT+3.3FT) USB 3.0 A Male to Micro B Cable Galaxy s5 Fast Charger, AINOPE External Hard Drive Cable Compatible with Galaxy Note 3, WD Camera, Seagate Hard Drive and More",
+     "brand": "AINOPE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07S1TV83G",
+     "title": "UGREEN USB-C to USB 3.0 Micro B Cable Fast Charging and Sync Data Transfer Cord Compatible with Samsung Galaxy S5 Note 3 Seagate WD Toshiba External Hard Drive Camera 3 Feet",
+     "brand": "UGREEN",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B01I4ZOIQY",
+     "title": "USB Type C Cable 5-Pack 3FT,SMALLElectric USB Type A to C Fast Charger Cords for Samsung Galaxy S20 S10 S9 S8 Plus, Braided Fast Charging Cable for Note 10 9 8, LG V50 V40 G8 G7,(Grey)",
+     "brand": "SMALLElectric",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B076FN2GSQ",
+     "title": "USB Type C Cable 3A Fast Charging [2-Pack 6.6ft], JSAUX USB-A to USB-C Charge Braided Cord Compatible with Samsung Galaxy S10 S9 S8 S20 Plus A51 A11,Note 10 9 8, PS5 Controller, USB C Charger-Grey",
+     "brand": "JSAUX",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00P0GI68M",
+     "title": "UGREEN Mini USB Cable, A-Male to Mini-B Cord USB 2.0 Charger Cable Compatible with GoPro Hero 3+, PS3 Controller, Digital Camera, Dash Cam, MP3 Player, GPS Receiver, Garmin Nuvi GPS, SatNav, PDA 3FT",
+     "brand": "UGREEN",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07KF7JVD3",
+     "title": "Micro USB Cable Android Charger, JSAUX (2-Pack 3.3FT+6.6FT) Micro USB Android Charger Cable Nylon Braided Cord Compatible with Galaxy S7 S6 J7 Edge Note 5, Kindle. MP3 and More-Blue",
+     "brand": "JSAUX",
+     "label": "Substitute"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B00P0C4MGG",
+     "title": "UGREEN Micro USB 3.0 Cable USB 3.0 Type A Male to Micro B Cord Compatible with Samsung Galaxy S5 Note 3 Camera Hard Drive and More 6ft",
+     "brand": "UGREEN",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07WG2TPC8",
+     "title": "2 Pack (3.3FT+3.3FT) USB 3.0 A Male to Micro B Cable Galaxy s5 Fast Charger, AINOPE External Hard Drive Cable Compatible with Galaxy Note 3, WD Camera, Seagate Hard Drive and More",
+     "brand": "AINOPE",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07VSG93G3",
+     "title": "2PACK AINOPE USB 3.0 Extension Cable Type A Male to Female Extension Cord Durable Braided Material Fast Data Transfer 3.3FT Compatible with USB Keyboard,Mouse,Flash Drive, Hard Drive,Printer",
+     "brand": "AINOPE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B074V3GD2S",
+     "title": "Micro USB 3.0 Cable, CableCreation Short USB A to Micro B Cord 1ft USB 3.0 External Hard Drive Cable, Compatible for Samsung Galaxy S5, Note 3/N9000, Camera, Hard Drive and More",
+     "brand": "CableCreation",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B01I4ZOIQY",
+     "title": "USB Type C Cable 5-Pack 3FT,SMALLElectric USB Type A to C Fast Charger Cords for Samsung Galaxy S20 S10 S9 S8 Plus, Braided Fast Charging Cable for Note 10 9 8, LG V50 V40 G8 G7,(Grey)",
+     "brand": "SMALLElectric",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B00T4AX9VY",
+     "title": "UCEC USB 3.0 Cable - Right Angle Type A Male to USB 3.0 Micro B Male Cable - 0.2 feet (0.06 M)",
+     "brand": "UCEC",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07M6PCKRR",
+     "title": "USB A to Type C Cable, Cabepow [3-Pack 3ft]\u00a0Fast Charging USB Type C Cord for Samsung Galaxy A10/A20/A51/S10/S9/S8, Type C Charger Premium Nylon Braided USB Cable (Red)",
+     "brand": "Cabepow",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07S1TV83G",
+     "title": "UGREEN USB-C to USB 3.0 Micro B Cable Fast Charging and Sync Data Transfer Cord Compatible with Samsung Galaxy S5 Note 3 Seagate WD Toshiba External Hard Drive Camera 3 Feet",
+     "brand": "UGREEN",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B076FN2GSQ",
+     "title": "USB Type C Cable 3A Fast Charging [2-Pack 6.6ft], JSAUX USB-A to USB-C Charge Braided Cord Compatible with Samsung Galaxy S10 S9 S8 S20 Plus A51 A11,Note 10 9 8, PS5 Controller, USB C Charger-Grey",
+     "brand": "JSAUX",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07KG4PNC2",
+     "title": "Micro USB 3.0 Cable, JSAUX USB A Male to Micro B Cable 2 Pack [3.3FT+6.6FT] External Hard Drive Cable Galaxy S5 Nylon Braided Cord for Samsung Galaxy S5, Note 3, Seagate Hard Drive, WD Hard Drive-Blue",
+     "brand": "JSAUX",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00P0GI68M",
+     "title": "UGREEN Mini USB Cable, A-Male to Mini-B Cord USB 2.0 Charger Cable Compatible with GoPro Hero 3+, PS3 Controller, Digital Camera, Dash Cam, MP3 Player, GPS Receiver, Garmin Nuvi GPS, SatNav, PDA 3FT",
+     "brand": "UGREEN",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07KF7JVD3",
+     "title": "Micro USB Cable Android Charger, JSAUX (2-Pack 3.3FT+6.6FT) Micro USB Android Charger Cable Nylon Braided Cord Compatible with Galaxy S7 S6 J7 Edge Note 5, Kindle. MP3 and More-Blue",
+     "brand": "JSAUX",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B00C7T78H0",
+     "title": "Cable Matters Long Micro USB 3.0 Cable 10 ft (External Hard Drive Cable, USB to USB Micro B Cable) in Black",
+     "brand": "Cable Matters",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B01C6032G0",
+     "title": "USB 2.0 Micro USB Male to USB Female OTG Adapter (2 Pack)",
+     "brand": "Ksmile",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B01GGKYIHS",
+     "title": "Amazon Basics USB Type-C to Micro-B 3.1 Gen2 Charger Cable - 3 Feet (0.9 Meters) - Black",
+     "brand": "Amazon Basics",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B012V56992",
+     "title": "CableCreation Short USB C Hard Drive Cable 1FT, USB 3.1 Micro B to USB C 10Gbps, USB C to Micro B External Hard Drive Cable for MacBook Pro Air Galaxy S5 My Passport Elements etc, 0.3m Black",
+     "brand": "CableCreation",
+     "label": "Substitute"
+    }
+   ]
+  },
+  {
+   "query_id": 61867,
+   "query": "lg refridgerators",
+   "query_used": "lg refrigerators",
+   "note": "A real customer typo. The spell checker fixes it, and ShopRank shows fridges instead of spare parts.",
+   "ndcg": {
+    "bm25": 0.7815,
+    "shoprank": 0.9996
+   },
+   "bm25": [
+    {
+     "product_id": "B07CVNC4ZC",
+     "title": "LG AHT73514301 LG-AHT73514301 Shelf Assembly,Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B00AOG6D4W",
+     "title": "LG EBR41531303 Genuine OEM Main Control Board for LG Refrigerators",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B00C29G7K4",
+     "title": "LG MDS47123602 Genuine OEM Door Gasket for LG Washing Machines",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B00AH5ZKFS",
+     "title": "LG AJU73753101 Genuine OEM Water Inlet Valve Assembly for LG Refrigerators",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B00AH5ZI9G",
+     "title": "LG 5209JA1044A Genuine OEM Blower Fan Assembly/Blower Motor for LG Refrigerators",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07FRPW55G",
+     "title": "LG AAP73631603 Refrigerator Door Shelf Bin",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08PMJSHCX",
+     "title": "LG LRDCS2603S 26 Cu. Ft. Stainless Bottom Freezer Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07V576VQF",
+     "title": "LG LFXC22596S 22 cu.ft. Stainless Smart Counter-Depth Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07Q3S68TR",
+     "title": "LG LFCC22426S 22.8 Cu. Ft. French Door Counter-Depth Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07ZN4N21N",
+     "title": "LG LRFVS3006D 30 Cu.Ft. Black Stainless Smart French Door Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B076J241YS",
+     "title": "LG LMXS28626S 28 cu.ft. 4-Door French Door Refrigerator - Stainless Steel",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07K3PKZR4",
+     "title": "LG LFDS22520S 30 Inch French Door Refrigerator with 21.8 cu. ft. Capacity",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08CY6WQBX",
+     "title": "LG LMXS28596S 28 Cu. Ft. Smart Wi-Fi Enabled InstaView0153; Door-in-Door0174; Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B095PSLF5H",
+     "title": "RV Refrigerator LG LBNC10551V 10.1 Cu. Ft. Refrigerator with Bottom Freezer in Platinum Silver with Reversible Door Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B0741DXDXM",
+     "title": "FFHD2250TS 36 French Door Refrigerator with 22.5 cu. ft. Capacity Energy Star Multi-Level LED Lighting Store-More Shelves and External Water Dispenser in Stainless Steel",
+     "brand": "Frigidaire",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09DTNMTGV",
+     "title": "Frigidaire EFR753-PLATINUM EFR753, 2 Door Apartment Size Refrigerator with Freezer, Retro Chrome Handle, cu ft, Platinum Series, Stainless Steel, 7.5, Silver",
+     "brand": "Frigidaire",
+     "label": "Substitute"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B07ZN4N21N",
+     "title": "LG LRFVS3006D 30 Cu.Ft. Black Stainless Smart French Door Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B076J241YS",
+     "title": "LG LMXS28626S 28 cu.ft. 4-Door French Door Refrigerator - Stainless Steel",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07V576VQF",
+     "title": "LG LFXC22596S 22 cu.ft. Stainless Smart Counter-Depth Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07K3PKZR4",
+     "title": "LG LFDS22520S 30 Inch French Door Refrigerator with 21.8 cu. ft. Capacity",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B095PSLF5H",
+     "title": "RV Refrigerator LG LBNC10551V 10.1 Cu. Ft. Refrigerator with Bottom Freezer in Platinum Silver with Reversible Door Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08PMJSHCX",
+     "title": "LG LRDCS2603S 26 Cu. Ft. Stainless Bottom Freezer Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07Q3S68TR",
+     "title": "LG LFCC22426S 22.8 Cu. Ft. French Door Counter-Depth Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07CVNC4ZC",
+     "title": "LG AHT73514301 LG-AHT73514301 Shelf Assembly,Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08CY6WQBX",
+     "title": "LG LMXS28596S 28 Cu. Ft. Smart Wi-Fi Enabled InstaView0153; Door-in-Door0174; Refrigerator",
+     "brand": "LG",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07FRPW55G",
+     "title": "LG AAP73631603 Refrigerator Door Shelf Bin",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B0741DXDXM",
+     "title": "FFHD2250TS 36 French Door Refrigerator with 22.5 cu. ft. Capacity Energy Star Multi-Level LED Lighting Store-More Shelves and External Water Dispenser in Stainless Steel",
+     "brand": "Frigidaire",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09DTNMTGV",
+     "title": "Frigidaire EFR753-PLATINUM EFR753, 2 Door Apartment Size Refrigerator with Freezer, Retro Chrome Handle, cu ft, Platinum Series, Stainless Steel, 7.5, Silver",
+     "brand": "Frigidaire",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B00AH5ZKFS",
+     "title": "LG AJU73753101 Genuine OEM Water Inlet Valve Assembly for LG Refrigerators",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B00AH5ZI9G",
+     "title": "LG 5209JA1044A Genuine OEM Blower Fan Assembly/Blower Motor for LG Refrigerators",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B00C29G7K4",
+     "title": "LG MDS47123602 Genuine OEM Door Gasket for LG Washing Machines",
+     "brand": "LG",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B00AOG6D4W",
+     "title": "LG EBR41531303 Genuine OEM Main Control Board for LG Refrigerators",
+     "brand": "LG",
+     "label": "Complement"
+    }
+   ]
+  },
+  {
+   "query_id": 64479,
+   "query": "m23 for cars",
+   "query_used": "m23 for cars",
+   "note": "ShopRank fails here: the shopper wanted McLaren M23 model cars, and ShopRank shows stickers and wheels first.",
+   "ndcg": {
+    "bm25": 1.0,
+    "shoprank": 0.5706
+   },
+   "bm25": [
+    {
+     "product_id": "B009KI2KQ0",
+     "title": "Yardley McLaren M23 1974 (Model Car)",
+     "brand": "TAMIYA",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B0046EDDBE",
+     "title": "1/20 McLaren M23 1976 Grand Prix",
+     "brand": "TAMIYA",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07ZJBD1Y4",
+     "title": "Car DC Adapter for Icom IC-M23 Handheld Marine VHF Radio CP-24 Charger BC-199SA",
+     "brand": "YUSTDA",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B012JBC4G0",
+     "title": "Navy Logo (M23) USN Vinyl Decal Sticker Car/Truck Laptop/Netbook Window",
+     "brand": "CustomDecal US",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08534DJQP",
+     "title": "Color N Drive for BMW Automotive Touch Up Paint - M23 - Asphaltgrau 2 Met Matt - Paint Scratch Repair, Exact Match - Plus",
+     "brand": "Color N Drive",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00JAH3G1E",
+     "title": "My Stick Figure Family Car Window Vinyl Bumper Sticker Decal Adult Male Weightlifting Fitness M23",
+     "brand": "My Stick Figure Family Car Window Stickers",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07QBXV9J1",
+     "title": "Newsmarts Tread Repair Kit M5 M6 M8 M10 M12 M23 Recoil Repair Kit Car Pro Coil Tool, 15pcs M12X1.0",
+     "brand": "Newsmarts",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07XZKK4WZ",
+     "title": "RV Tank Sensor Monitor Panel M23 | KIB Replacement | Panel Only | Level Sensor | Fresh Water or Holding Tank Level Sensor (Black)",
+     "brand": "RecPro",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00YTFDIQ0",
+     "title": "MSA OFFROAD WHEELS M23 BATTLE Flat Black Wheel with Painted and Chromium (hexavalent compounds) (14 x 7. inches /4 x 112 mm, 10 mm Offset)",
+     "brand": "MSA OFFROAD WHEELS",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07RYQL4YQ",
+     "title": "NCJEI NONGE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer License Plate Frames for Car Decoration 6 Inch X 12 Inch",
+     "brand": "NCJEI NONGE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0141JQ06S",
+     "title": "Inline Tube (M-2-3) Rear Lower Control Arms Boxed for Sway Bar with Rubber Bushings Compatible with 1964-72 Gm A-Body Chevelle, GTO, 442, Gs, Monte Carlo and Grand Prix",
+     "brand": "Inline Tube",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B007Q2G2R0",
+     "title": "Kodak KLIC-7006 Lithium Ion Replacement Battery and Wall Charger with Car Charger Attachment",
+     "brand": "Halcyon",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B072NDTRM4",
+     "title": "GP Confidential 05/28/17",
+     "brand": null,
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07HYL97SW",
+     "title": "Military Vet Shop Magnet U.S. Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Vinyl Magnet Car Fridge Locker Metal Decal 3.8\"",
+     "brand": "Military Vet Shop",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B082RCVDDD",
+     "title": "KEEDCE&FJE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Windshield Sun Shade Universal Car Sunshade 30 X 55 in Sunshades Car Sun Visor-Keep Your Vehicle Cool",
+     "brand": "KEEDCE&FJE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B084QG8V68",
+     "title": "BSA: The Complete Story",
+     "brand": null,
+     "label": "Irrelevant"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B012JBC4G0",
+     "title": "Navy Logo (M23) USN Vinyl Decal Sticker Car/Truck Laptop/Netbook Window",
+     "brand": "CustomDecal US",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00YTFDIQ0",
+     "title": "MSA OFFROAD WHEELS M23 BATTLE Flat Black Wheel with Painted and Chromium (hexavalent compounds) (14 x 7. inches /4 x 112 mm, 10 mm Offset)",
+     "brand": "MSA OFFROAD WHEELS",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0046EDDBE",
+     "title": "1/20 McLaren M23 1976 Grand Prix",
+     "brand": "TAMIYA",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B009KI2KQ0",
+     "title": "Yardley McLaren M23 1974 (Model Car)",
+     "brand": "TAMIYA",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B00JAH3G1E",
+     "title": "My Stick Figure Family Car Window Vinyl Bumper Sticker Decal Adult Male Weightlifting Fitness M23",
+     "brand": "My Stick Figure Family Car Window Stickers",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08534DJQP",
+     "title": "Color N Drive for BMW Automotive Touch Up Paint - M23 - Asphaltgrau 2 Met Matt - Paint Scratch Repair, Exact Match - Plus",
+     "brand": "Color N Drive",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B082RCVDDD",
+     "title": "KEEDCE&FJE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Windshield Sun Shade Universal Car Sunshade 30 X 55 in Sunshades Car Sun Visor-Keep Your Vehicle Cool",
+     "brand": "KEEDCE&FJE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07XZKK4WZ",
+     "title": "RV Tank Sensor Monitor Panel M23 | KIB Replacement | Panel Only | Level Sensor | Fresh Water or Holding Tank Level Sensor (Black)",
+     "brand": "RecPro",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07HYL97SW",
+     "title": "Military Vet Shop Magnet U.S. Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Vinyl Magnet Car Fridge Locker Metal Decal 3.8\"",
+     "brand": "Military Vet Shop",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07RYQL4YQ",
+     "title": "NCJEI NONGE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer License Plate Frames for Car Decoration 6 Inch X 12 Inch",
+     "brand": "NCJEI NONGE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07QBXV9J1",
+     "title": "Newsmarts Tread Repair Kit M5 M6 M8 M10 M12 M23 Recoil Repair Kit Car Pro Coil Tool, 15pcs M12X1.0",
+     "brand": "Newsmarts",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07ZJBD1Y4",
+     "title": "Car DC Adapter for Icom IC-M23 Handheld Marine VHF Radio CP-24 Charger BC-199SA",
+     "brand": "YUSTDA",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B0141JQ06S",
+     "title": "Inline Tube (M-2-3) Rear Lower Control Arms Boxed for Sway Bar with Rubber Bushings Compatible with 1964-72 Gm A-Body Chevelle, GTO, 442, Gs, Monte Carlo and Grand Prix",
+     "brand": "Inline Tube",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B072NDTRM4",
+     "title": "GP Confidential 05/28/17",
+     "brand": null,
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B007Q2G2R0",
+     "title": "Kodak KLIC-7006 Lithium Ion Replacement Battery and Wall Charger with Car Charger Attachment",
+     "brand": "Halcyon",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B084QG8V68",
+     "title": "BSA: The Complete Story",
+     "brand": null,
+     "label": "Irrelevant"
+    }
+   ]
+  }
+ ]
+}
