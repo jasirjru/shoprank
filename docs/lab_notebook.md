@@ -651,3 +651,31 @@ queries are harder or noisier in other ways (not yet checked).
 Typos: one swapped letter pair costs 0.026, more than the whole distillation gain (+0.0064) and bullets
 (+0.0068) together. This is the served model's largest measured weakness.
 Files: data/processed/serving/robustness_int8_dev.json; script kept in the session scratchpad (audit only).
+
+## 2026-11-21 — Reproduction from a clean clone (WSL Ubuntu 24.04) and first CI run
+CI (GitHub Actions, ubuntu-latest, push of 5128234): `uv sync --locked` (95 packages incl. torch 2.11.0+cu128),
+ruff clean, 124 tests passed in 26 s. Green on the first run.
+Clean clone: `git clone https://github.com/jasirjru/shoprank` in WSL (no files copied from Windows), then the
+README steps: uv sync --locked, download, ingest, features, pytest + ruff, BM25 title and LambdaMART on dev.
+Predictions:
+- raw file SHA-256 identical to the Windows manifest (unless Amazon changed the files upstream).
+- ingest_stats.json identical (split is a deterministic hash of query_id).
+- BM25 title dev nDCG identical to 4 decimals (0.8163); LambdaMART dev within 0.001 of 0.8342 (LightGBM is
+  deterministic for the same data, but float summation order may differ across OS/builds).
+- Risk: ingest or features may run out of memory in WSL's 8 GB.
+
+Result (WSL clean clone of github.com/jasirjru/shoprank at 5128234; data downloaded fresh, ~12 min):
+| Check | Windows record | WSL clean clone | Prediction |
+|---|---|---|---|
+| raw file SHA-256 (manifest.json) | | identical | right |
+| ingest_stats.json (split sizes) | | identical | right |
+| features_dev (40,304 x 20) | | max abs difference 1.4e-14 | (not predicted) |
+| tests / ruff | 124 passed / clean | 124 passed / clean | |
+| BM25 title, dev nDCG | 0.8162856959701303 | 0.8162856959701303 | identical: right |
+| LambdaMART, dev nDCG (259 trees) | 0.834246248084562 | 0.834246248084562 | within 0.001: right (identical) |
+Stage times in WSL: download 701 s, ingest 38 s, features 55 s, tests 23 s, BM25 2 s. Peak RAM was fine.
+One reproduction bug found: LightGBM needs the OpenMP runtime `libgomp1`, a system library missing on a fresh
+Ubuntu 24.04 WSL (`OSError: libgomp.so.1: cannot open shared object file`); GitHub's runner has it, so CI
+did not catch it. Fixed in the README reproduce steps (`sudo apt-get install -y libgomp1`).
+Not re-run in the clone (GPU hours): the cross-encoders, OOF folds and distillation; their code paths are
+covered by the unit tests and by the run records.

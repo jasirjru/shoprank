@@ -107,6 +107,7 @@ Hardest queries: negation ("without", "not"); BM25 0.748, DeBERTa 0.839 on dev.
 ## Reproduce
 
 ```bash
+sudo apt-get install -y libgomp1             # Linux only: OpenMP runtime LightGBM needs (not on fresh Ubuntu/WSL)
 uv sync --locked
 uv run python -m shoprank.data.download      # ~1.16 GB, resumable
 uv run python -m shoprank.data.ingest        # US tables + train/dev/dev2/test split (test = official test)
