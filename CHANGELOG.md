@@ -15,6 +15,12 @@ Phase A, supply chain and code health (plan: `docs/analysis/completion_plan_2026
 - Removed the placeholder `shoprank` console script.
 - Docs: completion plan (`docs/analysis/completion_plan_2026-11-21.md`).
 
+Phase B, anyone can run it.
+- Served model published: GitHub release v1.0 assets and Hugging Face `jasirjru/shoprank-reranker-minilm-int8`.
+- `shoprank.serve.fetch`: download + SHA-256 check; tests.
+- Dockerfile: CPU serving image without torch (45 packages); CI job builds it and checks `/rank`.
+- Model card: download and usage without this repo.
+
 ## v1.0 — 21 Nov 2026 (commit 3390899)
 Baseline for every later change.
 - Top model: DeBERTa-v3-base, mean of 5 fold models. Official test nDCG 0.8877 [0.8849, 0.8905].

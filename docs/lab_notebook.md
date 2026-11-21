@@ -708,3 +708,15 @@ MiniLM 7b02352, the commits the v1.0 runs used); new tests for the metric runner
 export path and the resumable download; CI gains a security job (osv-scanner 2.7.0 and gitleaks 8.30.1,
 binaries checked against their published SHA-256) and actions pinned to commit SHAs (checkout v7.0.1,
 setup-uv v10.3.3, both over two weeks old); the placeholder `shoprank` console script is removed.
+
+## 2026-11-21 — Phase B: the served model can be downloaded and run by anyone
+- GitHub release v1.0 (tag on 3390899): model_int8.onnx (33,848,219 bytes), tokenizer.json,
+  tokenizer_config.json, serving.json, quality.json, SHA256SUMS. Published files scanned first: no local paths
+  or personal data (one grep hit was the vocabulary word "studio", one random bytes inside the weights).
+- `shoprank.serve.fetch`: downloads from the release (or Hugging Face), writes a file only after its SHA-256
+  matches the value pinned in code, never overwrites a different local model without --force. Live test from
+  the release: 5/5 files verified.
+- Serving without torch: `uv export --prune` of the training stack leaves 45 packages (199 MB venv instead of
+  ~7 GB). Fresh venv + fetched model: /health ok, /rank orders the USB-C cable first, 41 ms.
+- Dockerfile (python 3.12-slim and uv 0.12.17 pinned by digest, hashed requirements, model verified at build
+  time, non-root user, health check). No Docker on this laptop: CI builds the image and runs a /rank smoke test.

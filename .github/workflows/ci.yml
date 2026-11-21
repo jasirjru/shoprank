@@ -27,6 +27,26 @@ jobs:
       - run: uv run --frozen ruff check src tests
       - run: uv run --frozen pytest -q
 
+  docker:
+    # Serving smoke test: build the CPU image (downloads the v1.0 model, checks SHA-256), start it, rank the
+    # README example and assert the right product comes first.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - run: docker build -t shoprank:ci .
+      - run: docker run -d --name shoprank -p 8000:8000 shoprank:ci
+      - name: Wait for /health, then rank an example
+        run: |
+          for i in $(seq 1 30); do curl -sf localhost:8000/health && break; sleep 2; done
+          curl -sf -X POST localhost:8000/rank -H "Content-Type: application/json" \
+            -d '{"query": "usb c cable 6ft", "products": [{"product_id": "b", "title": "HDMI cable 10 ft"},
+                 {"product_id": "a", "title": "Anker USB C to USB C cable, 6 ft", "brand": "Anker"}]}' | tee out.json
+          python3 -c "import json; r = json.load(open('out.json'))['results']; assert r[0]['product_id'] == 'a', r"
+          docker image ls shoprank:ci --format 'image size {{.Size}}'
+      - if: failure()
+        run: docker logs shoprank
+
   security:
     runs-on: ubuntu-latest
     timeout-minutes: 10

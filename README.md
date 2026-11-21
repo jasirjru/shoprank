@@ -50,8 +50,19 @@ At high load, latency is queueing: one process handles about 11 requests/s. The 
 0.020 nDCG better but scores ~89 pairs/s on an RTX 4060 GPU vs 230 pairs/s for the INT8 MiniLM on CPU, so it
 is used offline as the teacher.
 
+**Run it without training or a GPU.** The served model (INT8 ONNX, 32 MB) is published with v1.0 on the
+[GitHub release](https://github.com/jasirjru/shoprank/releases/tag/v1.0) and on
+[Hugging Face](https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8); every file is checked by SHA-256.
+
 ```bash
+# Option 1: Docker (CPU image, ~45 packages, no torch; the build downloads and verifies the model)
+docker build -t shoprank . && docker run --rm -p 8000:8000 shoprank
+
+# Option 2: uv
+uv sync --locked
+uv run python -m shoprank.serve.fetch            # or --source huggingface
 uv run uvicorn shoprank.serve.app:app --port 8000
+
 curl -X POST localhost:8000/rank -H "Content-Type: application/json" \
   -d '{"query": "usb c cable 6ft", "products": [{"product_id": "a", "title": "Anker USB C cable, 6 ft"},
        {"product_id": "b", "title": "HDMI cable 10 ft"}]}'

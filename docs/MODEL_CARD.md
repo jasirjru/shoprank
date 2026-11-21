@@ -25,6 +25,34 @@ For comparison on the same test: BM25 0.8202, Amazon's MiniLM recipe 0.8544, the
 ## Speed (laptop CPU, 16 threads, one model call at a time)
 p50 69 ms, p95 232 ms for one request of ~16 candidates; ~230 pairs/s (~11 requests/s) per process.
 
+## Download and use
+Published files (identical in both places, SHA-256 in `SHA256SUMS`): `model_int8.onnx`, `tokenizer.json`,
+`tokenizer_config.json`, `serving.json` (input fields, max length), `quality.json` (dev results).
+- Hugging Face: https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8
+- GitHub release v1.0: https://github.com/jasirjru/shoprank/releases/tag/v1.0
+- In this repo: `uv run python -m shoprank.serve.fetch` downloads them into the folder the API reads and
+  checks every SHA-256.
+
+Without this repo (onnxruntime + transformers only):
+```python
+import numpy as np
+import onnxruntime as ort
+from huggingface_hub import snapshot_download
+from transformers import AutoTokenizer
+
+path = snapshot_download("jasirjru/shoprank-reranker-minilm-int8")
+tokenizer = AutoTokenizer.from_pretrained(path)
+session = ort.InferenceSession(f"{path}/model_int8.onnx", providers=["CPUExecutionProvider"])
+query = "usb c cable 6ft"
+products = ["Anker USB C to USB C cable, 6 ft Anker Black", "HDMI cable 10 ft"]  # title brand colour bullets
+enc = tokenizer([query] * len(products), products, truncation=True, max_length=128, padding=True,
+                return_tensors="np")
+scores = session.run(["logits"], {k: v.astype(np.int64) for k, v in enc.items()})[0].ravel()
+print(sorted(zip(scores, products), reverse=True))  # higher score = more relevant
+```
+Build each product text exactly as in training: title, brand, colour, bullets joined by single spaces,
+missing fields left out.
+
 ## Intended use
 Re-ranking a short candidate list (up to 200 products) for English product-search queries, e.g. after a
 keyword or vector retrieval step. A teaching and portfolio project, not a production system.
