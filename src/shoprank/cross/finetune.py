@@ -6,6 +6,8 @@ Usage:
     uv run python -m shoprank.cross.finetune --model microsoft/deberta-v3-base \
         --fields title,brand,color --lr 2e-5 --warmup-steps 1000 --eval-every 2500   # 13: DeBERTa
     uv run python -m shoprank.cross.finetune --limit-steps 200 --name minilm_ft_smoke   # timing check
+    uv run python -m shoprank.cross.finetune --teacher deberta_oof --teacher-weight 1.0 --name minilm_distil
+        # distillation: MiniLM regresses DeBERTa's out-of-fold scores instead of (or mixed with) the gain
 
 Recipe (amazon-science/esci-data ranking/train.py): ms-marco-MiniLM-L-12-v2, one output, no activation,
 MSE on the gain (E 1, S 0.1, C 0.01, I 0), 1 epoch, lr 7e-6, 5,000 warmup steps, batch 32, title only,
@@ -78,6 +80,16 @@ def compute_loss(logits: torch.Tensor, targets: torch.Tensor, loss: str) -> torc
     if loss == "ce":
         return torch.nn.functional.cross_entropy(logits.float(), targets.long())
     raise ValueError(f"loss must be one of {LOSSES}, got {loss!r}")
+
+
+def mix_targets(gain: np.ndarray, teacher: np.ndarray, weight: float) -> np.ndarray:
+    """Distillation target: (1 - weight) * human gain + weight * teacher score. weight 1 = teacher only."""
+    if not 0.0 <= weight <= 1.0:
+        raise ValueError(f"teacher weight must be in [0, 1], got {weight}")
+    gain, teacher = np.asarray(gain, dtype=np.float32), np.asarray(teacher, dtype=np.float32)
+    if gain.shape != teacher.shape or not np.isfinite(teacher).all():
+        raise ValueError("need one finite teacher score per training pair")
+    return (1.0 - weight) * gain + weight * teacher
 
 
 def warmup_linear(step: int, warmup: int, total: int) -> float:
@@ -274,16 +286,21 @@ def main() -> None:
     p.add_argument("--loss", choices=LOSSES, default="mse")
     p.add_argument("--lr", type=float, default=FitConfig.lr)
     p.add_argument("--warmup-steps", type=int, default=FitConfig.warmup_steps)
+    p.add_argument("--seed", type=int, default=FitConfig.seed)
     p.add_argument("--name", default=None, help="default: <model tag>_ft_<loss>")
     p.add_argument("--limit-steps", type=int, default=None)
     p.add_argument("--eval-every", type=int, default=1000)
+    p.add_argument("--teacher", default=None, help="OOF score set to distil from, e.g. deberta_oof (MSE only)")
+    p.add_argument("--teacher-weight", type=float, default=1.0)
     args = p.parse_args()
+    if args.teacher and args.loss != "mse":
+        p.error("--teacher needs --loss mse")
     fields = args.fields.split(",")
     name = args.name or f"{model_tag(args.model)}_ft_{args.loss}"
 
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-    cfg = FitConfig(lr=args.lr, warmup_steps=args.warmup_steps, eval_every=args.eval_every,
+    cfg = FitConfig(lr=args.lr, warmup_steps=args.warmup_steps, eval_every=args.eval_every, seed=args.seed,
                     limit_steps=args.limit_steps, loss=args.loss)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # Only the needed columns: descriptions and bullets are large and unused (saves RAM).
@@ -305,6 +322,13 @@ def main() -> None:
         args.model, num_labels=num_labels, ignore_mismatched_sizes=num_labels != 1,
         dtype=torch.float32).to(device)  # fp32 master weights; DeBERTa-v3 is stored in fp16
     targets = fit_part["gain"].to_numpy() if cfg.loss == "mse" else class_ids(fit_part["esci_label"])
+    if args.teacher:  # out-of-fold teacher scores: the teacher never trained on the query it scores
+        from shoprank.ltr.stack import (
+            load_oof_scores,  # lazy: ltr.stack imports this package
+        )
+        teacher = fit_part.merge(load_oof_scores(args.teacher, "train"), on=["query_id", "product_id"],
+                                 how="left", validate="one_to_one")[args.teacher].to_numpy()
+        targets = mix_targets(targets, teacher, args.teacher_weight)
     # The 4D-mask trick only applies to sdpa attention (BERT/MiniLM). DeBERTa has its own attention code,
     # which has no hidden GPU wait, so it runs unwrapped.
     sdpa = getattr(model.config, "_attn_implementation", None) == "sdpa"
@@ -329,6 +353,7 @@ def main() -> None:
     config = {**asdict(cfg), "model": args.model, "fields": fields,
               "loss": "mse_gain" if cfg.loss == "mse" else "ce_4class_expected_gain",
               "best_step": history["best_step"], "train_seconds": history["train_seconds"],
+              "teacher": args.teacher, "teacher_weight": args.teacher_weight if args.teacher else None,
               "fit_pairs": len(fit_part), "dev_score_seconds": round(time.perf_counter() - start, 1),
               "peak_vram_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0}
     summary = save(name, "dev", per_query_results(dev.assign(score=scores), "score"), config)

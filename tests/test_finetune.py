@@ -14,6 +14,7 @@ from shoprank.cross.finetune import (
     compute_loss,
     fit,
     length_bucketed_batches,
+    mix_targets,
     model_tag,
     predict,
     pretokenize,
@@ -229,3 +230,19 @@ def test_fit_lowers_mse_and_keeps_the_best_checkpoint():
     best = max(history["evals"], key=lambda e: e["score"])
     assert history["best_step"] == best["step"]
     assert -after == pytest.approx(best["score"])  # model ends holding the best weights
+
+
+def test_mix_targets_blends_human_gain_with_teacher_score():
+    gain, teacher = np.array([1.0, 0.0]), np.array([0.6, 0.2])
+    assert mix_targets(gain, teacher, 1.0).tolist() == pytest.approx([0.6, 0.2])
+    assert mix_targets(gain, teacher, 0.5).tolist() == pytest.approx([0.8, 0.1])
+    assert mix_targets(gain, teacher, 0.0).tolist() == pytest.approx([1.0, 0.0])
+
+
+def test_mix_targets_refuses_missing_teacher_scores_and_bad_weights():
+    with pytest.raises(ValueError):
+        mix_targets(np.array([1.0, 0.0]), np.array([0.5, np.nan]), 1.0)
+    with pytest.raises(ValueError):
+        mix_targets(np.array([1.0]), np.array([0.5, 0.1]), 1.0)
+    with pytest.raises(ValueError):
+        mix_targets(np.array([1.0]), np.array([0.5]), 1.5)
