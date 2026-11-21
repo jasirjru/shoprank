@@ -28,7 +28,8 @@ tied scores are ordered the same way (ties come from bf16 scores; their order mo
 
 **Published references:** Amazon's fine-tuned MiniLM cross-encoder scores 0.857 on the English part of the
 KDD Cup 2022 *public* test (ESCI paper, Table 4; trained on the full US train, title only, max length 512); a
-public same-setup project scores 0.854 on the US test used here. Both lie below the primary system's interval,
+public same-setup project ([Anankin77/esci-search-reranking](https://github.com/Anankin77/esci-search-reranking),
+LightGBM with MiniLM-L6 features) scores 0.854 on the US test used here. Both lie below the primary system's interval,
 but Amazon's number is on a different sample of US test queries, so it is a reference, not a paired comparison.
 Our own run of Amazon's recipe (adapted: bf16, length-bucketed batches, max length 128, 90% of our train
 split) gives 0.8544, consistent with their 0.857. The KDD Cup 2022 winners (0.904) report on all three
@@ -38,7 +39,7 @@ locales (US, ES, JP) with large ensembles, so that number is not comparable.
 code swaps them (S 0.01, C 0.1); under that convention our numbers are 0.8724 (top) / 0.8499 (served) /
 0.8354 (Amazon's recipe, vs 0.83 in Amazon's README). An independent paper (SQID, 2024) re-ran Amazon's recipe
 on this same US test with the paper's gains: 0.8562 (ours: 0.8544). Full comparison with the KDD Cup 2022
-field: `docs/analysis/benchmark_position_2026-11-22.md`.
+field: `docs/analysis/benchmark_position_2026-11-21.md`.
 
 ## Serving
 
@@ -91,7 +92,7 @@ uv sync --group demo
 uv run --group demo python -m shoprank.serve.demo   # http://127.0.0.1:7860
 ```
 Type a query and one product per line (`title | brand | colour | bullets`); the page shows the list best
-first and the scoring time (about 10 ms for 4 products).
+first and the scoring time (about 10 ms for 4 products, measured once).
 
 ## What mattered (dev, 2,001 queries; paired 95% CIs)
 
@@ -106,6 +107,7 @@ first and the scoring time (about 10 ms for 4 products).
 | MiniLM: + bullets | +0.0068 [+0.0032, +0.0104] |
 | MiniLM: + learn DeBERTa's out-of-fold scores (distillation) | +0.0064 [+0.0038, +0.0090] |
 | 4-class cross-entropy instead of MSE on the gain | -0.0056 [-0.0094, -0.0018] |
+| MiniLM: 3.3x more labelled pairs (large ESCI version, title only) | +0.0052 [+0.0023, +0.0082] |
 | Typo queries: spell correction before ranking (v1.1) | +0.0252 [+0.0211, +0.0292], 89% of the typo loss; dev2 +0.0287 |
 | Clean queries: spell correction before ranking | +0.0003 [-0.0008, +0.0015] (no harm); dev2 +0.0020 |
 | Typo queries: train the ranker on misspelled queries instead | +0.0041 [+0.0019, +0.0062], 14% (rejected) |
@@ -114,7 +116,8 @@ first and the scoring time (about 10 ms for 4 products).
 
 Seed noise (3 seeds): DeBERTa spread 0.0016, MiniLM 0.0003 (title only) and 0.0017 (distilled + bullets); no
 change smaller than that is claimed.
-Hardest queries: negation ("without", "not"); BM25 0.748, DeBERTa 0.839 on dev.
+Hardest queries: negation ("without", "not"); BM25 0.748, a single DeBERTa 0.839 on dev (mostly ESCI's
+built-hard "negations" query source; the model does read the negation word).
 
 ## Honest limits
 
@@ -148,7 +151,7 @@ uv run python -m shoprank.data.download      # ~1.16 GB, resumable
 uv run python -m shoprank.data.ingest        # US tables + train/dev/dev2/test split (test = official test)
 uv run python -m shoprank.features.build     # 14 text features
 uv run pytest -q && uv run ruff check src tests
-# DeBERTa 5-fold models (~36 min each on an RTX 4060), MiniLM folds (~5 min each):
+# DeBERTa 5-fold models (~30-35 min each on an RTX 4060), MiniLM folds (~5-6 min each):
 for k in 0 1 2 3 4; do
   uv run python -m shoprank.cross.oof --model microsoft/deberta-v3-base --fields title,brand,color,bullets \
       --lr 2e-5 --warmup-steps 1000 --fold $k --name deberta_oof
@@ -166,7 +169,7 @@ The test split is locked in code; `--allow-test` exists for the one final run (`
 
 - `docs/lab_notebook.md`: every run, with the prediction written before it.
 - `docs/learn/`: lessons per section (beginner level, with check questions and answers).
-- `docs/analysis/project_status_2026-11-22.md`: final status, known limits, what would come next.
+- `docs/analysis/project_status_2026-11-21.md`: final status, known limits, what would come next.
 - `docs/analysis/`: error analysis, label audit and the 21 Nov 2026 audit (leakage, claims, robustness).
 
 ## Data

@@ -761,11 +761,12 @@ small clean cost (-0.0015). A 33M-parameter student that sees each misspelled qu
 the subword split a typo causes ("cbale" -> different word pieces). Likely better fix, not yet tested: correct
 the query BEFORE ranking (spell correction against the catalogue vocabulary), which is how production search
 handles typos; its ceiling is the clean score (0.8657), i.e. up to the full 0.028.
-Incident: first attempt thrashed (process 10.3 GB, 1.9 GB resident: all 1.2M US products (small + large ESCI versions; not three locales, corrected 22 Nov) were
+Incident: first attempt thrashed (process 10.3 GB, 1.9 GB resident: all 1.2M US products (small + large ESCI versions; not three locales, corrected 21 Nov) were
 loaded); fixed by reading only the 336k products the pairs use (`cross.zero_shot.read_products`, identical
-texts, tested). The laptop also slept ~11 h mid-run; runs resumed, results unaffected.
+texts, tested). The run paused once mid-way (the system clock jumped, likely sleep; this machine's clock proved unreliable,
+see git commit times); runs resumed, results unaffected.
 
-## 2026-11-22 — Phase D2: query spell correction before ranking (pre-registered before any dev look)
+## 2026-11-21 — Phase D2: query spell correction before ranking (pre-registered before any dev look)
 Idea: fix the typo before the ranker sees it, the way production search does. `serve/spell.py`: vocabulary =
 word counts from titles, brands and colours of the 1.2M US products (product text only, no labels, no
 queries). A query word (letters only, 4+ chars) seen < 5 times in the catalogue is replaced by the most
@@ -799,7 +800,7 @@ into serving (v1.1). It beats typo-consistency training (14%) by a wide margin a
 Known misses seen while building (not tuned): misspellings frequent in titles stay ("wirless" occurs 5+ times),
 and rare non-English words can be "corrected" into English ("llaves" -> "leaves").
 
-## 2026-11-22 — Release hardening (v1.1.1): independent review, fixes, licence
+## 2026-11-21 — Release hardening (v1.1.1): independent review, fixes, licence
 Independent reviewer agent (Sonnet) on everything since v1.0: no defect in the ranking path; 8 findings, all
 fixed or documented (CHANGELOG v1.1.1). The most important: following the README "Reproduce" steps gave an API
 with spell correction silently OFF (vocabulary not in the model folder), and the CI Docker smoke test used a
@@ -810,7 +811,7 @@ One behaviour change with no effect on scores: `query_used` returns the input un
 no word was corrected; the tokenizer ignores spacing, so the model input is identical.
 Also: Apache-2.0 licence, package version 1.1.1, repo topics + Hugging Face link, lesson 18 written.
 
-## 2026-11-22 — Modern rerankers, zero-shot, on dev (does training our own pay off?)
+## 2026-11-21 — Modern rerankers, zero-shot, on dev (does training our own pay off?)
 Prediction (written in the plan as the interview question, no numbers fixed beforehand; recorded as a gap):
 a strong 2025-26 general reranker should be close to, but below, an in-domain fine-tuned model.
 Setup: same product text as the served model (title, brand, colour, bullets), dev only (2,001 queries),
@@ -828,7 +829,7 @@ in-domain teacher. In-domain fine-tuning on ESCI labels is worth more than model
 only (fine-tuning them on ESCI would likely close or reverse the gap, at 17x the serving cost); dev only, the
 test set stays spent; the Qwen3 prompt was not tuned.
 
-## 2026-11-22 — Fresh-clone acceptance test of v1.1 in WSL (separate agent)
+## 2026-11-21 — Fresh-clone acceptance test of v1.1 in WSL (separate agent)
 `git clone` from GitHub, checkout v1.1 (40bace7), README steps only: `uv sync --locked` (torch 2.13.0+cu126),
 173 tests pass, ruff clean, `serve.fetch` verifies 6/6 files incl. spell_vocab.json, API /health
 spell_correction true, "usb c cbale 6ft" -> query_used "usb c cable 6ft", right product first (13 ms), empty
@@ -836,3 +837,57 @@ query -> 422. 8/8 steps pass. Its README findings (heavy torch install under "no
 /health hint) were fixed in v1.1.1; `scripts/serve_requirements.sh` also checked on the v1.1.1 checkout.
 Backup of GPU-hour artefacts (5 DeBERTa folds, served PyTorch model, run records, scores): private Hugging
 Face repository, 181 files.
+
+## 2026-11-21 — More labelled data: MiniLM on the LARGE ESCI version (pre-registered before the run)
+Why: the benchmark research (`docs/analysis/benchmark_position_2026-11-21.md`) names more labelled data as the
+biggest lever (KDD Cup 9th place: Task 2 data "improved the model substantially"). Cheapest honest test: the
+served-size MiniLM, Amazon's recipe (title only, MSE on the gain, lr 7e-6, warmup 5000, 1 epoch, batch 32,
+seed 42), trained on all LARGE-version train judgments: 63,553 queries / 1,181,741 pairs (small: 17,823 /
+357,759; small is a subset; 0 queries shared with dev or dev2). Checkpoint on a 10% train hold-out as before
+(eval every 5000 steps instead of 1000, to save time). Baseline: `minilm_ft_mse_fast` (same recipe, small
+version), dev 0.8534. Judged on the usual dev (2,001 small-version queries), paired bootstrap. dev2 and test
+untouched.
+Prediction: +0.008 to +0.020 dev nDCG (3.6x more queries; title-only MiniLM gained +0.0068 from bullets and
++0.0064 from distillation, so data at this scale should matter at least as much). A gain below 0.002 (6x the
+MiniLM seed spread 0.0003) would mean data is not the lever for this model size.
+
+## 2026-11-21 — Label-noise estimate on a RANDOM sample (pre-registered before judging)
+The 21 Nov audit hunted errors (most extreme disagreements), so it could not give an error rate. Now: 200 dev
+pairs drawn uniformly at random (seed 2026; label mix E 84 / S 73 / I 34 / C 9, close to dev's 44/34/18/4%).
+Two independent AI judges (a Sonnet agent and an Opus agent), each blind to the labels and to the other judge,
+label every pair with the ESCI definitions only. Files: data/processed/label_audit/ (blind sheet, key, judgments).
+Measures: each judge's agreement with the ESCI label (4 classes, and E vs not-E); Cohen's kappa between the two
+judges; "likely label error" = both judges agree with each other AND disagree with the ESCI label, as a share of
+200 with a Wilson 95% interval. A human (the owner) can later judge the same sheet for a human-vs-AI check.
+Predictions: judge vs label 4-class agreement 65-80% (Substitute vs Exact is the hard boundary), E vs not-E
+80-90%; judge-judge kappa 0.5-0.7; likely label errors 5-12% of pairs.
+
+Result (random label audit; `docs/analysis/label_audit_random200_dev.csv` and `..._summary.json`):
+| Measure | Result [Wilson 95%] | Prediction |
+|---|---|---|
+| judges agree with each other | 175/200 = 87.5% [82.2, 91.4]; Cohen's kappa 0.81 | kappa 0.5-0.7: wrong (higher) |
+| Sonnet judge = ESCI label (4 classes) | 63.5% [56.6, 69.9]; Exact vs not 72.5% | 65-80% / 80-90%: wrong (lower) |
+| Opus judge = ESCI label (4 classes) | 63.5% [56.6, 69.9]; Exact vs not 74.0% | same |
+| both judges agree AND differ from the label | 57/200 = 28.5% [22.7, 35.1] | 5-12%: wrong (much higher) |
+| same, Exact vs not-Exact only | 47/200 = 23.5% [18.2, 29.8] | |
+Where they differ (judge consensus vs label): label E -> judges S 17; label S -> judges E 15; label E -> I 5;
+label S -> I 6; the rest C/I. 32 of the 57 are the Exact/Substitute boundary.
+Reading (careful): two AI judges that agree with each other are not ground truth: they can share a bias. Some
+disagreements look like label errors ("boots for men work construction" -> WHITIN construction work boots,
+labelled S), others like judge errors ("wig without bangs" -> a wig WITH bangs, labelled I, judges said S:
+the label looks right). So 28.5% is an upper bound on how often a careful reader would contest the label, not
+the error rate. The ESCI paper's own 91% annotator agreement (9% disagreement) is a lower reference. The true
+noise level is between, and the Exact/Substitute boundary is genuinely subjective. Consequence for ShopRank:
+part of the remaining gap to 1.0 cannot be closed by any model; at most it argues for a "graded" view of
+Substitute vs Exact. A human pass over the 57 DISAGREE rows (column `your_label` in the CSV) would turn this
+into a real error-rate estimate.
+
+Result (large-version data, dev; `runs/minilm_ft_mse_large.json`): 0.8586 (nDCG@10 0.7605) vs small 0.8534:
++0.0052 [+0.0023, +0.0082] full list, +0.0093 [+0.0051, +0.0136] nDCG@10. 1,064,406 fit pairs, 1,009 s training
+(title only; ~17 min), best step 30,000 of 33,263. Prediction +0.008 to +0.020: wrong (smaller), but the gain is
+real (17x the MiniLM seed spread). Versus distillation on the small data (`minilm_distil_w10`, 0.8575): +0.0011
+[-0.0017, +0.0040], no clear difference: 3.3x more labelled pairs buy about what the DeBERTa teacher's soft
+scores buy. Combining both (distilling on the large version) would need teacher scores for 1.18M pairs, about
+5 x 1.5 GPU-hours of DeBERTa fold training: not run (over the 2-GPU-hour limit without the owner's OK).
+The hold-out nDCG during training (~0.956) is on large-version queries, whose candidate lists differ; not
+comparable to dev.

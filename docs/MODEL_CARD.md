@@ -7,7 +7,7 @@ scores each product's relevance so the list can be sorted best first. It re-rank
 ## Model
 - Architecture: cross-encoder, MiniLM-L12 (`cross-encoder/ms-marco-MiniLM-L-12-v2` start point), 33M
   parameters, one output score. Input: `query [SEP] title brand colour bullets`, cut at 128 tokens.
-- Training: ESCI Task 1 train, US English, 323,302 pairs (~16,100 queries, ~77% of the official training
+- Training: ESCI Task 1 train, US English, 323,302 pairs (~16,000 queries, ~77% of the official training
   queries; the rest is dev, dev2 and a 10% early-stopping hold-out). Target (knowledge distillation): for each
   pair, the score of the DeBERTa-v3-base fold model that never saw that query (out-of-fold), MSE loss,
   1 epoch, lr 7e-6 with 5,000 linear warm-up steps, batch 32, bf16, seed 42.

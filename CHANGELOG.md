@@ -5,7 +5,22 @@ was scored once, for v1.0.
 
 ## Unreleased
 
-## v1.1.1 — 22 Nov 2026: release hardening (no change to any reported number)
+## v1.1.2 — 21 Nov 2026: final audit (no change to any reported number)
+- Full-code audit (separate reviewer agent) of every module: no leakage, no metric or bootstrap bug. Fixed: every
+  `*_test` output is now write-once (`run_task1`, `cross.score`; `final_test` already was); training refuses to
+  keep weights if no hold-out evaluation produced a finite score; `queries.parquet` picks a deterministic split
+  for the one query id that has rows in two splits. Documented (not changed): bf16 ties, per-split BM25 stats,
+  two feature quirks (`project_status_2026-11-21.md`).
+- Docs audit (separate agent) of every number: fixed +0.031 -> +0.033 vs our re-run of Amazon's recipe; the gap to
+  the KDD Cup field (0.005 to 20th place, 0.017 to 1st, different test); source link for the public 0.854 project;
+  dates (all work is 21 Nov 2026; earlier notes said 22 Nov from an unreliable shell clock); snapshot notes on the
+  morning audit and completion plan.
+- Random label audit: 200 dev pairs, two blind AI judges (kappa 0.81 between them); they contest the ESCI label
+  on 28.5% [22.7, 35.1] of pairs, mostly Exact vs Substitute (upper bound; `eval/label_audit.py`,
+  `docs/analysis/label_audit_random200_dev.csv` with a column for a human pass).
+- `cross.finetune --train-version large` and a data-size experiment (see the lab notebook).
+
+## v1.1.1 — 21 Nov 2026: release hardening (no change to any reported number)
 Independent code review (separate reviewer agent) of v1.0..v1.1: no defect in the ranking path; fixed:
 - Spell correction could be silently off after the README "Reproduce" steps (vocabulary not in the model
   folder): `onnx_export` now copies `spell_vocab.json`, the API also looks at `data/processed/spell_vocab.json`,
@@ -25,7 +40,7 @@ Independent code review (separate reviewer agent) of v1.0..v1.1: no defect in th
 - `eval/baseline_rerankers.py`: zero-shot BGE-reranker-v2-m3 (dev 0.8585) and Qwen3-Reranker-0.6B (0.8540)
   vs our served 33M MiniLM (0.8667): -0.0081 [-0.0130, -0.0032] and -0.0127 [-0.0178, -0.0076].
 
-## v1.1 — 22 Nov 2026: query spell correction
+## v1.1 — 21 Nov 2026: query spell correction
 - `serve/spell.py`: catalogue vocabulary (titles, brands, colours of 1.2M US products, 184,594 words) and
   one-edit (Damerau-Levenshtein, SymSpell-style) correction of rare query words; 0.01 ms per query.
 - Dev (3 models): typo queries +0.0252 [+0.0211, +0.0292] and +0.0226 [+0.0185, +0.0267], 88-89% of the typo

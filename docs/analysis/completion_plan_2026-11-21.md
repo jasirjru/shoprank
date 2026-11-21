@@ -1,5 +1,8 @@
 # ShopRank: is it complete, and what is left? (21 Nov 2026)
 
+> Snapshot taken before v1.0..v1.1.1. Gaps G1-G6 and the licence, Docker, tag and changelog items were closed the
+> same day; G4 (typos) was solved by spell correction, not by typo training: see `CHANGELOG.md`.
+
 Builds on `audit_2026-11-21.md` (leakage, claims, robustness) and the WSL clean-clone reproduction.
 New checks today: dependency vulnerabilities (osv-scanner on `uv.lock`), untested modules, model loading,
 and what a fresh clone can actually run.

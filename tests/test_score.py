@@ -21,3 +21,15 @@ def test_score_frame_keeps_one_row_per_pair_with_labels():
     assert out["score"].tolist() == pytest.approx([0.9, 0.1])
     with pytest.raises(ValueError):
         score_frame(pairs, np.array([0.5]))
+
+
+def test_existing_test_scores_are_never_overwritten(tmp_path, monkeypatch):
+    import sys
+
+    from shoprank.cross import score as score_mod
+
+    monkeypatch.setattr(score_mod, "SCORES", tmp_path)
+    (tmp_path / "m_test.parquet").write_bytes(b"x")
+    monkeypatch.setattr(sys, "argv", ["score", "m", "--split", "test", "--allow-test"])
+    with pytest.raises(SystemExit, match="write-once"):
+        score_mod.main()

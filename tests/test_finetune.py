@@ -246,3 +246,18 @@ def test_mix_targets_refuses_missing_teacher_scores_and_bad_weights():
         mix_targets(np.array([1.0]), np.array([0.5, 0.1]), 1.0)
     with pytest.raises(ValueError):
         mix_targets(np.array([1.0]), np.array([0.5]), 1.5)
+
+
+def test_load_train_pairs_picks_the_version_and_only_train(tmp_path):
+    import pandas as pd
+
+    from shoprank.cross.finetune import load_train_pairs
+
+    pd.DataFrame({"query_id": [1, 1, 2, 3], "query": ["a", "a", "b", "c"], "product_id": ["x", "y", "z", "w"],
+                  "esci_label": ["E", "I", "S", "E"], "gain": [1.0, 0.0, 0.1, 1.0],
+                  "small_version": [1, 0, 0, 1], "large_version": [1, 1, 1, 1],
+                  "split": ["train", "train", "train", "dev"]}).to_parquet(tmp_path / "judgments.parquet")
+    small = load_train_pairs("small", tmp_path)
+    large = load_train_pairs("large", tmp_path)
+    assert list(small["product_id"]) == ["x"]
+    assert list(large["product_id"]) == ["x", "y", "z"]  # dev query 3 never appears

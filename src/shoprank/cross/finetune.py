@@ -22,6 +22,7 @@ import json
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -92,6 +93,25 @@ def mix_targets(gain: np.ndarray, teacher: np.ndarray, weight: float) -> np.ndar
     if gain.shape != teacher.shape or not np.isfinite(teacher).all():
         raise ValueError("need one finite teacher score per training pair")
     return (1.0 - weight) * gain + weight * teacher
+
+
+TRAIN_VERSIONS = ("small", "large")
+
+
+def load_train_pairs(version: str, processed: Path = PROCESSED) -> pd.DataFrame:
+    """TRAIN-split judgments of one ESCI version, sorted by query. The large version adds queries and products
+    beyond Task 1 (small); the split is by query, so no dev, dev2 or test query can appear here."""
+    if version not in TRAIN_VERSIONS:
+        raise ValueError(f"unknown version {version!r}")
+    import duckdb
+
+    flag = "small_version" if version == "small" else "large_version"
+    return duckdb.connect().execute(f"""
+        SELECT query_id, query, product_id, esci_label, gain
+        FROM '{(processed / "judgments.parquet").as_posix()}'
+        WHERE {flag} = 1 AND split = 'train'
+        ORDER BY query_id, product_id
+    """).df()
 
 
 def warmup_linear(step: int, warmup: int, total: int) -> float:
@@ -276,6 +296,8 @@ def fit(model, tokenizer, queries: Sequence[str], texts: Sequence[str], targets:
                     best_state = copy.deepcopy({k: v.detach().cpu() for k, v in model.state_dict().items()})
                 start = time.perf_counter() - train_seconds  # eval time is not training time
     history["train_seconds"] = round(time.perf_counter() - start, 1)
+    if best_state is None and history["evals"]:
+        raise RuntimeError("no hold-out evaluation produced a finite score; refusing to keep untested weights")
     if best_state is not None:
         model.load_state_dict(best_state)
     return history
@@ -296,7 +318,11 @@ def main() -> None:
     p.add_argument("--teacher-weight", type=float, default=1.0)
     p.add_argument("--typo-rate", type=float, default=0.0,
                    help="share of training QUERIES given one synthetic typo; targets stay those of the clean query")
+    p.add_argument("--train-version", choices=TRAIN_VERSIONS, default="small",
+                   help="large: all ESCI training judgments of the train queries (~3.6x more queries); dev stays small")
     args = p.parse_args()
+    if args.train_version == "large" and args.teacher:
+        p.error("--teacher scores exist for the small version only")
     if args.teacher and args.loss != "mse":
         p.error("--teacher needs --loss mse")
     fields = args.fields.split(",")
@@ -308,7 +334,7 @@ def main() -> None:
                     limit_steps=args.limit_steps, loss=args.loss)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     cols = ["query_id", "query", "product_id", "esci_label", "gain"]
-    train = cached("train")[cols]
+    train = cached("train")[cols] if args.train_version == "small" else load_train_pairs("large")
     dev = cached("dev")[cols]
     # Only the needed columns and only the products these pairs use (saves ~2.5 GB of RAM; same texts).
     products = read_products(fields, pd.concat([train["product_id"], dev["product_id"]]))
@@ -367,7 +393,7 @@ def main() -> None:
               "loss": "mse_gain" if cfg.loss == "mse" else "ce_4class_expected_gain",
               "best_step": history["best_step"], "train_seconds": history["train_seconds"],
               "teacher": args.teacher, "teacher_weight": args.teacher_weight if args.teacher else None,
-              "typo_rate": args.typo_rate,
+              "typo_rate": args.typo_rate, "train_version": args.train_version,
               "fit_pairs": len(fit_part), "dev_score_seconds": round(time.perf_counter() - start, 1),
               "peak_vram_gb": round(torch.cuda.max_memory_allocated() / 2**30, 2) if device == "cuda" else 0.0}
     summary = save(name, "dev", per_query_results(dev.assign(score=scores), "score"), config)

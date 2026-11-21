@@ -98,6 +98,8 @@ def evaluate(queries: dict, ranker: Ranker) -> list[dict]:
 
 def save(name: str, split: str, results: list[dict], config: dict) -> dict:
     RUNS.mkdir(parents=True, exist_ok=True)
+    if split == "test" and ((RUNS / f"{name}.json").exists() or (RUNS / f"{name}.parquet").exists()):
+        raise SystemExit(f"run {name} on test already exists; test results are write-once")
     con = duckdb.connect()
     con.register("r", pd.DataFrame(results))
     con.execute(f"COPY r TO '{(RUNS / f'{name}.parquet').as_posix()}' (FORMAT parquet)")

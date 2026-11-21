@@ -1,4 +1,4 @@
-# ShopRank: final status (22 Nov 2026, v1.1.1)
+# ShopRank: final status (21 Nov 2026, v1.1.1)
 
 The build is complete. This page says what exists, how good it is, how to run it, what is known to be weak, and
 what would come next. Details: `README.md`, `docs/MODEL_CARD.md`, `docs/lab_notebook.md`, `CHANGELOG.md`.
@@ -15,7 +15,7 @@ what would come next. Details: `README.md`, `docs/MODEL_CARD.md`, `docs/lab_note
 | Model download with checksums | `serve/fetch.py`; GitHub release v1.1; Hugging Face | public |
 | Evaluation tools | `eval/` (bootstrap CIs, trec_eval check, slices, typo and spell tests) | done |
 | CI | `.github/workflows/ci.yml`: tests, Docker smoke test, vulnerability + secret scans | green |
-| Lessons | `docs/learn/section09-18` | written, to be studied |
+| Lessons | `docs/learn/sections09-11.md`, `section12.md` ... `section18.md` | written, to be studied |
 
 ## How good it is
 | System | Official test nDCG [95% CI] (scored once) |
@@ -44,6 +44,13 @@ docker build -t shoprank . && docker run --rm -p 8000:8000 shoprank
   rare non-English words into English, and cannot fix misspellings that are common in product titles.
 - Latency is from one laptop; no load balancer, autoscaling, authentication or rate limiting.
 - The official test set is spent; v1.1 changes are judged on dev and dev2 only.
+- Found by the final full-code audit and documented rather than changed (changing them would move published
+  numbers after the fact): scores pass through bf16, so ~16% of a single model's pairs tie within a query (4% for
+  the 5-model mean; tie order moves nDCG by ~0.00005); BM25 statistics (IDF, average length) are computed per
+  split's candidate products, so LambdaMART/stacker BM25 features shift slightly in scale between splits; the
+  `phrase_in_title` feature is a substring test ("pen" matches "pencil"); the BM25 tokenizer drops non-ASCII.
+- Labels: on 200 random dev pairs, two AI judges agree with each other 87.5% of the time but contest the ESCI
+  label on 28.5% [22.7, 35.1] (mostly Exact vs Substitute); an upper bound, since judges can share a bias.
 
 ## Where the evidence is
 - Every run and its prediction: `docs/lab_notebook.md` (predictions written before each run, wrong ones kept).

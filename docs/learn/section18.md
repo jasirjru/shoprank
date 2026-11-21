@@ -1,4 +1,4 @@
-# ShopRank lessons: section 18, robustness, a failed fix, spell correction and shipping (built 21-22 Nov 2026, study after the build)
+# ShopRank lessons: section 18, robustness, a failed fix, spell correction and shipping (built 21-21 Nov 2026, study after the build)
 
 Files: `src/shoprank/cross/typos.py`, `src/shoprank/serve/spell.py`, `src/shoprank/serve/fetch.py`, `Dockerfile`, `CHANGELOG.md`.
 Notebook entries: "Audit: robustness", "Phase A", "Phase B", "Phase D", "Phase D2".

@@ -69,3 +69,13 @@ def test_test_split_is_locked_without_flag(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["run_task1", "--ranker", "random", "--name", "x", "--split", "test"])
     with pytest.raises(SystemExit):
         run_task1.main()
+
+
+def test_test_results_are_write_once(tmp_path, monkeypatch):
+    monkeypatch.setattr(run_task1, "RUNS", tmp_path)
+    rows = [{"query_id": 1, "ndcg10": 1.0, "ndcg_full": 1.0, "rr_exact": 1.0, "recall10_exact": 1.0}]
+    save("x_test", "test", rows, {})
+    with pytest.raises(SystemExit, match="write-once"):
+        save("x_test", "test", rows, {})
+    save("x_dev", "dev", rows, {})
+    save("x_dev", "dev", rows, {})  # dev may be overwritten

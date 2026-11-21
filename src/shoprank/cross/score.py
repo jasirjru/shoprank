@@ -66,6 +66,9 @@ def main() -> None:
     ap.add_argument("--allow-test", action="store_true")
     args = ap.parse_args()
     check_split(args.split, args.allow_test)
+    path = SCORES / f"{args.run}_{args.split}.parquet"
+    if args.split in LOCKED and path.exists():  # the official test set is scored once: never overwrite
+        raise SystemExit(f"{path} exists; test scores are write-once")
 
     config = json.loads((PROCESSED / "runs" / f"{args.run}.json").read_text(encoding="utf-8"))  # flat summary
     pairs, _ = load_split(args.split)
@@ -73,7 +76,6 @@ def main() -> None:
     scores = score_pairs(MODELS / args.run, pairs, config["fields"], config.get("max_length", 128))
     seconds = time.perf_counter() - start
     SCORES.mkdir(parents=True, exist_ok=True)
-    path = SCORES / f"{args.run}_{args.split}.parquet"
     score_frame(pairs, scores).to_parquet(path, index=False)
     print(f"{args.run} on {args.split}: {len(pairs):,} pairs in {seconds:.1f} s "
           f"({len(pairs) / seconds:,.0f} pairs/s) -> {path}")

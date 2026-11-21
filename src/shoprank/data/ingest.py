@@ -68,7 +68,11 @@ def build(con: duckdb.DuckDBPyConnection, raw_dir: Path, out_dir: Path) -> dict:
     """)
     con.execute("""
         CREATE OR REPLACE TABLE queries AS
-        SELECT query_id, any_value(query) AS query, any_value(split) AS split
+        -- A few query ids have rows in two splits (e.g. small-version test rows and large-version 'dropped'
+        -- rows); take the most protected split so the table is deterministic: test > dev > dev2 > train > dropped.
+        SELECT query_id, any_value(query) AS query,
+               arg_min(split, CASE split WHEN 'test' THEN 0 WHEN 'dev' THEN 1 WHEN 'dev2' THEN 2
+                                         WHEN 'train' THEN 3 ELSE 4 END) AS split
         FROM judgments GROUP BY query_id
     """)
     con.execute(f"""
