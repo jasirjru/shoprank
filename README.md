@@ -53,6 +53,17 @@ curl -X POST localhost:8000/rank -H "Content-Type: application/json" \
        {"product_id": "b", "title": "HDMI cable 10 ft"}]}'
 ```
 
+### Demo
+
+A Gradio page over the same INT8 model and input rules as `/rank` (local only, no public link):
+
+```bash
+uv sync --group demo
+uv run --group demo python -m shoprank.serve.demo   # http://127.0.0.1:7860
+```
+Type a query and one product per line (`title | brand | colour | bullets`); the page shows the list best
+first and the scoring time (about 10 ms for 4 products).
+
 ## What mattered (dev, 2,001 queries; paired 95% CIs)
 
 | Change | Effect on dev nDCG |

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "shoprank-demo",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "--group", "demo", "python", "-m", "shoprank.serve.demo"],
+      "port": 7860
+    }
+  ]
+}

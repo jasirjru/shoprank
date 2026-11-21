@@ -2,3 +2,6 @@
 # data is downloaded, never committed
 data/
 mlruns/
+
+# Python bytecode
+__pycache__/
