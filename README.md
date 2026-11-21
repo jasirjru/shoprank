@@ -1,5 +1,8 @@
 # ShopRank
 
+**Live page: [shoprank-jasirjru.vercel.app](https://shoprank-jasirjru.vercel.app)**: real searches ranked by keyword
+search and by ShopRank, side by side. Model: [Hugging Face](https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8).
+
 Product search re-ranking on the Amazon Shopping Queries dataset (ESCI, Task 1, US English): from BM25 to a
 DeBERTa-v3 cross-encoder ensemble, distilled into a small model served on a CPU. Every test number has a 95%
 confidence interval, every run has a prediction written before it (`docs/lab_notebook.md`), and the official
