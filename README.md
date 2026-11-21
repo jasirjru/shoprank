@@ -34,6 +34,12 @@ Our own run of Amazon's recipe (adapted: bf16, length-bucketed batches, max leng
 split) gives 0.8544, consistent with their 0.857. The KDD Cup 2022 winners (0.904) report on all three
 locales (US, ES, JP) with large ensembles, so that number is not comparable.
 
+**Gain convention:** we use the paper's gains (Substitute 0.1, Complement 0.01). Amazon's released evaluation
+code swaps them (S 0.01, C 0.1); under that convention our numbers are 0.8724 (top) / 0.8499 (served) /
+0.8354 (Amazon's recipe, vs 0.83 in Amazon's README). An independent paper (SQID, 2024) re-ran Amazon's recipe
+on this same US test with the paper's gains: 0.8562 (ours: 0.8544). Full comparison with the KDD Cup 2022
+field: `docs/analysis/benchmark_position_2026-11-22.md`.
+
 ## Serving
 
 `POST /rank` (FastAPI) first fixes typos in the query against the catalogue vocabulary (v1.1, see below), then
