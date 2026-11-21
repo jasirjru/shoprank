@@ -827,3 +827,12 @@ Reading: both 17x-larger general rerankers lose to our 33M in-domain distilled m
 in-domain teacher. In-domain fine-tuning on ESCI labels is worth more than model size here. Caveats: zero-shot
 only (fine-tuning them on ESCI would likely close or reverse the gap, at 17x the serving cost); dev only, the
 test set stays spent; the Qwen3 prompt was not tuned.
+
+## 2026-11-22 — Fresh-clone acceptance test of v1.1 in WSL (separate agent)
+`git clone` from GitHub, checkout v1.1 (40bace7), README steps only: `uv sync --locked` (torch 2.13.0+cu126),
+173 tests pass, ruff clean, `serve.fetch` verifies 6/6 files incl. spell_vocab.json, API /health
+spell_correction true, "usb c cbale 6ft" -> query_used "usb c cable 6ft", right product first (13 ms), empty
+query -> 422. 8/8 steps pass. Its README findings (heavy torch install under "no GPU", stale v1.0 link, no
+/health hint) were fixed in v1.1.1; `scripts/serve_requirements.sh` also checked on the v1.1.1 checkout.
+Backup of GPU-hour artefacts (5 DeBERTa folds, served PyTorch model, run records, scores): private Hugging
+Face repository, 181 files.
