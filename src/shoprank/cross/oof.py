@@ -31,6 +31,7 @@ from shoprank.cross.finetune import (
 from shoprank.cross.score import SCORES, score_frame
 from shoprank.cross.zero_shot import product_texts
 from shoprank.features.build import PROCESSED, cached, load_split
+from shoprank.hub import revision_for
 
 FOLD_HASH_KEY = "shoprank-oof-k!!"  # 16 characters, different from the hold-out hash
 NO_EVAL = 10**9  # eval_every larger than any run: only the final step is "evaluated", so last = kept
@@ -72,8 +73,10 @@ def main() -> None:
     print(f"fold {args.fold}/{args.n_folds}: fit {fit_part['query_id'].nunique():,} q / {len(fit_part):,} pairs; "
           f"out-of-fold {oof_part['query_id'].nunique():,} q / {len(oof_part):,} pairs", flush=True)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
-    model = AutoModelForSequenceClassification.from_pretrained(args.model, num_labels=1, dtype=torch.float32).to(device)
+    revision = revision_for(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(args.model, revision=revision)
+    model = AutoModelForSequenceClassification.from_pretrained(
+        args.model, revision=revision, num_labels=1, dtype=torch.float32).to(device)
     net = Prepared4DMask(model) if model.config._attn_implementation == "sdpa" else model
     cfg = FitConfig(lr=args.lr, warmup_steps=args.warmup_steps, eval_every=NO_EVAL, seed=args.seed)
     history = fit(net, tokenizer, fit_part["query"].tolist(), product_texts(fit_part, products, fields),

@@ -19,6 +19,7 @@ import pandas as pd
 
 from shoprank.eval.run_task1 import save
 from shoprank.features.build import PROCESSED, cached
+from shoprank.hub import revision_for
 from shoprank.ltr.train import per_query_results
 
 DEFAULT_MODEL = "cross-encoder/ms-marco-MiniLM-L-12-v2"  # Amazon's ESCI baseline starts from this model
@@ -58,7 +59,7 @@ def main() -> None:
     products = pd.read_parquet(PROCESSED / "products.parquet")
     texts = product_texts(dev, products, args.fields.split(","))
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = CrossEncoder(args.model, device=device, max_length=args.max_length)
+    model = CrossEncoder(args.model, device=device, max_length=args.max_length, revision=revision_for(args.model))
 
     start = time.perf_counter()
     scores = score_pairs(dev, texts, lambda pr: model.predict(pr, batch_size=args.batch_size))

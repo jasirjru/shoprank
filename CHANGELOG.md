@@ -1,0 +1,27 @@
+# Changelog
+
+Versions are git tags. Every quality number below is on the split named next to it; the official test set
+was scored once, for v1.0.
+
+## Unreleased
+Phase A, supply chain and code health (plan: `docs/analysis/completion_plan_2026-11-21.md`).
+- Security: torch 2.11.0+cu128 -> 2.13.0+cu126 (GHSA-rrmf-rvhw-rf47), setuptools 81.0.0 -> 84.2.1
+  (PYSEC-2026-3447, GHSA-xmj3-9gf7-h52w); osv-scanner now reports none. Results unchanged: served MiniLM dev
+  nDCG identical (0.86668), DeBERTa fold 0 +0.00017.
+- Reproducibility: Hugging Face base models pinned by commit (`src/shoprank/hub.py`).
+- Tests: metric runner (`eval/run_task1`), ONNX export + INT8 path (tiny random BERT), resumable download,
+  model pins; 124 -> 138 tests.
+- CI: security job (osv-scanner, gitleaks; binaries verified by SHA-256); actions pinned to commit SHAs.
+- Removed the placeholder `shoprank` console script.
+- Docs: completion plan (`docs/analysis/completion_plan_2026-11-21.md`).
+
+## v1.0 — 21 Nov 2026 (commit 3390899)
+Baseline for every later change.
+- Top model: DeBERTa-v3-base, mean of 5 fold models. Official test nDCG 0.8877 [0.8849, 0.8905].
+- Served model: MiniLM-L12 distilled from DeBERTa, with bullets, INT8 ONNX on CPU. Test nDCG 0.8674
+  [0.8643, 0.8703] (PyTorch); dev 0.8654 (INT8). p50 69 ms / p95 232 ms per request, 230 pairs/s.
+- Baselines on test: BM25 0.8202, LambdaMART 0.8337, MiniLM with Amazon's recipe 0.8544.
+- FastAPI `/rank`, Gradio demo, model card, lessons 13-17, CI (ruff + 124 tests).
+- Reproduced from a clean clone in WSL: data hashes, BM25 and LambdaMART dev nDCG bit for bit.
+- Known limits: typo sensitivity (one typo: dev 0.8654 -> 0.8392), 3 known dependency vulnerabilities
+  (torch 2.11, setuptools 81), served model not downloadable (lives only on the build machine).

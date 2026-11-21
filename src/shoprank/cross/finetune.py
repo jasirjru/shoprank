@@ -30,6 +30,7 @@ import torch
 from shoprank.cross.zero_shot import DEFAULT_MODEL, product_texts
 from shoprank.eval.run_task1 import save
 from shoprank.features.build import PROCESSED, cached
+from shoprank.hub import revision_for
 from shoprank.ltr.train import is_holdout, per_query_results
 
 MODELS = PROCESSED / "models"
@@ -314,12 +315,13 @@ def main() -> None:
     print(f"{args.model} | fields {fields} | fit {fit_part['query_id'].nunique():,} q / {len(fit_part):,} pairs; "
           f"hold-out {hold_part['query_id'].nunique():,} q / {len(hold_part):,} pairs; device {device}", flush=True)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    revision = revision_for(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(args.model, revision=revision)
     # "ce" needs 4 outputs; the MS MARCO head has 1, so it is replaced by a new, randomly initialised head.
     # A model without a ranking head (DeBERTa) always gets a new random head.
     num_labels = 1 if cfg.loss == "mse" else len(CLASSES)
     model = AutoModelForSequenceClassification.from_pretrained(
-        args.model, num_labels=num_labels, ignore_mismatched_sizes=num_labels != 1,
+        args.model, revision=revision, num_labels=num_labels, ignore_mismatched_sizes=num_labels != 1,
         dtype=torch.float32).to(device)  # fp32 master weights; DeBERTa-v3 is stored in fp16
     targets = fit_part["gain"].to_numpy() if cfg.loss == "mse" else class_ids(fit_part["esci_label"])
     if args.teacher:  # out-of-fold teacher scores: the teacher never trained on the query it scores

@@ -679,3 +679,32 @@ Ubuntu 24.04 WSL (`OSError: libgomp.so.1: cannot open shared object file`); GitH
 did not catch it. Fixed in the README reproduce steps (`sudo apt-get install -y libgomp1`).
 Not re-run in the clone (GPU hours): the cross-encoders, OOF folds and distillation; their code paths are
 covered by the unit tests and by the run records.
+
+## 2026-11-21 — Phase A: dependency upgrade (torch 2.11 cu128 -> 2.13 cu126, setuptools 81 -> >= 84.1)
+Why: osv-scanner on uv.lock found GHSA-rrmf-rvhw-rf47 (torch, memory corruption in torch.jit.script; our code
+never calls torch.jit, so not directly exposed) and two setuptools issues (macOS NFD file names; legacy egg
+install on Windows, a path uv does not use). torch 2.11 caps setuptools < 82, so one torch upgrade fixes all
+three. The cu128 index stops at torch 2.11; 2.13.0 exists for cu126 (same CUDA 12 family, Ada sm_89 GPUs
+supported) and cu130/cu132. cu126 chosen as the smaller change; driver 610.62 supports it.
+Re-verification and predictions (v1.0 numbers in brackets):
+- unit tests: 124 pass; ruff clean; osv-scanner: 0 known vulnerabilities.
+- served MiniLM (PyTorch, bf16) re-scored on dev: within 0.0005 of 0.8667 (new GPU kernels change bf16
+  rounding and tie order slightly).
+- DeBERTa fold-0 model re-scored on dev: within 0.0005 of its stored v1.0 dev scores' nDCG.
+- ONNX INT8 path does not use torch at inference: unchanged by definition (onnxruntime not upgraded).
+
+Result (Phase A, 21 Nov 2026):
+| Check | v1.0 (torch 2.11 cu128) | torch 2.13.0 cu126 | Prediction |
+|---|---|---|---|
+| served MiniLM, dev nDCG (PyTorch, bf16) | 0.86668 | 0.86668 | within 0.0005: right (identical) |
+| DeBERTa fold 0, dev nDCG | 0.88578 | 0.88595 (+0.00017) | within 0.0005: right |
+| DeBERTa fold 0, largest per-pair score change | | 0.031 (a few bf16 steps) | (not predicted) |
+| unit tests | 124 | 138 (14 new) pass | right |
+| osv-scanner on uv.lock | 3 known vulnerabilities | none | right |
+setuptools 81.0.0 -> 84.2.1. All v1.0 numbers stand; the INT8 ONNX model was not re-exported (onnxruntime
+unchanged, and the export path is now covered by a test on a tiny random BERT).
+Also in Phase A: Hugging Face base models pinned by commit (`src/shoprank/hub.py`; DeBERTa main 8ccc9b6,
+MiniLM 7b02352, the commits the v1.0 runs used); new tests for the metric runner (`run_task1`), the ONNX
+export path and the resumable download; CI gains a security job (osv-scanner 2.7.0 and gitleaks 8.30.1,
+binaries checked against their published SHA-256) and actions pinned to commit SHAs (checkout v7.0.1,
+setup-uv v10.3.3, both over two weeks old); the placeholder `shoprank` console script is removed.

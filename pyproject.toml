@@ -23,13 +23,10 @@ dependencies = [
     "scikit-learn>=1.9.1",
     "sentence-transformers>=6.3",
     "sentencepiece>=0.2.3",
-    "torch>=2.11.0",
+    "torch>=2.13.0,<2.14",
     "transformers>=5.23",
     "uvicorn>=0.54.0",
 ]
-
-[project.scripts]
-shoprank = "shoprank:main"
 
 [build-system]
 requires = ["uv_build>=0.12.17,<0.13.0"]
@@ -45,11 +42,12 @@ dev = [
     "scikit-learn>=1.9.1",
 ]
 
-# PyTorch with CUDA 12.8 (RTX 4060). Only torch comes from this index.
+# PyTorch with CUDA 12.6 (RTX 4060). Only torch comes from this index. The cu128 index stops at torch 2.11,
+# which has GHSA-rrmf-rvhw-rf47 and caps setuptools < 82; 2.13 (the fix) is built for cu126 and cu130+.
 [[tool.uv.index]]
-name = "pytorch-cu128"
-url = "https://download.pytorch.org/whl/cu128"
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu128" }
+torch = { index = "pytorch-cu126" }
