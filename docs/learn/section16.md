@@ -40,14 +40,18 @@ the declared second system with confidence intervals. Nothing was changed after 
 +0.0541. The stack: +0.0006 [-0.0003, +0.0014] over the primary, so "no clear difference" even on 8,956
 queries. Amazon's 0.857 lies below our whole interval.
 
-- Our run of Amazon's own MiniLM recipe gives 0.8544, close to their 0.857. That is the sanity check that we
-  measure the same thing they did (we train on less data: dev and dev2 are held out).
+- Careful (found in the 21 Nov audit): Amazon's 0.857 is the English part of the KDD Cup *public* test, a
+  different sample of US queries from our 8,956, with max length 512 and the full train set. So it is a
+  reference point, not a paired comparison. Our own run of their recipe on OUR test (0.8544) is the fair
+  baseline: same queries, paired CI.
+- Our run of Amazon's own MiniLM recipe gives 0.8544, consistent with their 0.857. That is the sanity check
+  that we measure the same thing they did (we train on less data: dev and dev2 are held out).
 - dev2 had suggested DeBERTa's dev score was ~0.007 optimistic. Test (8x more queries) says dev was right:
   0.8879 dev vs 0.8877 test. A 1,053-query split is noisier than it looks.
 
 **Interview answer:** "On the official test set the DeBERTa ensemble scored 0.888 nDCG with a 95% interval of
-0.885 to 0.891, 6.8 points above BM25 and about 3 points above Amazon's published cross-encoder baseline. My
-replication of Amazon's baseline scored 0.854, close to their 0.857, so the comparison is fair."
+0.885 to 0.891, 6.8 points above BM25 and 3.3 points above my own run of Amazon's cross-encoder recipe on
+the same queries (0.854; Amazon published 0.857 on the public-test English queries)."
 
 ## Part 3: An independent metric check, and what ties do
 

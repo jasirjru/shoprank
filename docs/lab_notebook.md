@@ -618,3 +618,36 @@ for the single MiniLM runs are hard-coded rather than read from their run files 
 `minilm_ft_mse_fast` = title, `minilm_distil_w10_bullets` = title, brand, colour, bullets); the trec_eval check
 prints rather than asserts. None of these happened in this run (one crash, before any model score or guard).
 Load-test limits stated in the code: closed-loop clients, client and server on one CPU, p99 from 300 requests.
+
+## 2026-11-21 — Audit: robustness of the served model (INT8 ONNX, dev), predictions written before the run
+Behavioural tests in the CheckList style: change the input in one controlled way, re-score all 2,001 dev
+queries with the served INT8 model, compare dev nDCG (labels unchanged) with the unperturbed run.
+Predictions:
+- unperturbed: 0.8654 (same as quality.json; checks the harness).
+- query in UPPER CASE: |change| < 0.0001 (the MiniLM tokenizer lower-cases).
+- one typo in the longest query word (two neighbouring letters swapped): -0.010 to -0.025.
+- query words in reverse order: -0.005 to -0.015.
+- product as title only (brand, colour, bullets missing at serving time): -0.008 to -0.015.
+- negation queries (slices.NEGATION, about 158 queries): delete the negation word. If the model reads the
+  negation, scores should move a lot; prediction: they barely move (Spearman of scores > 0.9) and nDCG on
+  that slice changes by less than 0.01, i.e. the model mostly ignores negation.
+
+Result (dev, 2,001 queries, served INT8 model, labels unchanged; one run each, no CI computed: the 3-seed
+spread of MiniLM is 0.0003, so changes of 0.01 and more are far outside noise):
+
+| Perturbation | dev nDCG | change | negation slice (158 q) | Prediction |
+|---|---|---|---|---|
+| none | 0.8654 | | 0.8347 | 0.8654: right |
+| query in UPPER CASE | 0.8654 | 0.0000 | 0.8347 | < 0.0001: right |
+| one typo, longest query word | 0.8392 | **-0.0262** | 0.8043 | -0.010 to -0.025: wrong, worse |
+| query words reversed | 0.8537 | -0.0117 | 0.7687 | -0.005 to -0.015: right |
+| title only (no brand/colour/bullets) | 0.8557 | -0.0097 | 0.8188 | -0.008 to -0.015: right |
+| negation word deleted | 0.8581 | -0.0073 | **0.7585** (-0.0762) | slice change < 0.01, Spearman > 0.9: **wrong** |
+
+Negation: within-query Spearman between scores with and without the negation word, median 0.50 (prediction
+> 0.9). The model does read "without / not / no": deleting the word re-orders the list and costs 0.076 on that
+slice. So the slice's low score (0.835 vs 0.865) is not "the model ignores negation"; more likely those
+queries are harder or noisier in other ways (not yet checked).
+Typos: one swapped letter pair costs 0.026, more than the whole distillation gain (+0.0064) and bullets
+(+0.0068) together. This is the served model's largest measured weakness.
+Files: data/processed/serving/robustness_int8_dev.json; script kept in the session scratchpad (audit only).

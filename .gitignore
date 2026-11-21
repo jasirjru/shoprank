@@ -5,3 +5,6 @@ mlruns/
 
 # Python bytecode
 __pycache__/
+
+# Private session notes (personal details; never published)
+docs/HANDOFF.md

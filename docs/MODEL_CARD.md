@@ -7,9 +7,10 @@ scores each product's relevance so the list can be sorted best first. It re-rank
 ## Model
 - Architecture: cross-encoder, MiniLM-L12 (`cross-encoder/ms-marco-MiniLM-L-12-v2` start point), 33M
   parameters, one output score. Input: `query [SEP] title brand colour bullets`, cut at 128 tokens.
-- Training: ESCI Task 1 train, US English, 80% of the official training queries (285k-358k pairs). Target:
-  the out-of-fold score of a 5-model DeBERTa-v3-base ensemble (knowledge distillation), MSE loss, 1 epoch,
-  lr 7e-6, batch 32, seed 42.
+- Training: ESCI Task 1 train, US English, 323,302 pairs (~16,100 queries, ~77% of the official training
+  queries; the rest is dev, dev2 and a 10% early-stopping hold-out). Target (knowledge distillation): for each
+  pair, the score of the DeBERTa-v3-base fold model that never saw that query (out-of-fold), MSE loss,
+  1 epoch, lr 7e-6 with 5,000 linear warm-up steps, batch 32, bf16, seed 42.
 - Serving: ONNX Runtime, transformer kernel fusion, dynamic INT8 weights (per channel), 32 MB file.
 
 ## Evaluation
@@ -31,9 +32,13 @@ keyword or vector retrieval step. A teaching and portfolio project, not a produc
 ## Not intended / known limits
 - Other languages (ES, JP data exist in ESCI but were not used), other domains than Amazon-style products.
 - Retrieval from a full catalogue: it must be given candidates.
-- Weakest on negation queries ("without", "not"): dev nDCG 0.8378 on 158 such queries vs 0.8667 overall.
-- Labels are noisy: in a 100-pair audit of confident disagreements, 75 human labels looked wrong under the
-  ESCI guidelines; scores above ~0.90 are not realistic on this data.
+- Sensitive to typos: one swapped letter pair in the longest query word lowers dev nDCG from 0.8654 to
+  0.8392 (INT8). Missing brand, colour and bullets cost ~0.01; upper/lower case makes no difference.
+- Weaker on negation queries ("without", "not"): dev nDCG 0.8378 on 158 such queries vs 0.8667 overall. The
+  model does read the negation word (deleting it changes the ranking a lot), so the cause is something else.
+- Labels are noisy (ESCI paper: 91% annotator agreement). In a 100-pair sample chosen to find errors (the
+  teacher's most extreme disagreements, judged by an LLM reviewer and spot-checked), 75 labels looked wrong.
+  Label noise limits how high nDCG can go; how high exactly was not measured.
 - Scores are relevance scores for ranking within one query, not calibrated probabilities; do not compare
   them across queries or use them as thresholds without calibration.
 - Bias and safety: trained on Amazon US queries and human labels, it inherits their brand and popularity

@@ -1,9 +1,9 @@
 # ShopRank
 
 Product search re-ranking on the Amazon Shopping Queries dataset (ESCI, Task 1, US English): from BM25 to a
-DeBERTa-v3 cross-encoder ensemble, distilled into a small model served on a CPU. Every number has a 95%
-confidence interval, a prediction written before the run (`docs/lab_notebook.md`), and the official test set
-was scored once, with the systems declared in advance.
+DeBERTa-v3 cross-encoder ensemble, distilled into a small model served on a CPU. Every test number has a 95%
+confidence interval, every run has a prediction written before it (`docs/lab_notebook.md`), and the official
+test set was scored once, with the systems declared in advance.
 
 ## Results on the official test set (scored once)
 
@@ -24,12 +24,15 @@ Paired differences on test: primary vs BM25 +0.0676 [+0.0646, +0.0705]; vs Lambd
 [+0.0513, +0.0568]; stack vs primary +0.0006 [-0.0003, +0.0014] (no clear difference); served model vs
 Amazon-recipe MiniLM +0.0130 [+0.0112, +0.0148].
 Every test nDCG was re-computed with pytrec_eval (trec_eval): the means agree within 0.0003, and exactly once
-tied scores are ordered the same way.
+tied scores are ordered the same way (ties come from bf16 scores; their order moves the mean by ~0.00005).
 
-**Published references:** Amazon's fine-tuned MiniLM baseline 0.857 (English); a public same-setup project
-0.854 (US test). Both lie below the primary system's interval. Our own run of Amazon's recipe gives 0.8544,
-close to their 0.857, which supports that the metric and data match. The KDD Cup 2022 winners (0.904) report
-on all three locales (US, ES, JP) with large ensembles, so that number is not comparable.
+**Published references:** Amazon's fine-tuned MiniLM cross-encoder scores 0.857 on the English part of the
+KDD Cup 2022 *public* test (ESCI paper, Table 4; trained on the full US train, title only, max length 512); a
+public same-setup project scores 0.854 on the US test used here. Both lie below the primary system's interval,
+but Amazon's number is on a different sample of US test queries, so it is a reference, not a paired comparison.
+Our own run of Amazon's recipe (adapted: bf16, length-bucketed batches, max length 128, 90% of our train
+split) gives 0.8544, consistent with their 0.857. The KDD Cup 2022 winners (0.904) report on all three
+locales (US, ES, JP) with large ensembles, so that number is not comparable.
 
 ## Serving
 
@@ -43,8 +46,9 @@ to INT8 (32 MB; dev nDCG 0.8654 vs 0.8662 fp32). Load test with real dev queries
 | INT8 | 16 | 1,436 ms | 1,784 ms | 1,950 ms | 230 pairs/s |
 | fp32 | 1 | 115 ms | 313 ms | 335 ms | 143 pairs/s |
 
-At high load, latency is queueing: one process handles about 11 requests/s. The DeBERTa ensemble is 0.020
-nDCG better but needs a GPU and is ~2.6x slower there, so it is used offline as the teacher.
+At high load, latency is queueing: one process handles about 11 requests/s. The 5-model DeBERTa ensemble is
+0.020 nDCG better but scores ~89 pairs/s on an RTX 4060 GPU vs 230 pairs/s for the INT8 MiniLM on CPU, so it
+is used offline as the teacher.
 
 ```bash
 uv run uvicorn shoprank.serve.app:app --port 8000
@@ -71,7 +75,7 @@ first and the scoring time (about 10 ms for 4 products).
 | Fine-tuned MiniLM cross-encoder vs LambdaMART | +0.019 |
 | DeBERTa-v3-base vs MiniLM (same fields) | +0.0244 [+0.0197, +0.0292] |
 | + bullet points as input (DeBERTa) | +0.0072 [+0.0039, +0.0106] |
-| + brand and colour fields | -0.0002 [-0.0032, +0.0029] (nothing) |
+| + brand and colour fields (DeBERTa) | +0.0002 [-0.0029, +0.0032] (nothing) |
 | mean of 5 fold models vs 1 model | +0.0028 [+0.0004, +0.0051] |
 | z-score blend / LightGBM stack vs the 5-model mean | -0.0003 / +0.0000 (nothing) |
 | MiniLM: + bullets | +0.0068 [+0.0032, +0.0104] |
@@ -85,13 +89,20 @@ Hardest queries: negation ("without", "not"); BM25 0.748, DeBERTa 0.839 on dev.
 
 - US English only, small version of Task 1 (re-ranking of judged candidates, no retrieval stage). The trained
   two-tower retriever stayed below BM25 (0.790 vs 0.816 on dev).
-- Models train on 80% of the official training queries; 20% is held out as dev and dev2 for model choices.
-- Label quality caps the score: in a 100-pair audit of the model's most confident disagreements, 75 labels
-  looked wrong under the ESCI guidelines (`docs/analysis/`).
+- Less training data than the official setup: dev (2,001) and dev2 (1,053 queries), 14.6% of the official
+  training queries, are held out for model choices. Each DeBERTa fold model trains on 80% of the remaining
+  train split (~68% of the official training queries); the served MiniLM on 323,302 pairs (~77%; a further
+  10% of train is its early-stopping hold-out).
+- Label noise: in a 100-pair sample of the DeBERTa model's most extreme disagreements with the labels (judged
+  against the ESCI guidelines by an LLM reviewer, spot-checked by hand; 50 rows come from 10 queries), 75
+  labels looked wrong (`docs/analysis/`). The sample is chosen to find errors, so it does not estimate the
+  overall error rate (the ESCI paper reports 91% annotator agreement).
 - Some choices rest on one seed (the bullets ablation), checked against the 3-seed spread.
 - Scores pass through bf16, so 14% of a query's products can tie; the tie order moves nDCG by ~0.00005.
 - The INT8 model was not scored on test (the test set is spent); its dev loss is 0.0008.
 - Latency is from one laptop, client on the same machine; no network, no autoscaling.
+- The served model is sensitive to typos: one swapped letter pair in a query costs 0.026 dev nDCG
+  (behavioural tests in `docs/analysis/audit_2026-11-21.md`).
 
 ## Reproduce
 
@@ -118,7 +129,7 @@ The test split is locked in code; `--allow-test` exists for the one final run (`
 
 - `docs/lab_notebook.md`: every run, with the prediction written before it.
 - `docs/learn/`: lessons per section (beginner level, with check questions and answers).
-- `docs/HANDOFF.md`: project state and decisions.
+- `docs/analysis/`: error analysis, label audit and the 21 Nov 2026 audit (leakage, claims, robustness).
 
 ## Data
 
