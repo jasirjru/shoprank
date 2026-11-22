@@ -3,6 +3,11 @@
  "metric": "nDCG over the full judged list (Exact 1, Substitute 0.1, Complement 0.01)",
  "baseline": "BM25 on product titles",
  "model": "ShopRank API: spell correction + INT8 MiniLM",
+ "others": {
+  "bge": "BGE-reranker-v2-m3 (568M), zero-shot",
+  "qwen3": "Qwen3-Reranker-0.6B (596M), zero-shot",
+  "teacher": "5 DeBERTa-v3-base fold models, mean score"
+ },
  "examples": [
   {
    "query_id": 54672,
@@ -208,625 +213,1031 @@
      "brand": "Mkeke",
      "label": "Complement"
     }
-   ]
+   ],
+   "others": {
+    "bge": 0.3705,
+    "qwen3": 0.5899,
+    "teacher": 0.6156
+   }
   },
   {
-   "query_id": 50847,
-   "query": "holey jeans for babys",
-   "query_used": "holey jeans for babys",
-   "note": "Casual wording and a misspelling. Keyword search shows women's jeans; ShopRank finds ripped jeans for babies.",
+   "query_id": 83990,
+   "query": "ps5",
+   "query_used": "ps5",
+   "note": "Keyword search shows PlayStation 4 games first. ShopRank shows the PS5 console and PS5 games.",
    "ndcg": {
-    "bm25": 0.4922,
+    "bm25": 0.6477,
+    "shoprank": 0.9908
+   },
+   "bm25": [
+    {
+     "product_id": "B087XTT5GZ",
+     "title": "Assassin\u2019s Creed Valhalla PlayStation 4 Standard Edition with Free Upgrade to the Digital PS5 Version",
+     "brand": "Ubisoft",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07DJWBYKP",
+     "title": "Cyberpunk 2077 - PlayStation 4",
+     "brand": "WB Games",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08BJ63ZH6",
+     "title": "NexiGo 2021 Playstation 4 PS4 Slim 1TB Console Holiday Bundle, Light & Slim PS4 System, 1TB Hard Drive with NexiGo Charging Station Dock Bundle",
+     "brand": "NexiGo",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08D7DKLPC",
+     "title": "NBA 2K21 - PlayStation 5 Standard Edition",
+     "brand": "2K",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08D7DX16N",
+     "title": "NBA 2K21 Mamba Forever Edition - PlayStation 5 Mamba Forever Edition",
+     "brand": "2K",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FC5L3RG",
+     "title": "PlayStation 5 Console",
+     "brand": "PlayStation",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FC5R4KV",
+     "title": "Playstation Media Remote",
+     "brand": "PlayStation",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08FC6MR62",
+     "title": "PlayStation 5 Digital Edition",
+     "brand": "PlayStation",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FC6QLKN",
+     "title": "Sony PULSE 3D Wireless Headset",
+     "brand": "PlayStation",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08FC6Y4VG",
+     "title": "Playstation DualSense Charging Station",
+     "brand": "PlayStation",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08FS6BB9N",
+     "title": "Watch Dogs: Legion PlayStation 5 Standard Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS6G3Y5",
+     "title": "Watch Dogs: Legion - PlayStation 5 Gold Steelbook Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS6R244",
+     "title": "Far Cry 6 PlayStation 5 Gold Steelbook Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS7BCR4",
+     "title": "Assassin\u2019s Creed Valhalla PlayStation 5 Gold Steelbook Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08JHQ4NBB",
+     "title": "Sackboy: A Big Adventure - PlayStation 4",
+     "brand": "PlayStation",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08JHVG9ZJ",
+     "title": "Marvel's Spider-Man: Miles Morales Launch Edition - PlayStation 4",
+     "brand": "PlayStation",
+     "label": "Irrelevant"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B08FC6MR62",
+     "title": "PlayStation 5 Digital Edition",
+     "brand": "PlayStation",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS7BCR4",
+     "title": "Assassin\u2019s Creed Valhalla PlayStation 5 Gold Steelbook Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FC5L3RG",
+     "title": "PlayStation 5 Console",
+     "brand": "PlayStation",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS6BB9N",
+     "title": "Watch Dogs: Legion PlayStation 5 Standard Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS6G3Y5",
+     "title": "Watch Dogs: Legion - PlayStation 5 Gold Steelbook Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FS6R244",
+     "title": "Far Cry 6 PlayStation 5 Gold Steelbook Edition",
+     "brand": "Ubisoft",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08D7DKLPC",
+     "title": "NBA 2K21 - PlayStation 5 Standard Edition",
+     "brand": "2K",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FC6QLKN",
+     "title": "Sony PULSE 3D Wireless Headset",
+     "brand": "PlayStation",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B087XTT5GZ",
+     "title": "Assassin\u2019s Creed Valhalla PlayStation 4 Standard Edition with Free Upgrade to the Digital PS5 Version",
+     "brand": "Ubisoft",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08FC5R4KV",
+     "title": "Playstation Media Remote",
+     "brand": "PlayStation",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08D7DX16N",
+     "title": "NBA 2K21 Mamba Forever Edition - PlayStation 5 Mamba Forever Edition",
+     "brand": "2K",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08FC6Y4VG",
+     "title": "Playstation DualSense Charging Station",
+     "brand": "PlayStation",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07DJWBYKP",
+     "title": "Cyberpunk 2077 - PlayStation 4",
+     "brand": "WB Games",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08JHVG9ZJ",
+     "title": "Marvel's Spider-Man: Miles Morales Launch Edition - PlayStation 4",
+     "brand": "PlayStation",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08JHQ4NBB",
+     "title": "Sackboy: A Big Adventure - PlayStation 4",
+     "brand": "PlayStation",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08BJ63ZH6",
+     "title": "NexiGo 2021 Playstation 4 PS4 Slim 1TB Console Holiday Bundle, Light & Slim PS4 System, 1TB Hard Drive with NexiGo Charging Station Dock Bundle",
+     "brand": "NexiGo",
+     "label": "Irrelevant"
+    }
+   ],
+   "others": {
+    "bge": 0.8906,
+    "qwen3": 0.8719,
+    "teacher": 0.9999
+   }
+  },
+  {
+   "query_id": 44041,
+   "query": "galaxy s9 plus",
+   "query_used": "galaxy s9 plus",
+   "note": "Keyword search starts with a privacy screen and a wallet case. ShopRank puts four Galaxy S9+ phones first.",
+   "ndcg": {
+    "bm25": 0.6125,
     "shoprank": 0.9927
    },
    "bm25": [
     {
-     "product_id": "B07G8GJXN6",
-     "title": "Kardashian Jeans, Womens High Waisted Skinny Denim Stretch Slim Length Jeans Pants",
-     "brand": "TOPUNDER",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07G8FQM6T",
-     "title": "TOPUNDER High Waisted Skinny Elastic for Women Denim Pants\u2002 Holes Broken Pencil Jeans White",
-     "brand": "TOPUNDER",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07G8FD614",
-     "title": "TOPUNDER Plus Size High Waist Jeans for Women Trimmings Slim Denim Pants Belt Trousers Blue",
-     "brand": "TOPUNDER",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B079FRSPQW",
-     "title": "Kehen Kids Toddler Girls 3pcs Summer Outfits Ruffles Whirt T-Shirt Tops+Blue Denim Stretch Loose Jeans Destroy Ripped Jeans Distressed Pants+Headband Sets (White, 6-12 Months)",
-     "brand": "Kehen",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07DGH6BX6",
-     "title": "COVER GIRL Women's Skinny Jeans Distressed Fray Cropped, Step Hem/Inseam, 7 Junior",
-     "brand": "COVER GIRL",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B06Y2K57D8",
-     "title": "The Children's Place Baby Girls and Toddler Girls Basic Skinny Jeans, Blues Wash, 2T",
-     "brand": "The Children's Place",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B075B4ZHMG",
-     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Waist Ripped Denim Pants,Blue,6-12 Months",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07D38QB85",
-     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B00WGIA22K",
-     "title": "The Children's Place Baby Toddler Girls Basic Denim Jacket, China Blue, 2T",
-     "brand": "The Children's Place",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B073XJZPFH",
-     "title": "Signature by Levi Strauss & Co. Gold Label Women's Modern Skinny Jean, Mascara, 12",
-     "brand": "Signature by Levi Strauss & Co. Gold Label",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B078HF97NF",
-     "title": "KIDSCOOL SPACE Baby Ripped Jean,Toddler Elastic Distressed Waist Denim Pants,2-3 Years",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07FD45L8L",
-     "title": "Women's Stretch Pull-On Skinny Ripped Distressed Denim Jeggings Regular-Plus Size (XX-Large, Dark Denim)",
-     "brand": "Jvini",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07PK7R5N6",
-     "title": "KIDSCOOL SPACE Baby Girl Boy Jean,D Ring Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07PPLR8LF",
-     "title": "CARETOO Girls Clothes Outfits, Cute Baby Girl Floral Long Sleeve Pant Set Flower Ruffle Top Pink",
-     "brand": "CARETOO",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07VYHP8GL",
-     "title": "3PCS Infant Baby Girl Leopard Outfits Fly Sleeve Hollow Romper Bodysuit+Harem Pants+Headband Clothes Set (Jean Set, 12-24M)",
-     "brand": "Luckinbaby",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B087JMXVH7",
-     "title": "Toddler Baby Girls Ruffle Halter Crop Top Shirt+Ripped Jean Shorts Summer Outfits Clothes Sets (Yellow Top+Jean Shorts, 2T)",
-     "brand": "hunan",
-     "label": "Substitute"
-    }
-   ],
-   "shoprank": [
-    {
-     "product_id": "B075B4ZHMG",
-     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Waist Ripped Denim Pants,Blue,6-12 Months",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07D38QB85",
-     "title": "KIDSCOOL SPACE Baby Girl Boy Jeans,Little Kid Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07PK7R5N6",
-     "title": "KIDSCOOL SPACE Baby Girl Boy Jean,D Ring Elastic Band Inside Ripped Denim Pants,Light Blue,18-24 Months",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B078HF97NF",
-     "title": "KIDSCOOL SPACE Baby Ripped Jean,Toddler Elastic Distressed Waist Denim Pants,2-3 Years",
-     "brand": "KIDSCOOL SPACE",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07G8FQM6T",
-     "title": "TOPUNDER High Waisted Skinny Elastic for Women Denim Pants\u2002 Holes Broken Pencil Jeans White",
-     "brand": "TOPUNDER",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B087JMXVH7",
-     "title": "Toddler Baby Girls Ruffle Halter Crop Top Shirt+Ripped Jean Shorts Summer Outfits Clothes Sets (Yellow Top+Jean Shorts, 2T)",
-     "brand": "hunan",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B06Y2K57D8",
-     "title": "The Children's Place Baby Girls and Toddler Girls Basic Skinny Jeans, Blues Wash, 2T",
-     "brand": "The Children's Place",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07G8GJXN6",
-     "title": "Kardashian Jeans, Womens High Waisted Skinny Denim Stretch Slim Length Jeans Pants",
-     "brand": "TOPUNDER",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07G8FD614",
-     "title": "TOPUNDER Plus Size High Waist Jeans for Women Trimmings Slim Denim Pants Belt Trousers Blue",
-     "brand": "TOPUNDER",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07VYHP8GL",
-     "title": "3PCS Infant Baby Girl Leopard Outfits Fly Sleeve Hollow Romper Bodysuit+Harem Pants+Headband Clothes Set (Jean Set, 12-24M)",
-     "brand": "Luckinbaby",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07FD45L8L",
-     "title": "Women's Stretch Pull-On Skinny Ripped Distressed Denim Jeggings Regular-Plus Size (XX-Large, Dark Denim)",
-     "brand": "Jvini",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B079FRSPQW",
-     "title": "Kehen Kids Toddler Girls 3pcs Summer Outfits Ruffles Whirt T-Shirt Tops+Blue Denim Stretch Loose Jeans Destroy Ripped Jeans Distressed Pants+Headband Sets (White, 6-12 Months)",
-     "brand": "Kehen",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B00WGIA22K",
-     "title": "The Children's Place Baby Toddler Girls Basic Denim Jacket, China Blue, 2T",
-     "brand": "The Children's Place",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07DGH6BX6",
-     "title": "COVER GIRL Women's Skinny Jeans Distressed Fray Cropped, Step Hem/Inseam, 7 Junior",
-     "brand": "COVER GIRL",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B073XJZPFH",
-     "title": "Signature by Levi Strauss & Co. Gold Label Women's Modern Skinny Jean, Mascara, 12",
-     "brand": "Signature by Levi Strauss & Co. Gold Label",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07PPLR8LF",
-     "title": "CARETOO Girls Clothes Outfits, Cute Baby Girl Floral Long Sleeve Pant Set Flower Ruffle Top Pink",
-     "brand": "CARETOO",
-     "label": "Substitute"
-    }
-   ]
-  },
-  {
-   "query_id": 38711,
-   "query": "extendable ram for lenovo yoga",
-   "query_used": "extendable ram for lenovo yoga",
-   "note": "Keyword search sees 'lenovo' and shows Lenovo tablets. ShopRank shows memory that fits the laptop.",
-   "ndcg": {
-    "bm25": 0.4702,
-    "shoprank": 0.8494
-   },
-   "bm25": [
-    {
-     "product_id": "B0881HDRTH",
-     "title": "Lenovo Yoga Smart Tab, 10.1\" FHD Android Tablet, Octa-Core Processor, 64GB Storage, 4GB RAM, Iron Grey, ZA3V0005US",
-     "brand": "Lenovo",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B01AZC3HF2",
-     "title": "Lenovo Active Capacity Pens for Touchscreen Laptop for Lenovo Yoga 900S-12ISK, Miix 700-12ISK, Miix 510-12IKB, Miix 510-12ISK, Miix 720-12IKB,GX80K32882 - Black",
-     "brand": "Lenovo",
+     "product_id": "B089RFZ46V",
+     "title": "Galaxy S9 Plus /S8 Plus Privacy Screen Protector, Tempered Glass HD Clear [Anti-spy] [9H Hardenss] [Case Friendly] [Easy Installation] Premium Protective Film,For Samsung Galaxy S9 Plus/S8 Plus",
+     "brand": "VITAVELAAA",
      "label": "Complement"
     },
     {
-     "product_id": "B08NXSJVCR",
-     "title": "Lenovo IdeaPad 3 Intel i5-1035G1 Quad Core 12GB RAM 256GB SSD 15.6-inch Touch Screen Laptop",
-     "brand": "Lenovo",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07R68XHZ9",
-     "title": "Lenovo USA Lenovo ThinkPad USB-C Dock Gen 2 (40AS0090US)",
-     "brand": "Lenovo USA",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B0762M2QF7",
-     "title": "Lenovo Active Pen 2, 4096 Levels of Pressure Sensitivity, Customized Shortcut Buttons, for ThinkPad X1 Tablet Gen 2, Miix 720, 510, 520, Yoga 720, 920, Replacement Tips Included, GX80N07825",
-     "brand": "Lenovo",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B0091LG13O",
-     "title": "Crucial RAM 16GB Kit (2x8GB) DDR3 1600 MHz CL11 Desktop Memory CT2K102464BD160B",
-     "brand": "Crucial",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07M6S81CM",
-     "title": "Lenovo USA ThinkPad Thunderbolt 3 Dock Gen 2 135W (40AN0135US) Dual UHD 4K Display Capability, 2 HDMI, 2 DP, USB-C, USB 3.1, Black",
-     "brand": "Lenovo USA",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07L8C37DH",
-     "title": "Silicon Power Hynix IC Compatible for Apple DDR3 DDR3L 16GB (2 x 8GB) RAM 1600MHz (PC3 12800) 204 pin CL11 1.35V Non ECC Unbuffered SODIMM Laptop Memory Module - Low Voltage",
-     "brand": "SP Silicon Power",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B0191WAGE2",
-     "title": "TEAMGROUP Elite DDR3L 16GB Kit (2 x 8GB) 1600MHz PC3-12800 CL11 Unbuffered Non-ECC 1.35V SODIMM 204-Pin Laptop Notebook PC Computer Memory Module Ram Upgrade - TED3L16G1600C11DC-S01",
-     "brand": "TEAMGROUP",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B00C5389HQ",
-     "title": "A-Tech RAM 8GB DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Module",
-     "brand": "A-Tech",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07JGSPGGZ",
-     "title": "A-Tech RAM 16GB Kit (2x8GB) DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Modules",
-     "brand": "A-Tech",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B00IV19HZE",
-     "title": "Timetec 16GB KIT(2x8GB) DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800 Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 240 Pin UDIMM Desktop PC Computer Memory RAM(SDRAM) Module Upgrade",
-     "brand": "Timetec",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B0145WDNI4",
-     "title": "Timetec 8GB DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800(PC3L-12800S) Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 204 Pin SODIMM Laptop Notebook PC Computer Memory RAM Module Upgrade",
-     "brand": "Timetec",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07MJW5BXZ",
-     "title": "External DVD Drive, USB 3.0 Portable CD/DVD +/-RW Drive/DVD Player for Laptop CD ROM Burner Compatible with Laptop Desktop PC Windows Linux OS Apple Mac Black",
-     "brand": "Gotega",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B009WIW9GE",
-     "title": "Patriot 1.35V 8GB DDR3 1600MHz PC3-12800 CL11 SODIMM Memory PSD38G1600L2S",
-     "brand": "Patriot Memory",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B01BIWKP58",
-     "title": "Crucial 8GB Single DDR4 2400 MT/S (PC4-19200) SR x8 SODIMM 260-Pin Memory - CT8G4SFS824A",
-     "brand": "Crucial",
-     "label": "Irrelevant"
-    }
-   ],
-   "shoprank": [
-    {
-     "product_id": "B009WIW9GE",
-     "title": "Patriot 1.35V 8GB DDR3 1600MHz PC3-12800 CL11 SODIMM Memory PSD38G1600L2S",
-     "brand": "Patriot Memory",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B0881HDRTH",
-     "title": "Lenovo Yoga Smart Tab, 10.1\" FHD Android Tablet, Octa-Core Processor, 64GB Storage, 4GB RAM, Iron Grey, ZA3V0005US",
-     "brand": "Lenovo",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B00C5389HQ",
-     "title": "A-Tech RAM 8GB DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Module",
-     "brand": "A-Tech",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B00IV19HZE",
-     "title": "Timetec 16GB KIT(2x8GB) DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800 Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 240 Pin UDIMM Desktop PC Computer Memory RAM(SDRAM) Module Upgrade",
-     "brand": "Timetec",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B08NXSJVCR",
-     "title": "Lenovo IdeaPad 3 Intel i5-1035G1 Quad Core 12GB RAM 256GB SSD 15.6-inch Touch Screen Laptop",
-     "brand": "Lenovo",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B0191WAGE2",
-     "title": "TEAMGROUP Elite DDR3L 16GB Kit (2 x 8GB) 1600MHz PC3-12800 CL11 Unbuffered Non-ECC 1.35V SODIMM 204-Pin Laptop Notebook PC Computer Memory Module Ram Upgrade - TED3L16G1600C11DC-S01",
-     "brand": "TEAMGROUP",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B0145WDNI4",
-     "title": "Timetec 8GB DDR3L / DDR3 1600MHz (DDR3L-1600) PC3L-12800 / PC3-12800(PC3L-12800S) Non-ECC Unbuffered 1.35V/1.5V CL11 2Rx8 Dual Rank 204 Pin SODIMM Laptop Notebook PC Computer Memory RAM Module Upgrade",
-     "brand": "Timetec",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07JGSPGGZ",
-     "title": "A-Tech RAM 16GB Kit (2x8GB) DDR3 / DDR3L 1600 MHz PC3L-12800 (PC3-12800) SODIMM - Laptop & All-in-One Computer Memory - CL11 2Rx8 1.35V 204-Pin SO-DIMM Non-ECC Unbuffered Upgrade Modules",
-     "brand": "A-Tech",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B01BIWKP58",
-     "title": "Crucial 8GB Single DDR4 2400 MT/S (PC4-19200) SR x8 SODIMM 260-Pin Memory - CT8G4SFS824A",
-     "brand": "Crucial",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B0091LG13O",
-     "title": "Crucial RAM 16GB Kit (2x8GB) DDR3 1600 MHz CL11 Desktop Memory CT2K102464BD160B",
-     "brand": "Crucial",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07MJW5BXZ",
-     "title": "External DVD Drive, USB 3.0 Portable CD/DVD +/-RW Drive/DVD Player for Laptop CD ROM Burner Compatible with Laptop Desktop PC Windows Linux OS Apple Mac Black",
-     "brand": "Gotega",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07L8C37DH",
-     "title": "Silicon Power Hynix IC Compatible for Apple DDR3 DDR3L 16GB (2 x 8GB) RAM 1600MHz (PC3 12800) 204 pin CL11 1.35V Non ECC Unbuffered SODIMM Laptop Memory Module - Low Voltage",
-     "brand": "SP Silicon Power",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07M6S81CM",
-     "title": "Lenovo USA ThinkPad Thunderbolt 3 Dock Gen 2 135W (40AN0135US) Dual UHD 4K Display Capability, 2 HDMI, 2 DP, USB-C, USB 3.1, Black",
-     "brand": "Lenovo USA",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07R68XHZ9",
-     "title": "Lenovo USA Lenovo ThinkPad USB-C Dock Gen 2 (40AS0090US)",
-     "brand": "Lenovo USA",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B01AZC3HF2",
-     "title": "Lenovo Active Capacity Pens for Touchscreen Laptop for Lenovo Yoga 900S-12ISK, Miix 700-12ISK, Miix 510-12IKB, Miix 510-12ISK, Miix 720-12IKB,GX80K32882 - Black",
-     "brand": "Lenovo",
+     "product_id": "B08794S956",
+     "title": "Harryshell 12 Card Slots Detachable Magnetic Wallet PU Leather Flip Protective Case Wrist Strap Kickstand for Samsung Galaxy S9 Plus (2018) (Not fit S9) (Flower Purple)",
+     "brand": "Harryshell",
      "label": "Complement"
     },
     {
-     "product_id": "B0762M2QF7",
-     "title": "Lenovo Active Pen 2, 4096 Levels of Pressure Sensitivity, Customized Shortcut Buttons, for ThinkPad X1 Tablet Gen 2, Miix 720, 510, 520, Yoga 720, 920, Replacement Tips Included, GX80N07825",
-     "brand": "Lenovo",
-     "label": "Irrelevant"
-    }
-   ]
-  },
-  {
-   "query_id": 107191,
-   "query": "usb 3.0 type a to micro a",
-   "query_used": "usb 3.0 type a to micro a",
-   "note": "A technical cable spec. ShopRank puts the two matching cables on top.",
-   "ndcg": {
-    "bm25": 0.5903,
-    "shoprank": 0.972
-   },
-   "bm25": [
-    {
-     "product_id": "B00T4AX9VY",
-     "title": "UCEC USB 3.0 Cable - Right Angle Type A Male to USB 3.0 Micro B Male Cable - 0.2 feet (0.06 M)",
-     "brand": "UCEC",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B00P0C4MGG",
-     "title": "UGREEN Micro USB 3.0 Cable USB 3.0 Type A Male to Micro B Cord Compatible with Samsung Galaxy S5 Note 3 Camera Hard Drive and More 6ft",
-     "brand": "UGREEN",
+     "product_id": "B083B62LR1",
+     "title": "Samsung Galaxy S9+ Plus G965U 64GB 6GB RAM 6.2 Display IP68 Water Resistance TMobile GSM Unlocked - Midnight Black",
+     "brand": "Samsung Electronics",
      "label": "Exact"
     },
     {
-     "product_id": "B01GGKYIHS",
-     "title": "Amazon Basics USB Type-C to Micro-B 3.1 Gen2 Charger Cable - 3 Feet (0.9 Meters) - Black",
-     "brand": "Amazon Basics",
+     "product_id": "B07TXM3251",
+     "title": "Samsung Galaxy S9 G960U 64GB Unlocked [Midnight Black]",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B074V3GD2S",
-     "title": "Micro USB 3.0 Cable, CableCreation Short USB A to Micro B Cord 1ft USB 3.0 External Hard Drive Cable, Compatible for Samsung Galaxy S5, Note 3/N9000, Camera, Hard Drive and More",
-     "brand": "CableCreation",
-     "label": "Irrelevant"
+     "product_id": "B07XBWTNZ8",
+     "title": "apiker 4 Pack Screen Protector Compatible with Samsung Galaxy S9 Plus 6.2 Inches, Soft TPU Film Support Fingerprint Sensor",
+     "brand": "apiker",
+     "label": "Complement"
     },
     {
-     "product_id": "B00C7T78H0",
-     "title": "Cable Matters Long Micro USB 3.0 Cable 10 ft (External Hard Drive Cable, USB to USB Micro B Cable) in Black",
-     "brand": "Cable Matters",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B01C6032G0",
-     "title": "USB 2.0 Micro USB Male to USB Female OTG Adapter (2 Pack)",
-     "brand": "Ksmile",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07M6PCKRR",
-     "title": "USB A to Type C Cable, Cabepow [3-Pack 3ft]\u00a0Fast Charging USB Type C Cord for Samsung Galaxy A10/A20/A51/S10/S9/S8, Type C Charger Premium Nylon Braided USB Cable (Red)",
-     "brand": "Cabepow",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07KG4PNC2",
-     "title": "Micro USB 3.0 Cable, JSAUX USB A Male to Micro B Cable 2 Pack [3.3FT+6.6FT] External Hard Drive Cable Galaxy S5 Nylon Braided Cord for Samsung Galaxy S5, Note 3, Seagate Hard Drive, WD Hard Drive-Blue",
-     "brand": "JSAUX",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07VSG93G3",
-     "title": "2PACK AINOPE USB 3.0 Extension Cable Type A Male to Female Extension Cord Durable Braided Material Fast Data Transfer 3.3FT Compatible with USB Keyboard,Mouse,Flash Drive, Hard Drive,Printer",
-     "brand": "AINOPE",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B012V56992",
-     "title": "CableCreation Short USB C Hard Drive Cable 1FT, USB 3.1 Micro B to USB C 10Gbps, USB C to Micro B External Hard Drive Cable for MacBook Pro Air Galaxy S5 My Passport Elements etc, 0.3m Black",
-     "brand": "CableCreation",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07WG2TPC8",
-     "title": "2 Pack (3.3FT+3.3FT) USB 3.0 A Male to Micro B Cable Galaxy s5 Fast Charger, AINOPE External Hard Drive Cable Compatible with Galaxy Note 3, WD Camera, Seagate Hard Drive and More",
-     "brand": "AINOPE",
+     "product_id": "B079JXY4TJ",
+     "title": "SAMSUNG Galaxy S9+ Factory Unlocked Smartphone 64GB - Midnight Black",
+     "brand": "Samsung Electronics",
      "label": "Exact"
     },
     {
-     "product_id": "B07S1TV83G",
-     "title": "UGREEN USB-C to USB 3.0 Micro B Cable Fast Charging and Sync Data Transfer Cord Compatible with Samsung Galaxy S5 Note 3 Seagate WD Toshiba External Hard Drive Camera 3 Feet",
-     "brand": "UGREEN",
+     "product_id": "B07C65VV3R",
+     "title": "Samsung Galaxy S9+, 64GB, Midnight Black - For GSM (Renewed)",
+     "brand": "Samsung Electronics",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07VYTLC6Q",
+     "title": "Samsung Galaxy S9, 64GB, Midnight Black - Fully Unlocked (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B01I4ZOIQY",
-     "title": "USB Type C Cable 5-Pack 3FT,SMALLElectric USB Type A to C Fast Charger Cords for Samsung Galaxy S20 S10 S9 S8 Plus, Braided Fast Charging Cable for Note 10 9 8, LG V50 V40 G8 G7,(Grey)",
-     "brand": "SMALLElectric",
+     "product_id": "B07B8M5R45",
+     "title": "Samsung Galaxy S9+ G965F (International Version), 64GB, GSM, Factory Unlocked Smartphone - Titanium Gray",
+     "brand": "Samsung Electronics",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07PFL29FR",
+     "title": "Samsung Galaxy S10+, 128GB, Prism White - Unlocked (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B076FN2GSQ",
-     "title": "USB Type C Cable 3A Fast Charging [2-Pack 6.6ft], JSAUX USB-A to USB-C Charge Braided Cord Compatible with Samsung Galaxy S10 S9 S8 S20 Plus A51 A11,Note 10 9 8, PS5 Controller, USB C Charger-Grey",
-     "brand": "JSAUX",
-     "label": "Irrelevant"
+     "product_id": "B0788ZD69Z",
+     "title": "(Renewed) Samsung Galaxy S8+, 64GB, Midnight Black - Fully Unlocked",
+     "brand": "Samsung Electronics",
+     "label": "Substitute"
     },
     {
-     "product_id": "B00P0GI68M",
-     "title": "UGREEN Mini USB Cable, A-Male to Mini-B Cord USB 2.0 Charger Cable Compatible with GoPro Hero 3+, PS3 Controller, Digital Camera, Dash Cam, MP3 Player, GPS Receiver, Garmin Nuvi GPS, SatNav, PDA 3FT",
-     "brand": "UGREEN",
-     "label": "Irrelevant"
+     "product_id": "B07H8PXT7K",
+     "title": "Samsung Galaxy Note 9, 128GB, Lavender Purple - Unlocked (Renewed)",
+     "brand": "Samsung Electronics",
+     "label": "Substitute"
     },
     {
-     "product_id": "B07KF7JVD3",
-     "title": "Micro USB Cable Android Charger, JSAUX (2-Pack 3.3FT+6.6FT) Micro USB Android Charger Cable Nylon Braided Cord Compatible with Galaxy S7 S6 J7 Edge Note 5, Kindle. MP3 and More-Blue",
-     "brand": "JSAUX",
+     "product_id": "B07P6SWG7T",
+     "title": "Samsung Galaxy S10e, 128GB, Prism Black - GSM Carriers (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     }
    ],
    "shoprank": [
     {
-     "product_id": "B00P0C4MGG",
-     "title": "UGREEN Micro USB 3.0 Cable USB 3.0 Type A Male to Micro B Cord Compatible with Samsung Galaxy S5 Note 3 Camera Hard Drive and More 6ft",
-     "brand": "UGREEN",
+     "product_id": "B083B62LR1",
+     "title": "Samsung Galaxy S9+ Plus G965U 64GB 6GB RAM 6.2 Display IP68 Water Resistance TMobile GSM Unlocked - Midnight Black",
+     "brand": "Samsung Electronics",
      "label": "Exact"
     },
     {
-     "product_id": "B07WG2TPC8",
-     "title": "2 Pack (3.3FT+3.3FT) USB 3.0 A Male to Micro B Cable Galaxy s5 Fast Charger, AINOPE External Hard Drive Cable Compatible with Galaxy Note 3, WD Camera, Seagate Hard Drive and More",
-     "brand": "AINOPE",
+     "product_id": "B079JXY4TJ",
+     "title": "SAMSUNG Galaxy S9+ Factory Unlocked Smartphone 64GB - Midnight Black",
+     "brand": "Samsung Electronics",
      "label": "Exact"
     },
     {
-     "product_id": "B07VSG93G3",
-     "title": "2PACK AINOPE USB 3.0 Extension Cable Type A Male to Female Extension Cord Durable Braided Material Fast Data Transfer 3.3FT Compatible with USB Keyboard,Mouse,Flash Drive, Hard Drive,Printer",
-     "brand": "AINOPE",
-     "label": "Irrelevant"
+     "product_id": "B07C65VV3R",
+     "title": "Samsung Galaxy S9+, 64GB, Midnight Black - For GSM (Renewed)",
+     "brand": "Samsung Electronics",
+     "label": "Exact"
     },
     {
-     "product_id": "B074V3GD2S",
-     "title": "Micro USB 3.0 Cable, CableCreation Short USB A to Micro B Cord 1ft USB 3.0 External Hard Drive Cable, Compatible for Samsung Galaxy S5, Note 3/N9000, Camera, Hard Drive and More",
-     "brand": "CableCreation",
-     "label": "Irrelevant"
+     "product_id": "B07B8M5R45",
+     "title": "Samsung Galaxy S9+ G965F (International Version), 64GB, GSM, Factory Unlocked Smartphone - Titanium Gray",
+     "brand": "Samsung Electronics",
+     "label": "Exact"
     },
     {
-     "product_id": "B01I4ZOIQY",
-     "title": "USB Type C Cable 5-Pack 3FT,SMALLElectric USB Type A to C Fast Charger Cords for Samsung Galaxy S20 S10 S9 S8 Plus, Braided Fast Charging Cable for Note 10 9 8, LG V50 V40 G8 G7,(Grey)",
-     "brand": "SMALLElectric",
+     "product_id": "B08794S956",
+     "title": "Harryshell 12 Card Slots Detachable Magnetic Wallet PU Leather Flip Protective Case Wrist Strap Kickstand for Samsung Galaxy S9 Plus (2018) (Not fit S9) (Flower Purple)",
+     "brand": "Harryshell",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07VYTLC6Q",
+     "title": "Samsung Galaxy S9, 64GB, Midnight Black - Fully Unlocked (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B00T4AX9VY",
-     "title": "UCEC USB 3.0 Cable - Right Angle Type A Male to USB 3.0 Micro B Male Cable - 0.2 feet (0.06 M)",
-     "brand": "UCEC",
-     "label": "Irrelevant"
+     "product_id": "B07XBWTNZ8",
+     "title": "apiker 4 Pack Screen Protector Compatible with Samsung Galaxy S9 Plus 6.2 Inches, Soft TPU Film Support Fingerprint Sensor",
+     "brand": "apiker",
+     "label": "Complement"
     },
     {
-     "product_id": "B07M6PCKRR",
-     "title": "USB A to Type C Cable, Cabepow [3-Pack 3ft]\u00a0Fast Charging USB Type C Cord for Samsung Galaxy A10/A20/A51/S10/S9/S8, Type C Charger Premium Nylon Braided USB Cable (Red)",
-     "brand": "Cabepow",
+     "product_id": "B089RFZ46V",
+     "title": "Galaxy S9 Plus /S8 Plus Privacy Screen Protector, Tempered Glass HD Clear [Anti-spy] [9H Hardenss] [Case Friendly] [Easy Installation] Premium Protective Film,For Samsung Galaxy S9 Plus/S8 Plus",
+     "brand": "VITAVELAAA",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07TXM3251",
+     "title": "Samsung Galaxy S9 G960U 64GB Unlocked [Midnight Black]",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B07S1TV83G",
-     "title": "UGREEN USB-C to USB 3.0 Micro B Cable Fast Charging and Sync Data Transfer Cord Compatible with Samsung Galaxy S5 Note 3 Seagate WD Toshiba External Hard Drive Camera 3 Feet",
-     "brand": "UGREEN",
+     "product_id": "B0788ZD69Z",
+     "title": "(Renewed) Samsung Galaxy S8+, 64GB, Midnight Black - Fully Unlocked",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B076FN2GSQ",
-     "title": "USB Type C Cable 3A Fast Charging [2-Pack 6.6ft], JSAUX USB-A to USB-C Charge Braided Cord Compatible with Samsung Galaxy S10 S9 S8 S20 Plus A51 A11,Note 10 9 8, PS5 Controller, USB C Charger-Grey",
-     "brand": "JSAUX",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07KG4PNC2",
-     "title": "Micro USB 3.0 Cable, JSAUX USB A Male to Micro B Cable 2 Pack [3.3FT+6.6FT] External Hard Drive Cable Galaxy S5 Nylon Braided Cord for Samsung Galaxy S5, Note 3, Seagate Hard Drive, WD Hard Drive-Blue",
-     "brand": "JSAUX",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B00P0GI68M",
-     "title": "UGREEN Mini USB Cable, A-Male to Mini-B Cord USB 2.0 Charger Cable Compatible with GoPro Hero 3+, PS3 Controller, Digital Camera, Dash Cam, MP3 Player, GPS Receiver, Garmin Nuvi GPS, SatNav, PDA 3FT",
-     "brand": "UGREEN",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B07KF7JVD3",
-     "title": "Micro USB Cable Android Charger, JSAUX (2-Pack 3.3FT+6.6FT) Micro USB Android Charger Cable Nylon Braided Cord Compatible with Galaxy S7 S6 J7 Edge Note 5, Kindle. MP3 and More-Blue",
-     "brand": "JSAUX",
+     "product_id": "B07PFL29FR",
+     "title": "Samsung Galaxy S10+, 128GB, Prism White - Unlocked (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B00C7T78H0",
-     "title": "Cable Matters Long Micro USB 3.0 Cable 10 ft (External Hard Drive Cable, USB to USB Micro B Cable) in Black",
-     "brand": "Cable Matters",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B01C6032G0",
-     "title": "USB 2.0 Micro USB Male to USB Female OTG Adapter (2 Pack)",
-     "brand": "Ksmile",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B01GGKYIHS",
-     "title": "Amazon Basics USB Type-C to Micro-B 3.1 Gen2 Charger Cable - 3 Feet (0.9 Meters) - Black",
-     "brand": "Amazon Basics",
+     "product_id": "B07H8PXT7K",
+     "title": "Samsung Galaxy Note 9, 128GB, Lavender Purple - Unlocked (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     },
     {
-     "product_id": "B012V56992",
-     "title": "CableCreation Short USB C Hard Drive Cable 1FT, USB 3.1 Micro B to USB C 10Gbps, USB C to Micro B External Hard Drive Cable for MacBook Pro Air Galaxy S5 My Passport Elements etc, 0.3m Black",
-     "brand": "CableCreation",
+     "product_id": "B07P6SWG7T",
+     "title": "Samsung Galaxy S10e, 128GB, Prism Black - GSM Carriers (Renewed)",
+     "brand": "Samsung Electronics",
      "label": "Substitute"
     }
-   ]
+   ],
+   "others": {
+    "bge": 0.8335,
+    "qwen3": 0.9402,
+    "teacher": 0.9914
+   }
+  },
+  {
+   "query_id": 53879,
+   "query": "ipad mini four",
+   "query_used": "ipad mini four",
+   "note": "The shopper typed 'four' as a word. Keyword search shows cases; ShopRank understands they mean the iPad Mini 4 and shows the tablets.",
+   "ndcg": {
+    "bm25": 0.4742,
+    "shoprank": 0.9999
+   },
+   "bm25": [
+    {
+     "product_id": "B01551U05I",
+     "title": "Snugg iPad Mini 5 (2019) & iPad Mini 4 (2015) Leather Case, Flip Stand Cover - Black",
+     "brand": "Snugg",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B01597GXJU",
+     "title": "amFilm Glass Screen Protector for iPad Mini 5 (2019) and iPad Mini 4, Tempered Glass",
+     "brand": "amFilm",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SW33KW2",
+     "title": "iPad Mini 5/ Mini 4 Keyboard Case - 360\u00b0 Rotatable 180 Flip- 7 Colors Backlit - Wireless Smart Folio Auto Sleep/Wake Hard Cover fit iPad Mini 5 2019(5th Gen)/ iPad Mini 4 2015, Black",
+     "brand": "GreenLaw",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QNTVPN7",
+     "title": "SUPCASE [Unicorn Beetle Pro Series] Design for iPad Mini 5 Case, with Built-In Screen Protector Full-body Rugged Kickstand Hybrid Case for iPad Mini 5 (2019 release) & iPad Mini 4 (Black)",
+     "brand": "SUPCASE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00HRM5TZA",
+     "title": "JETech Case for iPad Mini 1 2 3 (NOT for iPad Mini 4), Smart Cover with Auto Sleep/Wake, Black",
+     "brand": "JETech",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07CXSTN38",
+     "title": "iPad Mini 5 Case for Kids | TSQ Defender Bumper Protection Case for iPad Mini 4 | Mini iPad Case 5th Generation Rugged Shockproof with Rotating Stand, Hand Strap & Shoulder Strap for Girls Boys | Red",
+     "brand": "TSQ",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B0744W8WB2",
+     "title": "Apple iPad Mini 4 16gb Space Gray (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B072QDWZ5W",
+     "title": "(2 Pack) Supershieldz Designed for Apple iPad Mini 5 (2019) and iPad Mini 4 Tempered Glass Screen Protector, Anti Scratch, Bubble Free",
+     "brand": "Supershieldz",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B076VX1WJ6",
+     "title": "Apple iPad Mini 4, 32GB, Space Gray - WiFi (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07GBGQD76",
+     "title": "Apple iPad Mini 4, 16GB, Space Gray - WiFi (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07PRD2NQ7",
+     "title": "2019 Apple iPad Mini (Wi-Fi, 64GB) - Space Gray",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B00Z7T2I54",
+     "title": "OTTERBOX DEFENDER SERIES Case for iPad Mini 4 (ONLY) - Retail Packaging - BLACK",
+     "brand": "OtterBox",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07R27ZBFP",
+     "title": "i-Blason Cosmo Case for iPad Mini 5 2019 / iPad Mini 4, [Built-in Screen Protector] Full-Body Folding Stand Protective Case Cover with Auto Sleep/Wake, Marble, 7.9\"",
+     "brand": "i-Blason",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SWR8QZL",
+     "title": "Apple iPad Mini 4, 64GB with Retina Display, Wi-Fi + Cellular, Space Gray (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B071YMZ4LD",
+     "title": "USB Charger, Anker Elite Dual Port 24W Wall Charger, PowerPort 2 with PowerIQ and Foldable Plug, for iPhone 11/Xs/XS Max/XR/X/8/7/6/Plus, iPad Pro/Air 2/Mini 3/Mini 4, Samsung S4/S5, and More",
+     "brand": "Anker",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B086HB336T",
+     "title": "Dcibit Phone Charger [3/6/10ft], Long Braided Cables, Fast Charging Power Charger Cords for iPhone 12/SE/11/11 Pro/11Pro Max/XS/XR/8/7/6S Plus, iPad mini/2/3/4, iPro Air2/3/4th gen, iPod Touch Charger",
+     "brand": "Kemier Star",
+     "label": "Complement"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B07GBGQD76",
+     "title": "Apple iPad Mini 4, 16GB, Space Gray - WiFi (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B0744W8WB2",
+     "title": "Apple iPad Mini 4 16gb Space Gray (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B076VX1WJ6",
+     "title": "Apple iPad Mini 4, 32GB, Space Gray - WiFi (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07SWR8QZL",
+     "title": "Apple iPad Mini 4, 64GB with Retina Display, Wi-Fi + Cellular, Space Gray (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07PRD2NQ7",
+     "title": "2019 Apple iPad Mini (Wi-Fi, 64GB) - Space Gray",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B00Z7T2I54",
+     "title": "OTTERBOX DEFENDER SERIES Case for iPad Mini 4 (ONLY) - Retail Packaging - BLACK",
+     "brand": "OtterBox",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07R27ZBFP",
+     "title": "i-Blason Cosmo Case for iPad Mini 5 2019 / iPad Mini 4, [Built-in Screen Protector] Full-Body Folding Stand Protective Case Cover with Auto Sleep/Wake, Marble, 7.9\"",
+     "brand": "i-Blason",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B072QDWZ5W",
+     "title": "(2 Pack) Supershieldz Designed for Apple iPad Mini 5 (2019) and iPad Mini 4 Tempered Glass Screen Protector, Anti Scratch, Bubble Free",
+     "brand": "Supershieldz",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B01551U05I",
+     "title": "Snugg iPad Mini 5 (2019) & iPad Mini 4 (2015) Leather Case, Flip Stand Cover - Black",
+     "brand": "Snugg",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SW33KW2",
+     "title": "iPad Mini 5/ Mini 4 Keyboard Case - 360\u00b0 Rotatable 180 Flip- 7 Colors Backlit - Wireless Smart Folio Auto Sleep/Wake Hard Cover fit iPad Mini 5 2019(5th Gen)/ iPad Mini 4 2015, Black",
+     "brand": "GreenLaw",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B01597GXJU",
+     "title": "amFilm Glass Screen Protector for iPad Mini 5 (2019) and iPad Mini 4, Tempered Glass",
+     "brand": "amFilm",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QNTVPN7",
+     "title": "SUPCASE [Unicorn Beetle Pro Series] Design for iPad Mini 5 Case, with Built-In Screen Protector Full-body Rugged Kickstand Hybrid Case for iPad Mini 5 (2019 release) & iPad Mini 4 (Black)",
+     "brand": "SUPCASE",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B00HRM5TZA",
+     "title": "JETech Case for iPad Mini 1 2 3 (NOT for iPad Mini 4), Smart Cover with Auto Sleep/Wake, Black",
+     "brand": "JETech",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07CXSTN38",
+     "title": "iPad Mini 5 Case for Kids | TSQ Defender Bumper Protection Case for iPad Mini 4 | Mini iPad Case 5th Generation Rugged Shockproof with Rotating Stand, Hand Strap & Shoulder Strap for Girls Boys | Red",
+     "brand": "TSQ",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B071YMZ4LD",
+     "title": "USB Charger, Anker Elite Dual Port 24W Wall Charger, PowerPort 2 with PowerIQ and Foldable Plug, for iPhone 11/Xs/XS Max/XR/X/8/7/6/Plus, iPad Pro/Air 2/Mini 3/Mini 4, Samsung S4/S5, and More",
+     "brand": "Anker",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B086HB336T",
+     "title": "Dcibit Phone Charger [3/6/10ft], Long Braided Cables, Fast Charging Power Charger Cords for iPhone 12/SE/11/11 Pro/11Pro Max/XS/XR/8/7/6S Plus, iPad mini/2/3/4, iPro Air2/3/4th gen, iPod Touch Charger",
+     "brand": "Kemier Star",
+     "label": "Complement"
+    }
+   ],
+   "others": {
+    "bge": 0.8021,
+    "qwen3": 0.9953,
+    "teacher": 0.9975
+   }
+  },
+  {
+   "query_id": 9651,
+   "query": "apple airpods without case",
+   "query_used": "apple airpods without case",
+   "note": "'Without case' is the hard part. Keyword search shows AirPods bundles and case covers; ShopRank puts the AirPods themselves first.",
+   "ndcg": {
+    "bm25": 0.4723,
+    "shoprank": 0.9886
+   },
+   "bm25": [
+    {
+     "product_id": "B07PYLT6DN",
+     "title": "Apple AirPods with Wireless Charging Case",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07SJJ7FTJ",
+     "title": "(Renewed) Apple AirPods with Wireless Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07SKLLYTW",
+     "title": "(Renewed) Apple AirPods 2 with Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07RLVXV5B",
+     "title": "AirPods Case, Full Protective Silicone AirPods Accessories Cover Compatible with Apple AirPods 1&2 Wireless and Wired Charging Case(Front LED Visible),Black",
+     "brand": "SATLITOG",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09G6F6WCY",
+     "title": "Thick AirPods Case Cover 2nd/1st Generation with Keychain&Carabiner,Full Protective Silicone Case AirPods Compatible for Apple AirPods Wired&Wireless Charging Case for Woman Men,Blue",
+     "brand": "Risehigh",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B09B6Z3SK6",
+     "title": "Faith Can Move Mountains AirPods Case Protective Cover,Matching Airpods Anti-Lost Hook,Black Skin Charging Case Cover for Apple AirPods 2 and 1 (Black)",
+     "brand": "Jaustee",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08XX7MTKL",
+     "title": "Airpods Case Cover, LELONG Soft Silicone Protective Case Cover with Keychain for Apple Airpods 2nd 1st Charging Case Men Women [Front LED Visible]",
+     "brand": "Lelong",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B089H1XRTQ",
+     "title": "Deppa Soft Protective Airpods Pro Case Cover Silicone Skin for Apple Airpod Pro 2019 Without Keychain (Front LED Visible) (hinged) (Sky Blue)",
+     "brand": "Deppa",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07PXGQC1Q",
+     "title": "Apple AirPods (2nd Generation)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08ZXKBRN2",
+     "title": "Maxjoy Compatible AirPods Pro Case Cover, Clear Butterfly Case Cute Protective Soft Shockproof Case with Keychain for Girls Women Men Compatible with Apple AirPods Pro 2019 Wireless Charging Case,Blue",
+     "brand": "Maxjoy",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SK76S84",
+     "title": "Airpods Case, Full Body Protection and Durable TPU Waterproof and Shockproof Case Charging Earphone Cover with Anti-Lost Carabiner for Apple Airpods 1 and 2 Charging Box (Dark Blue)",
+     "brand": "EVERITES",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09CD8KS8D",
+     "title": "VOFUOE for AirPods Case 2&1 with Keychain\u00a0Pop Fidget Sensory Toys Push Bubble it Cases Soft Silicone Apple AirPod Cover Shockproof Stress Reliever Pop Sound Case for AirPods 2&1(Blue Red)",
+     "brand": "VOFUOE",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08YYK8FJN",
+     "title": "wenew Protective Case Cover Designed for Apple Airpods Pro 2019, Cute Fadeless Patterns Shockproof Hard Case Cover with Portable Keychain for Girls Women Men (Blue)",
+     "brand": "wenew",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09CTT9DS2",
+     "title": "Halloween Airpods Pro Case Cover, Cool 2 Pack Luminous Skull & Pumpkin Airpod Case, Cute 3D Cartoon Funny Character Soft Silicone Case Compatible with AirPod Pro Case for Kids Boys Girls with Keychain",
+     "brand": "Skyconser",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09DFQQ5V2",
+     "title": "Dexnor Compatible with Airpods Pro Case Clear Hard PC & Silicone Protective Cover [LED Visible] [Supports Wireless Charging] 360 Full Body Skin for Men Boys - Black",
+     "brand": "Dexnor",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B08C4KWM9T",
+     "title": "Bose QuietComfort Noise Cancelling Earbuds - Bluetooth Wireless Earphones, Triple Black, the World's Most Effective Noise Cancelling Earbuds",
+     "brand": "Bose",
+     "label": "Substitute"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B07PXGQC1Q",
+     "title": "Apple AirPods (2nd Generation)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07SJJ7FTJ",
+     "title": "(Renewed) Apple AirPods with Wireless Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07PYLT6DN",
+     "title": "Apple AirPods with Wireless Charging Case",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09DFQQ5V2",
+     "title": "Dexnor Compatible with Airpods Pro Case Clear Hard PC & Silicone Protective Cover [LED Visible] [Supports Wireless Charging] 360 Full Body Skin for Men Boys - Black",
+     "brand": "Dexnor",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07SKLLYTW",
+     "title": "(Renewed) Apple AirPods 2 with Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09CD8KS8D",
+     "title": "VOFUOE for AirPods Case 2&1 with Keychain\u00a0Pop Fidget Sensory Toys Push Bubble it Cases Soft Silicone Apple AirPod Cover Shockproof Stress Reliever Pop Sound Case for AirPods 2&1(Blue Red)",
+     "brand": "VOFUOE",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B09G6F6WCY",
+     "title": "Thick AirPods Case Cover 2nd/1st Generation with Keychain&Carabiner,Full Protective Silicone Case AirPods Compatible for Apple AirPods Wired&Wireless Charging Case for Woman Men,Blue",
+     "brand": "Risehigh",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07RLVXV5B",
+     "title": "AirPods Case, Full Protective Silicone AirPods Accessories Cover Compatible with Apple AirPods 1&2 Wireless and Wired Charging Case(Front LED Visible),Black",
+     "brand": "SATLITOG",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08ZXKBRN2",
+     "title": "Maxjoy Compatible AirPods Pro Case Cover, Clear Butterfly Case Cute Protective Soft Shockproof Case with Keychain for Girls Women Men Compatible with Apple AirPods Pro 2019 Wireless Charging Case,Blue",
+     "brand": "Maxjoy",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08C4KWM9T",
+     "title": "Bose QuietComfort Noise Cancelling Earbuds - Bluetooth Wireless Earphones, Triple Black, the World's Most Effective Noise Cancelling Earbuds",
+     "brand": "Bose",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09CTT9DS2",
+     "title": "Halloween Airpods Pro Case Cover, Cool 2 Pack Luminous Skull & Pumpkin Airpod Case, Cute 3D Cartoon Funny Character Soft Silicone Case Compatible with AirPod Pro Case for Kids Boys Girls with Keychain",
+     "brand": "Skyconser",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08XX7MTKL",
+     "title": "Airpods Case Cover, LELONG Soft Silicone Protective Case Cover with Keychain for Apple Airpods 2nd 1st Charging Case Men Women [Front LED Visible]",
+     "brand": "Lelong",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09B6Z3SK6",
+     "title": "Faith Can Move Mountains AirPods Case Protective Cover,Matching Airpods Anti-Lost Hook,Black Skin Charging Case Cover for Apple AirPods 2 and 1 (Black)",
+     "brand": "Jaustee",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07SK76S84",
+     "title": "Airpods Case, Full Body Protection and Durable TPU Waterproof and Shockproof Case Charging Earphone Cover with Anti-Lost Carabiner for Apple Airpods 1 and 2 Charging Box (Dark Blue)",
+     "brand": "EVERITES",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08YYK8FJN",
+     "title": "wenew Protective Case Cover Designed for Apple Airpods Pro 2019, Cute Fadeless Patterns Shockproof Hard Case Cover with Portable Keychain for Girls Women Men (Blue)",
+     "brand": "wenew",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B089H1XRTQ",
+     "title": "Deppa Soft Protective Airpods Pro Case Cover Silicone Skin for Apple Airpod Pro 2019 Without Keychain (Front LED Visible) (hinged) (Sky Blue)",
+     "brand": "Deppa",
+     "label": "Complement"
+    }
+   ],
+   "others": {
+    "bge": 0.3533,
+    "qwen3": 0.3584,
+    "teacher": 0.9854
+   }
+  },
+  {
+   "query_id": 5665,
+   "query": "I want a google chromebook, that converts to a tablet, and it has to have a full size keyboard. ",
+   "query_used": "I want a google chromebook, that converts to a tablet, and it has to have a full size keyboard.",
+   "note": "A long, chat-style request, like one an AI assistant might pass on. ShopRank beats keyword search (which ranks a Chromecast at #4), but the big ready-made models do better on this kind of request.",
+   "ndcg": {
+    "bm25": 0.693,
+    "shoprank": 0.7923
+   },
+   "bm25": [
+    {
+     "product_id": "B07L24TWSG",
+     "title": "Acer Chromebook 514, CB514-1HT-C6EV, Intel Celeron N3450, 14\" Full HD Touch Display, 4GB LPDDR4, 64GB eMMC, Backlit Keyboard, Google Chrome",
+     "brand": "Acer",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B0858N8CGX",
+     "title": "Acer Chromebook 314, Intel Celeron N4000, 14\" Full HD Display, 4GB LPDDR4, 64GB eMMC, Gigabit WiFi, Google Chrome, CB314-1H-C884",
+     "brand": "Acer",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07H5B75SY",
+     "title": "ASUS Chromebook C223 11.6\" HD Chromebook Laptop, Intel Dual-Core Celeron N3350 Processor (up to 2.4GHz), 4GB RAM, 32GB eMMC Storage, Premium Design, Red, C223NA-DH02-RD",
+     "brand": "ASUS",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B015UKRNGS",
+     "title": "Google Chromecast - Streaming Device with HDMI Cable - Stream Shows, Music, Photos, and Sports from Your Phone to Your TV",
+     "brand": "Google",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07R2YBG94",
+     "title": "ASUS Chromebook Flip C214MA-YS02T 11.6\u201d Ruggedized and Water Resistant Chromebook, 360 Touchscreen Convertible, Intel N4000, 4GB DDR4 RAM, 32GB Storage, Mil STD design, Chrome OS, Black",
+     "brand": "ASUS",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08ZLF99VD",
+     "title": "ASUS Chromebook Flip C433 2 in 1 Laptop, 14\" Touchscreen FHD NanoEdge Display, Intel Core m3-8100Y Processor, 8GB RAM, 64GB eMMC Storage, Backlit Keyboard, Silver, Chrome OS, C433TA-AS384T",
+     "brand": "ASUS",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07VXXG5WZ",
+     "title": "HP Chromebook X360 12-Inch HD+ Touchscreen Laptop, Intel Celeron N4000, 4. GB SDRAM, 32 GB eMMC, Chrome (12b-ca0010nr, Ceramic White)",
+     "brand": "HP",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07GLV1VC7",
+     "title": "Lenovo Chromebook S330 Laptop, 14-Inch FHD (1920 x 1080) Display, MediaTek MT8173C Processor, 4GB LPDDR3, 64GB eMMC, Chrome OS, 81JW0000US, Business Black",
+     "brand": "Lenovo",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07KF1TC9T",
+     "title": "Lenovo Chromebook S330 Laptop, 14-Inch HD (1366 x 768) Display, MediaTek MT8173C Processor, 4GB OnBoard LPDDR3, 32GB eMMC SSD, Chrome OS, 81JW0001US, Black",
+     "brand": "Lenovo",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07VZ39199",
+     "title": "HP Chromebook x360 14-inch HD Touchscreen Laptop, Intel Celeron N4000, 4 GB RAM, 32 GB eMMC, Chrome (14b-ca0010nr, Ceramic White/Mineral Silver)",
+     "brand": "HP",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07GM2J11Q",
+     "title": "Lenovo Chromebook C330 2-in-1 Convertible Laptop, 11.6-Inch HD (1366 x 768) IPS Display, MediaTek MT8173C Processor, 4GB LPDDR3, 64 GB eMMC, Chrome OS, 81HY0000US, Blizzard White",
+     "brand": "Lenovo",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B01N74KH32",
+     "title": "COSSINI Black Superior Vegan Leather Business Portfolio with Zipper \u2013 Padfolio All-in-One - Smartest Protective 10.1 Inch Tablet Sleeve, Presentation Slot, Solar Calculator, Card Storage, Writing Pad",
+     "brand": "COSSINI",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07N6S4SY1",
+     "title": "ASUS VivoBook L203MA Ultra-Thin Laptop, Intel Celeron N4000 Processor, 4GB LPDDR4, 64GB eMMC, 11.6\u201d HD, USB-C, Windows 10 in S Mode (Switchable to Pro), L203MA-DS04, One Year of Microsoft Office 365",
+     "brand": "ASUS",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B004S8F7QM",
+     "title": "Cards Against Humanity",
+     "brand": "Cards Against Humanity LLC.",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B015G0EWLG",
+     "title": "Feelin Good Tees My Opinion Offended You Adult Humor T Shirt XL Black",
+     "brand": "Feelin Good Tees",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08FRP4H2Z",
+     "title": "When This Virus is Over Graphic Novelty Sarcastic Funny T Shirt XL Black",
+     "brand": "Feelin Good Tees",
+     "label": "Irrelevant"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B07L24TWSG",
+     "title": "Acer Chromebook 514, CB514-1HT-C6EV, Intel Celeron N3450, 14\" Full HD Touch Display, 4GB LPDDR4, 64GB eMMC, Backlit Keyboard, Google Chrome",
+     "brand": "Acer",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07VZ39199",
+     "title": "HP Chromebook x360 14-inch HD Touchscreen Laptop, Intel Celeron N4000, 4 GB RAM, 32 GB eMMC, Chrome (14b-ca0010nr, Ceramic White/Mineral Silver)",
+     "brand": "HP",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08ZLF99VD",
+     "title": "ASUS Chromebook Flip C433 2 in 1 Laptop, 14\" Touchscreen FHD NanoEdge Display, Intel Core m3-8100Y Processor, 8GB RAM, 64GB eMMC Storage, Backlit Keyboard, Silver, Chrome OS, C433TA-AS384T",
+     "brand": "ASUS",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07GM2J11Q",
+     "title": "Lenovo Chromebook C330 2-in-1 Convertible Laptop, 11.6-Inch HD (1366 x 768) IPS Display, MediaTek MT8173C Processor, 4GB LPDDR3, 64 GB eMMC, Chrome OS, 81HY0000US, Blizzard White",
+     "brand": "Lenovo",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B0858N8CGX",
+     "title": "Acer Chromebook 314, Intel Celeron N4000, 14\" Full HD Display, 4GB LPDDR4, 64GB eMMC, Gigabit WiFi, Google Chrome, CB314-1H-C884",
+     "brand": "Acer",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07VXXG5WZ",
+     "title": "HP Chromebook X360 12-Inch HD+ Touchscreen Laptop, Intel Celeron N4000, 4. GB SDRAM, 32 GB eMMC, Chrome (12b-ca0010nr, Ceramic White)",
+     "brand": "HP",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07KF1TC9T",
+     "title": "Lenovo Chromebook S330 Laptop, 14-Inch HD (1366 x 768) Display, MediaTek MT8173C Processor, 4GB OnBoard LPDDR3, 32GB eMMC SSD, Chrome OS, 81JW0001US, Black",
+     "brand": "Lenovo",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07GLV1VC7",
+     "title": "Lenovo Chromebook S330 Laptop, 14-Inch FHD (1920 x 1080) Display, MediaTek MT8173C Processor, 4GB LPDDR3, 64GB eMMC, Chrome OS, 81JW0000US, Business Black",
+     "brand": "Lenovo",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07H5B75SY",
+     "title": "ASUS Chromebook C223 11.6\" HD Chromebook Laptop, Intel Dual-Core Celeron N3350 Processor (up to 2.4GHz), 4GB RAM, 32GB eMMC Storage, Premium Design, Red, C223NA-DH02-RD",
+     "brand": "ASUS",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07R2YBG94",
+     "title": "ASUS Chromebook Flip C214MA-YS02T 11.6\u201d Ruggedized and Water Resistant Chromebook, 360 Touchscreen Convertible, Intel N4000, 4GB DDR4 RAM, 32GB Storage, Mil STD design, Chrome OS, Black",
+     "brand": "ASUS",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B015UKRNGS",
+     "title": "Google Chromecast - Streaming Device with HDMI Cable - Stream Shows, Music, Photos, and Sports from Your Phone to Your TV",
+     "brand": "Google",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07N6S4SY1",
+     "title": "ASUS VivoBook L203MA Ultra-Thin Laptop, Intel Celeron N4000 Processor, 4GB LPDDR4, 64GB eMMC, 11.6\u201d HD, USB-C, Windows 10 in S Mode (Switchable to Pro), L203MA-DS04, One Year of Microsoft Office 365",
+     "brand": "ASUS",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B01N74KH32",
+     "title": "COSSINI Black Superior Vegan Leather Business Portfolio with Zipper \u2013 Padfolio All-in-One - Smartest Protective 10.1 Inch Tablet Sleeve, Presentation Slot, Solar Calculator, Card Storage, Writing Pad",
+     "brand": "COSSINI",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08FRP4H2Z",
+     "title": "When This Virus is Over Graphic Novelty Sarcastic Funny T Shirt XL Black",
+     "brand": "Feelin Good Tees",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B015G0EWLG",
+     "title": "Feelin Good Tees My Opinion Offended You Adult Humor T Shirt XL Black",
+     "brand": "Feelin Good Tees",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B004S8F7QM",
+     "title": "Cards Against Humanity",
+     "brand": "Cards Against Humanity LLC.",
+     "label": "Irrelevant"
+    }
+   ],
+   "others": {
+    "bge": 0.9011,
+    "qwen3": 0.9107,
+    "teacher": 0.9266
+   }
   },
   {
    "query_id": 61867,
@@ -1032,213 +1443,235 @@
      "brand": "LG",
      "label": "Complement"
     }
-   ]
+   ],
+   "others": {
+    "bge": 0.9876,
+    "qwen3": 0.8999,
+    "teacher": 0.9917
+   }
   },
   {
-   "query_id": 64479,
-   "query": "m23 for cars",
-   "query_used": "m23 for cars",
-   "note": "ShopRank fails here: the shopper wanted McLaren M23 model cars, and ShopRank shows stickers and wheels first.",
+   "query_id": 73878,
+   "query": "nintendo switch console",
+   "query_used": "nintendo switch console",
+   "note": "ShopRank fails here: the shopper asked for the Switch console, and ShopRank puts the cheaper Switch Lite first. Keyword search gets the exact console at #1.",
    "ndcg": {
-    "bm25": 1.0,
-    "shoprank": 0.5706
+    "bm25": 0.8903,
+    "shoprank": 0.723
    },
    "bm25": [
     {
-     "product_id": "B009KI2KQ0",
-     "title": "Yardley McLaren M23 1974 (Model Car)",
-     "brand": "TAMIYA",
+     "product_id": "B01MFADJFV",
+     "title": "Nintendo Switch Console Gray Joy-Con",
+     "brand": "Nintendo",
      "label": "Exact"
     },
     {
-     "product_id": "B0046EDDBE",
-     "title": "1/20 McLaren M23 1976 Grand Prix",
-     "brand": "TAMIYA",
+     "product_id": "B072HJW41C",
+     "title": "Nintendo Switch 3 Items Bundle: Nintendo Switch 32GB Gaming Console with Gray Joy-Con, 64GB MicroSD Memory Card, and Mario Kart 8 Deluxe",
+     "brand": "Nintendo",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07H9HDDK7",
+     "title": "Nintendo Switch Console Bundle- Pikachu & Eevee Edition with Pokemon: Let's Go, Pikachu! + Poke Ball Plus",
+     "brand": "Nintendo",
      "label": "Exact"
     },
     {
-     "product_id": "B07ZJBD1Y4",
-     "title": "Car DC Adapter for Icom IC-M23 Handheld Marine VHF Radio CP-24 Charger BC-199SA",
-     "brand": "YUSTDA",
-     "label": "Irrelevant"
+     "product_id": "B07H9HH4VS",
+     "title": "Nintendo Switch Console Bundle - Pikachu & Eevee Edition with Pokemon: Let's Go, Eevee! + Poke Ball Plus",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B012JBC4G0",
-     "title": "Navy Logo (M23) USN Vinyl Decal Sticker Car/Truck Laptop/Netbook Window",
-     "brand": "CustomDecal US",
-     "label": "Irrelevant"
+     "product_id": "B086XGHNB1",
+     "title": "Nintendo Switch Lite - Gray with 128GB SD Card for Nintendo Switch",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B08534DJQP",
-     "title": "Color N Drive for BMW Automotive Touch Up Paint - M23 - Asphaltgrau 2 Met Matt - Paint Scratch Repair, Exact Match - Plus",
-     "brand": "Color N Drive",
-     "label": "Irrelevant"
+     "product_id": "B07V2BBMK4",
+     "title": "Nintendo Switch Lite - Gray",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B00JAH3G1E",
-     "title": "My Stick Figure Family Car Window Vinyl Bumper Sticker Decal Adult Male Weightlifting Fitness M23",
-     "brand": "My Stick Figure Family Car Window Stickers",
-     "label": "Irrelevant"
+     "product_id": "B07YZQSC5Y",
+     "title": "Nintendo Switch w/ Gray Joy-Con + Mario Kart 8 Deluxe (Full Game Download) - Switch",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B07QBXV9J1",
-     "title": "Newsmarts Tread Repair Kit M5 M6 M8 M10 M12 M23 Recoil Repair Kit Car Pro Coil Tool, 15pcs M12X1.0",
-     "brand": "Newsmarts",
-     "label": "Irrelevant"
+     "product_id": "B07RGFF98S",
+     "title": "Nintendo Switch 32GB Console Video Games w/ 32GB Memory Card | Neon Red/Neon Blue Joy-Con | 1080p Resolution | 802.11ac WiFi | HDMI | Surround Sound | IR Motion Camera",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B07XZKK4WZ",
-     "title": "RV Tank Sensor Monitor Panel M23 | KIB Replacement | Panel Only | Level Sensor | Fresh Water or Holding Tank Level Sensor (Black)",
-     "brand": "RecPro",
-     "label": "Irrelevant"
+     "product_id": "B088JW6M94",
+     "title": "Newest Nintendo Switch Lite Game Console, Gray, 5.5\u201d Touchscreen, Built-in Plus Control Pad, W/128GB Micro SD Card, Built-in Speakers, 3.5mm Audio Jack",
+     "brand": "HESVAP",
+     "label": "Substitute"
     },
     {
-     "product_id": "B00YTFDIQ0",
-     "title": "MSA OFFROAD WHEELS M23 BATTLE Flat Black Wheel with Painted and Chromium (hexavalent compounds) (14 x 7. inches /4 x 112 mm, 10 mm Offset)",
-     "brand": "MSA OFFROAD WHEELS",
-     "label": "Irrelevant"
+     "product_id": "B0894C2SXH",
+     "title": "Newest Nintendo Switch Lite Game Console, 5.5\u201d Touchscreen, Built-in Plus Control Pad, Yellow, W/ 128GB Micro SD Card, Built-in Speakers, 3.5mm Audio Jack",
+     "brand": "HESVAP",
+     "label": "Substitute"
     },
     {
-     "product_id": "B07RYQL4YQ",
-     "title": "NCJEI NONGE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer License Plate Frames for Car Decoration 6 Inch X 12 Inch",
-     "brand": "NCJEI NONGE",
-     "label": "Irrelevant"
+     "product_id": "B07VJRZ62R",
+     "title": "Nintendo Switch with Gray Joy\u2011Con -\u00a0HAC-001(-01)",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B0141JQ06S",
-     "title": "Inline Tube (M-2-3) Rear Lower Control Arms Boxed for Sway Bar with Rubber Bushings Compatible with 1964-72 Gm A-Body Chevelle, GTO, 442, Gs, Monte Carlo and Grand Prix",
-     "brand": "Inline Tube",
-     "label": "Irrelevant"
+     "product_id": "B089Q26P72",
+     "title": "Newest Nintendo Switch Lite Game Console, 5.5 inch LCD Touchscreen, Built-in Plus Control Pad, Speakers, 3.5mm Audio Jack, Speakers, with CUE 128GB Micro SD Card (Turquoise)",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B007Q2G2R0",
-     "title": "Kodak KLIC-7006 Lithium Ion Replacement Battery and Wall Charger with Car Charger Attachment",
-     "brand": "Halcyon",
-     "label": "Irrelevant"
+     "product_id": "B07YFKM7N6",
+     "title": "Nintendo 32GB Switch with Gray Joy-Con Controllers - with SanDisk 128GB UHS-I microSDXC Memory Card for The Switch",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B072NDTRM4",
-     "title": "GP Confidential 05/28/17",
-     "brand": null,
-     "label": "Irrelevant"
+     "product_id": "B07VGRJDFY",
+     "title": "Nintendo Switch with Neon Blue and Neon Red Joy\u2011Con - HAC-001(-01)",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B07HYL97SW",
-     "title": "Military Vet Shop Magnet U.S. Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Vinyl Magnet Car Fridge Locker Metal Decal 3.8\"",
-     "brand": "Military Vet Shop",
-     "label": "Irrelevant"
+     "product_id": "B08B3XMK2F",
+     "title": "Nintendo Switch w/ Red & Blue Joy-Con + Animal Crossing (New Horizons) Game Bundle",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B082RCVDDD",
-     "title": "KEEDCE&FJE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Windshield Sun Shade Universal Car Sunshade 30 X 55 in Sunshades Car Sun Visor-Keep Your Vehicle Cool",
-     "brand": "KEEDCE&FJE",
-     "label": "Irrelevant"
+     "product_id": "B00AFAOAOM",
+     "title": "Nintendo Switch HAC 001 with Gray Joy-Con + Mario Kart 8 Deluxe (Full Game Download) & Animal Crossing: New Horizons (Disc) Game Bundle",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B084QG8V68",
-     "title": "BSA: The Complete Story",
-     "brand": null,
-     "label": "Irrelevant"
+     "product_id": "B087JR596S",
+     "title": "2020 Switch with Neon Blue and Red Controllers w/ 69 Value 13in1 Supper Kit Case (Earphone, LCD Film, Card Case, Silicon Case x 2pcs, Carry Bag, Wiping Cloth etc.)",
+     "brand": "HESVAP",
+     "label": "Exact"
     }
    ],
    "shoprank": [
     {
-     "product_id": "B012JBC4G0",
-     "title": "Navy Logo (M23) USN Vinyl Decal Sticker Car/Truck Laptop/Netbook Window",
-     "brand": "CustomDecal US",
-     "label": "Irrelevant"
+     "product_id": "B088JW6M94",
+     "title": "Newest Nintendo Switch Lite Game Console, Gray, 5.5\u201d Touchscreen, Built-in Plus Control Pad, W/128GB Micro SD Card, Built-in Speakers, 3.5mm Audio Jack",
+     "brand": "HESVAP",
+     "label": "Substitute"
     },
     {
-     "product_id": "B00YTFDIQ0",
-     "title": "MSA OFFROAD WHEELS M23 BATTLE Flat Black Wheel with Painted and Chromium (hexavalent compounds) (14 x 7. inches /4 x 112 mm, 10 mm Offset)",
-     "brand": "MSA OFFROAD WHEELS",
-     "label": "Irrelevant"
+     "product_id": "B0894C2SXH",
+     "title": "Newest Nintendo Switch Lite Game Console, 5.5\u201d Touchscreen, Built-in Plus Control Pad, Yellow, W/ 128GB Micro SD Card, Built-in Speakers, 3.5mm Audio Jack",
+     "brand": "HESVAP",
+     "label": "Substitute"
     },
     {
-     "product_id": "B0046EDDBE",
-     "title": "1/20 McLaren M23 1976 Grand Prix",
-     "brand": "TAMIYA",
+     "product_id": "B01MFADJFV",
+     "title": "Nintendo Switch Console Gray Joy-Con",
+     "brand": "Nintendo",
      "label": "Exact"
     },
     {
-     "product_id": "B009KI2KQ0",
-     "title": "Yardley McLaren M23 1974 (Model Car)",
-     "brand": "TAMIYA",
+     "product_id": "B089Q26P72",
+     "title": "Newest Nintendo Switch Lite Game Console, 5.5 inch LCD Touchscreen, Built-in Plus Control Pad, Speakers, 3.5mm Audio Jack, Speakers, with CUE 128GB Micro SD Card (Turquoise)",
+     "brand": "Nintendo",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07VJRZ62R",
+     "title": "Nintendo Switch with Gray Joy\u2011Con -\u00a0HAC-001(-01)",
+     "brand": "Nintendo",
      "label": "Exact"
     },
     {
-     "product_id": "B00JAH3G1E",
-     "title": "My Stick Figure Family Car Window Vinyl Bumper Sticker Decal Adult Male Weightlifting Fitness M23",
-     "brand": "My Stick Figure Family Car Window Stickers",
-     "label": "Irrelevant"
+     "product_id": "B07V2BBMK4",
+     "title": "Nintendo Switch Lite - Gray",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B08534DJQP",
-     "title": "Color N Drive for BMW Automotive Touch Up Paint - M23 - Asphaltgrau 2 Met Matt - Paint Scratch Repair, Exact Match - Plus",
-     "brand": "Color N Drive",
-     "label": "Irrelevant"
+     "product_id": "B00AFAOAOM",
+     "title": "Nintendo Switch HAC 001 with Gray Joy-Con + Mario Kart 8 Deluxe (Full Game Download) & Animal Crossing: New Horizons (Disc) Game Bundle",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B082RCVDDD",
-     "title": "KEEDCE&FJE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Windshield Sun Shade Universal Car Sunshade 30 X 55 in Sunshades Car Sun Visor-Keep Your Vehicle Cool",
-     "brand": "KEEDCE&FJE",
-     "label": "Irrelevant"
+     "product_id": "B072HJW41C",
+     "title": "Nintendo Switch 3 Items Bundle: Nintendo Switch 32GB Gaming Console with Gray Joy-Con, 64GB MicroSD Memory Card, and Mario Kart 8 Deluxe",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B07XZKK4WZ",
-     "title": "RV Tank Sensor Monitor Panel M23 | KIB Replacement | Panel Only | Level Sensor | Fresh Water or Holding Tank Level Sensor (Black)",
-     "brand": "RecPro",
-     "label": "Irrelevant"
+     "product_id": "B07VGRJDFY",
+     "title": "Nintendo Switch with Neon Blue and Neon Red Joy\u2011Con - HAC-001(-01)",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B07HYL97SW",
-     "title": "Military Vet Shop Magnet U.S. Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer Vinyl Magnet Car Fridge Locker Metal Decal 3.8\"",
-     "brand": "Military Vet Shop",
-     "label": "Irrelevant"
+     "product_id": "B07RGFF98S",
+     "title": "Nintendo Switch 32GB Console Video Games w/ 32GB Memory Card | Neon Red/Neon Blue Joy-Con | 1080p Resolution | 802.11ac WiFi | HDMI | Surround Sound | IR Motion Camera",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B07RYQL4YQ",
-     "title": "NCJEI NONGE Army MOS 63M M2-3 Bradley Fighting Vehicle System Maintainer License Plate Frames for Car Decoration 6 Inch X 12 Inch",
-     "brand": "NCJEI NONGE",
-     "label": "Irrelevant"
+     "product_id": "B07YZQSC5Y",
+     "title": "Nintendo Switch w/ Gray Joy-Con + Mario Kart 8 Deluxe (Full Game Download) - Switch",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B07QBXV9J1",
-     "title": "Newsmarts Tread Repair Kit M5 M6 M8 M10 M12 M23 Recoil Repair Kit Car Pro Coil Tool, 15pcs M12X1.0",
-     "brand": "Newsmarts",
-     "label": "Irrelevant"
+     "product_id": "B07YFKM7N6",
+     "title": "Nintendo 32GB Switch with Gray Joy-Con Controllers - with SanDisk 128GB UHS-I microSDXC Memory Card for The Switch",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B07ZJBD1Y4",
-     "title": "Car DC Adapter for Icom IC-M23 Handheld Marine VHF Radio CP-24 Charger BC-199SA",
-     "brand": "YUSTDA",
-     "label": "Irrelevant"
+     "product_id": "B087JR596S",
+     "title": "2020 Switch with Neon Blue and Red Controllers w/ 69 Value 13in1 Supper Kit Case (Earphone, LCD Film, Card Case, Silicon Case x 2pcs, Carry Bag, Wiping Cloth etc.)",
+     "brand": "HESVAP",
+     "label": "Exact"
     },
     {
-     "product_id": "B0141JQ06S",
-     "title": "Inline Tube (M-2-3) Rear Lower Control Arms Boxed for Sway Bar with Rubber Bushings Compatible with 1964-72 Gm A-Body Chevelle, GTO, 442, Gs, Monte Carlo and Grand Prix",
-     "brand": "Inline Tube",
-     "label": "Irrelevant"
+     "product_id": "B07H9HDDK7",
+     "title": "Nintendo Switch Console Bundle- Pikachu & Eevee Edition with Pokemon: Let's Go, Pikachu! + Poke Ball Plus",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B072NDTRM4",
-     "title": "GP Confidential 05/28/17",
-     "brand": null,
-     "label": "Irrelevant"
+     "product_id": "B07H9HH4VS",
+     "title": "Nintendo Switch Console Bundle - Pikachu & Eevee Edition with Pokemon: Let's Go, Eevee! + Poke Ball Plus",
+     "brand": "Nintendo",
+     "label": "Exact"
     },
     {
-     "product_id": "B007Q2G2R0",
-     "title": "Kodak KLIC-7006 Lithium Ion Replacement Battery and Wall Charger with Car Charger Attachment",
-     "brand": "Halcyon",
-     "label": "Irrelevant"
+     "product_id": "B08B3XMK2F",
+     "title": "Nintendo Switch w/ Red & Blue Joy-Con + Animal Crossing (New Horizons) Game Bundle",
+     "brand": "Nintendo",
+     "label": "Substitute"
     },
     {
-     "product_id": "B084QG8V68",
-     "title": "BSA: The Complete Story",
-     "brand": null,
-     "label": "Irrelevant"
+     "product_id": "B086XGHNB1",
+     "title": "Nintendo Switch Lite - Gray with 128GB SD Card for Nintendo Switch",
+     "brand": "Nintendo",
+     "label": "Substitute"
     }
-   ]
+   ],
+   "others": {
+    "bge": 0.7011,
+    "qwen3": 0.6983,
+    "teacher": 0.7163
+   }
   }
  ]
 }

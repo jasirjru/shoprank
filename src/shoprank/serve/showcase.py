@@ -129,11 +129,30 @@ def example_record(group: pd.DataFrame, rank: RankFn, note: str) -> dict:
             "bm25": items(bm25), "shoprank": items(ours)}
 
 
-def export(pairs: pd.DataFrame, chosen: Sequence[tuple[int, str]], rank: RankFn) -> dict:
+# Saved per-query dev results of other systems (same judged lists, full-list nDCG), shown beside each example.
+OTHER_RUNS = {"bge": "zeroshot_bge_v2m3_dev", "qwen3": "zeroshot_qwen3_06b_dev", "teacher": "deberta_oof_avg5"}
+
+
+def other_scores(qids: Sequence[int], runs_dir: Path = PROCESSED / "runs") -> dict[int, dict[str, float]]:
+    out: dict[int, dict[str, float]] = {int(q): {} for q in qids}
+    for key, name in OTHER_RUNS.items():
+        run = pd.read_parquet(runs_dir / f"{name}.parquet", columns=["query_id", "ndcg_full"]).set_index("query_id")
+        for q, scores in out.items():
+            scores[key] = round(float(run.at[q, "ndcg_full"]), 4)
+    return out
+
+
+def export(pairs: pd.DataFrame, chosen: Sequence[tuple[int, str]], rank: RankFn,
+           others: dict[int, dict[str, float]] | None = None) -> dict:
     groups = {qid: g for qid, g in pairs.groupby("query_id")}
+    examples = [example_record(groups[qid], rank, note) for qid, note in chosen]
+    for ex in examples:
+        ex["others"] = (others or {}).get(ex["query_id"], {})
     return {"split": "dev", "metric": "nDCG over the full judged list (Exact 1, Substitute 0.1, Complement 0.01)",
             "baseline": "BM25 on product titles", "model": "ShopRank API: spell correction + INT8 MiniLM",
-            "examples": [example_record(groups[qid], rank, note) for qid, note in chosen]}
+            "others": {"bge": "BGE-reranker-v2-m3 (568M), zero-shot", "qwen3": "Qwen3-Reranker-0.6B (596M), zero-shot",
+                       "teacher": "5 DeBERTa-v3-base fold models, mean score"},
+            "examples": examples}
 
 
 def check(data: Mapping, pairs: pd.DataFrame, rank: RankFn) -> list[str]:
@@ -166,7 +185,8 @@ def main() -> None:
         elif args.cmd == "export":
             chosen = [(int(c.split("=", 1)[0]), c.split("=", 1)[1] if "=" in c else "") for c in args.choices]
             EXAMPLES_PATH.parent.mkdir(parents=True, exist_ok=True)
-            EXAMPLES_PATH.write_text(json.dumps(export(pairs, chosen, rank), indent=1), encoding="utf-8")
+            data = export(pairs, chosen, rank, other_scores([q for q, _ in chosen]))
+            EXAMPLES_PATH.write_text(json.dumps(data, indent=1), encoding="utf-8", newline="\n")
             print(f"{len(chosen)} examples -> {EXAMPLES_PATH}")
         else:
             bad = check(json.loads(EXAMPLES_PATH.read_text(encoding="utf-8")), pairs, rank)

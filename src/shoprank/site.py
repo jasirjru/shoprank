@@ -41,7 +41,7 @@ SCALE_MIN, SCALE_MAX = 0.80, 0.90
 KNOWN_ITEM = [
     ("With a number, like \u201cfp30 piano\u201d or a size", 413, 0.593, 0.782),
     ("With a brand name", 338, 0.672, 0.766),
-    ("Neither, like \u201choley jeans for babys\u201d", 1318, 0.618, 0.737),
+    ("Neither, like \u201ccheap spy camera\u201d", 1318, 0.618, 0.737),
 ]
 
 MARKS = {  # authored SVG paths, one stroke family; shape (not colour) carries the label
@@ -77,6 +77,33 @@ def grade(value: float, side: str) -> str:
     return f'<span class="grade grade-{side}" title="Ranking score for this search (1.0 = perfect)">{value:.2f}</span>'
 
 
+BOARD = [  # (key, label, size) in the order shown; "bm25" and "shoprank" come from the example's own grades
+    ("bm25", "Keyword search", ""),
+    ("bge", "BGE reranker", "568M, ready-made"),
+    ("qwen3", "Qwen3 reranker", "596M, ready-made"),
+    ("teacher", "Teacher", "5 DeBERTa models"),
+    ("shoprank", "ShopRank", "33M, 32 MB"),
+]
+TAB_CHARS = 26
+
+
+def scoreboard(ex: dict) -> str:
+    scores = {**ex.get("others", {}), **ex["ndcg"]}
+    if not ex.get("others"):
+        return ""
+    best = max(scores.values())
+    items = []
+    for key, label, size in BOARD:
+        value = scores[key]
+        cls = " is-ours" if key == "shoprank" else ""
+        cls += " is-best" if value == best else ""
+        sub = f'<span class="board-size">{size}</span>' if size else ""
+        items.append(f'<li class="board-item{cls}"><span class="board-name">{label}{sub}</span>'
+                     f'<span class="board-score">{value:.2f}</span></li>')
+    return ('<div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p>'
+            f'<ul>{"".join(items)}</ul></div>')
+
+
 def example_panel(ex: dict, index: int) -> str:
     corrected = ex["query_used"] != ex["query"].strip()
     fix = (f'<p class="fix">Spell checker changed it to <q class="q">{escape(ex["query_used"])}</q></p>' if corrected else "")
@@ -88,6 +115,7 @@ def example_panel(ex: dict, index: int) -> str:
     {fix}
     <p class="note">{escape(ex["note"])}</p>
   </div>
+  {scoreboard(ex)}
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -105,13 +133,18 @@ def example_panel(ex: dict, index: int) -> str:
 </section>"""
 
 
+def short(query: str) -> str:
+    query = query.strip()
+    return query if len(query) <= TAB_CHARS else query[:TAB_CHARS].rsplit(" ", 1)[0] + "\u2026"
+
+
 def tabs(examples: list[dict]) -> str:
     buttons = []
     for i, ex in enumerate(examples):
         flag = ' <span class="tab-flag">fails</span>' if ex["ndcg"]["shoprank"] < ex["ndcg"]["bm25"] else ""
         selected = "true" if i == 0 else "false"
         buttons.append(f'<a class="tab" id="tab-{i}" href="#ex-{i}" role="tab" aria-selected="{selected}" '
-                       f'aria-controls="ex-{i}">{escape(ex["query"])}{flag}</a>')
+                       f'aria-controls="ex-{i}">{escape(short(ex["query"]))}{flag}</a>')
     return f'<nav class="tabs" role="tablist" aria-label="Example searches">{"".join(buttons)}</nav>'
 
 
@@ -226,7 +259,7 @@ def page(data: dict, css: str, js: str) -> str:
 
 <section aria-labelledby="examples-title">
   <h2 id="examples-title">See it work</h2>
-  <p class="section-lede">Real searches the model never saw while learning, hand-picked to show clear wins and one failure. Across all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Both lists hold the same products in a different order; the ticks and crosses come from Amazon's human reviewers.</p>
+  <p class="section-lede">Real searches for phones, consoles and laptops that the model never saw while learning, hand-picked: clear wins, one honest failure, and two big ready-made AI rerankers on the same search. Over all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Ticks and crosses come from Amazon&#39;s human reviewers.</p>
   {legend()}
   {tabs(examples)}
   {panels}
@@ -257,7 +290,8 @@ def page(data: dict, css: str, js: str) -> str:
 <section aria-labelledby="limits-title">
   <h2 id="limits-title">Where it fails</h2>
   <ul class="limits">
-    <li>Exact model names can trip it up: for <a href="#ex-{failure}">m23 for cars</a> it showed stickers, not McLaren M23 model cars.</li>
+    <li>Exact product names can trip it up: for <a href="#ex-{failure}">nintendo switch console</a> it put the cheaper Switch Lite first, while keyword search found the console.</li>
+    <li>On long, chat-style requests the big ready-made models can rank better (see the Chromebook example).</li>
     <li>The spell checker sometimes &ldquo;fixes&rdquo; real names: <q>nivda</q> (Nvidia) became <q>nivea</q>.</li>
     <li>It does not search the whole catalogue: it re-orders the results another search returns, and only for English (US) searches.</li>
   </ul>

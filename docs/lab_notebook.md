@@ -933,3 +933,14 @@ Fixes: headline now "right product first in 3 of 4 searches" (75% vs 63%), hones
 "before compression", examples are hand-picked, 65% better / 33% worse overall, synthetic typos, laptop CPU),
 known-item section, Open Graph tags + 1200x627 preview image, in-page example links fixed, tap targets 44 px,
 fonts without the optical-size axis (about half the bytes), private path removed from docs/PLAN.md.
+
+## 22 Nov 2026: page examples v2 (famous products, five-system scoreboard)
+
+Replaced the six examples with eight famous-product dev searches chosen from 131 brand/electronics queries in
+`showcase_candidates.parquet`: iphone xs pro, ps5, galaxy s9 plus, ipad mini four, apple airpods without case, a
+long chat-style Chromebook request, lg refridgerators (real typo) and nintendo switch console (honest failure). Each
+example now shows a scoreboard from saved per-query dev runs (no new scoring): keyword search, BGE-reranker-v2-m3
+and Qwen3-Reranker-0.6B (zero-shot), the DeBERTa teacher, and ShopRank via the API (parity check OK).
+Findings shown on the page: on "apple airpods without case" both ready-made rerankers score 0.35 vs ShopRank 0.99;
+on the long Chromebook request they beat ShopRank (0.90/0.91 vs 0.79), stated as a limit; on "nintendo switch
+console" every learned model ranks the Switch Lite first and only keyword search is right (0.89 vs 0.72).

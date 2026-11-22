@@ -180,6 +180,18 @@ h2 { font: 500 clamp(1.5rem, 3.6vw, 2.125rem)/1.15 var(--serif); letter-spacing:
 }
 @media (max-width: 639px) { .results .track { display: none; } }
 
+/* Five-system scoreboard under each example */
+.board { margin: 0 0 1.25rem; }
+.board-title { font-size: 0.875rem; color: var(--pencil); margin: 0 0 0.5rem; }
+.board ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.5rem; }
+.board-item { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.5rem 0.75rem; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--rule); background: var(--paper); }
+.board-name { font-size: 0.875rem; line-height: 1.3; color: var(--ink-soft); }
+.board-size { display: block; font: 400 0.75rem/1.3 var(--mono); color: var(--pencil); }
+.board-score { font: 500 1.25rem/1 var(--mono); letter-spacing: -0.03em; color: var(--pencil); font-variant-numeric: tabular-nums; }
+.board-item.is-ours { box-shadow: inset 0 0 0 2px var(--red); }
+.board-item.is-ours .board-score { color: var(--red); }
+.board-item.is-best .board-score::after { content: " best"; font: 400 0.75rem/1 var(--serif); color: var(--ink-soft); }
+
 /* Known-item searches */
 .known { max-width: 44rem; }
 .known .count { display: block; font: 400 0.8125rem/1.4 var(--mono); color: var(--pencil); }

@@ -68,4 +68,4 @@ def test_committed_page_matches_the_generator():
     html, headers = build()
     assert Path(OUT_PATH).read_text(encoding="utf-8") == html
     assert json.loads((Path(OUT_PATH).parent / "vercel.json").read_text(encoding="utf-8")) == headers
-    assert len(json.loads(Path(EXAMPLES_PATH).read_text(encoding="utf-8"))["examples"]) == 6
+    assert len(json.loads(Path(EXAMPLES_PATH).read_text(encoding="utf-8"))["examples"]) == 8
