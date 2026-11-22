@@ -9,7 +9,7 @@ vercel.json; `tests/test_site.py` checks they match), then deploy.
 Tools: Lighthouse 13.6.0 (npx, headless Chrome 157); axe-core 4.14.1 (see section 2 for how); puppeteer-core from the
 Lighthouse npx cache for 320/375/390 px, no-JS, focus and reduced-motion checks; Python for contrast ratios.
 Raw outputs (scratch, not in repo): `lh_mobile.json`, `lh_desktop.json`, `axe_results.json`, screenshots, in
-`C:\Users\jasir\AppData\Local\Temp\claude\9a00c2f9925841e7\ba3f9b0d-0ecc-4746-ad55-b30a544358de\scratchpad\site_audit\`.
+`[local scratch folder]`.
 
 ## Verdict
 

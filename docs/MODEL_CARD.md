@@ -25,7 +25,7 @@ Ready-made rerankers, zero-shot on dev (same product text): BGE-reranker-v2-m3 (
 Qwen3-Reranker-0.6B (596M) 0.8540, both below this model's 0.8667 (paired CIs exclude 0), at 17x its size.
 
 ## Speed (laptop CPU, 16 threads, one model call at a time)
-p50 69 ms, p95 232 ms for one request of ~16 candidates; ~230 pairs/s (~11 requests/s) per process.
+p50 69 ms, p95 232 ms for one request of ~16 candidates; 217-230 pairs/s (~11 requests/s) per process.
 
 ## Download and use
 Published files (identical in both places, SHA-256 in `SHA256SUMS`): `model_int8.onnx`, `tokenizer.json`,
@@ -33,7 +33,7 @@ Published files (identical in both places, SHA-256 in `SHA256SUMS`): `model_int8
 v1.1 `spell_vocab.json` (catalogue word counts for query spell correction).
 - Hugging Face: https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8
 - GitHub release v1.1: https://github.com/jasirjru/shoprank/releases/tag/v1.1
-- In this repo: `uv run python -m shoprank.serve.fetch` downloads them into the folder the API reads and
+- In the GitHub repo: `uv run python -m shoprank.serve.fetch` downloads them into the folder the API reads and
   checks every SHA-256.
 
 Without this repo (onnxruntime + transformers only):

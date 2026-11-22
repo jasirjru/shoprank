@@ -36,11 +36,12 @@ RESULTS = [
 ]
 SCALE_MIN, SCALE_MAX = 0.80, 0.90
 
-# Right product at #1 on the dev split by kind of search (all 2,001 dev queries through the real API, 22 Nov 2026).
+# Right product at #1 on dev by rule tag from eval/slices.py (has_number = any digit; brand; neither). Rows 1-2
+# overlap (68 queries). ShopRank = the API (INT8 + spell), BM25 = the raw query. 22 Nov 2026.
 KNOWN_ITEM = [
-    ("With a model number, like \u201cfp30 piano\u201d", 413, 0.593, 0.782),
+    ("With a number, like \u201cfp30 piano\u201d or a size", 413, 0.593, 0.782),
     ("With a brand name", 338, 0.672, 0.766),
-    ("General browsing, like \u201cwomens running shoes 10.5\u201d", 1318, 0.618, 0.737),
+    ("Neither, like \u201choley jeans for babys\u201d", 1318, 0.618, 0.737),
 ]
 
 MARKS = {  # authored SVG paths, one stroke family; shape (not colour) carries the label
@@ -225,7 +226,7 @@ def page(data: dict, css: str, js: str) -> str:
 
 <section aria-labelledby="examples-title">
   <h2 id="examples-title">See it work</h2>
-  <p class="section-lede">Real searches the model never saw while learning, hand-picked to show typical wins and one failure. Across all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Both lists hold the same products in a different order; the ticks and crosses come from Amazon's human reviewers.</p>
+  <p class="section-lede">Real searches the model never saw while learning, hand-picked to show clear wins and one failure. Across all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Both lists hold the same products in a different order; the ticks and crosses come from Amazon's human reviewers.</p>
   {legend()}
   {tabs(examples)}
   {panels}
@@ -238,8 +239,8 @@ def page(data: dict, css: str, js: str) -> str:
 </section>
 
 <section aria-labelledby="known-title">
-  <h2 id="known-title">Best when shoppers already know what they want</h2>
-  <p class="section-lede">Many shoppers now arrive after asking an AI assistant or reading reviews, and search for one specific product. Those searches gain the most: how often the top result is exactly right, on 2,001 development searches.</p>
+  <h2 id="known-title">Biggest gain on searches with a number in them</h2>
+  <p class="section-lede">How often the top result is exactly right, by kind of search, on 2,001 development searches (ShopRank as served, with its spell checker). Searches with a number in them, such as a model number or a size, gain the most.</p>
   {known_item_table()}
 </section>
 

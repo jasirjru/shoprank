@@ -147,9 +147,8 @@ sizes; full `git log -p origin/main`; PDF metadata (ExifTool).
 
 ### SHOULD-2: private local path and career notes in `docs/PLAN.md`
 
-`docs/PLAN.md:41`: ``Reference: `C:\Studio\Career\reports\shoprank_career_research_2026-11-17.md` (why ShopRank,
-honest score 7/10, sources).`` This is a local Windows path to a private career file, plus a private self-rating; it
-is the only local path in any tracked file. The same file says "put it on the resume" (`docs/PLAN.md:3, 9, 22`).
+`docs/PLAN.md:41`: a reference line (private note redacted on 22 Nov) This is a local Windows path to a private career file, plus a private self-rating; it
+is the only local path in any tracked file. The same file says career notes (`docs/PLAN.md:3, 9, 22`).
 Fix: delete line 41 of `docs/PLAN.md` (old text above, new text: nothing). Judgement: consider moving the whole
 `docs/PLAN.md` to the git-ignored `docs/private/`. The line stays in git history (added in an earlier public commit);
 that is acceptable for a folder name, not worth a history rewrite.
