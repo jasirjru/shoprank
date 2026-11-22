@@ -50,7 +50,7 @@ def test_page_escapes_product_text_and_shows_every_example():
     assert "<script>alert(1)</script>" not in html
     assert "&lt;script&gt;" in html
     assert html.count('role="tabpanel"') == 2
-    assert html.count("tab-flag") == 1  # only the example where ShopRank loses is flagged
+    assert html.count("card-flag") == 1  # only the example where ShopRank loses is flagged
 
 
 def test_proof_line_is_built_from_the_example_data():

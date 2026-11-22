@@ -6,8 +6,6 @@
   const tabs = [...document.querySelectorAll(".tab")];
   const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls")));
 
-  const strip = document.querySelector(".tabs");
-
   function select(i, focus) {
     tabs.forEach((t, j) => {
       const on = i === j;
@@ -16,15 +14,14 @@
       panels[j].hidden = !on;
     });
     if (focus) tabs[i].focus();
-    // keep the chosen tab visible inside the strip without scrolling the page
-    const t = tabs[i];
-    if (t.offsetLeft < strip.scrollLeft || t.offsetLeft + t.offsetWidth > strip.scrollLeft + strip.clientWidth) {
-      strip.scrollTo({ left: t.offsetLeft - 16, behavior: reduce.matches ? "auto" : "smooth" });
-    }
   }
 
   tabs.forEach((tab, i) => {
-    tab.addEventListener("click", (e) => { e.preventDefault(); select(i, false); });
+    tab.addEventListener("click", (e) => {
+      e.preventDefault();
+      select(i, false);
+      if (innerWidth < 900) panels[i].scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+    });
     tab.addEventListener("keydown", (e) => {
       const keys = { ArrowRight: 1, ArrowLeft: -1, Home: -i, End: tabs.length - 1 - i };
       if (!(e.key in keys)) return;

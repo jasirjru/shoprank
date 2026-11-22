@@ -123,17 +123,27 @@ h2 { font: 500 clamp(1.5rem, 3.6vw, 2.125rem)/1.15 var(--serif); letter-spacing:
 .mark { width: 1.25rem; height: 1.25rem; flex: none; fill: none; stroke: var(--red); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .mark-complement, .mark-irrelevant { stroke-width: 2; opacity: 0.85; }
 
-/* Example tabs: the six searches */
-.tabs { position: relative; display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.25rem 0.125rem 0.75rem; margin: 0 -0.125rem; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
-.tab {
-  flex: none; font: 400 0.9375rem/1.2 var(--mono); color: var(--ink); text-decoration: none; padding: 0.6rem 0.875rem; min-height: 2.75rem;
-  display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--rule); background: var(--paper);
-  transition: box-shadow 0.2s, background-color 0.2s;
+/* Example cards: all eight searches at a glance; each opens its full comparison below */
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.625rem; margin: 0 0 1rem; }
+.card {
+  display: flex; flex-direction: column; gap: 0.375rem; min-height: 2.75rem; padding: 0.75rem 0.875rem 0.875rem;
+  color: var(--ink); text-decoration: none; background: var(--paper); border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--rule), 0 1px 2px rgb(29 27 22 / 0.05);
+  transition: box-shadow 0.2s, transform 0.2s var(--ease);
 }
-.tab:hover { box-shadow: inset 0 0 0 1px var(--pencil); color: var(--ink); }
-.tab[aria-selected="true"], .tab[aria-selected="true"]:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
-.tab-flag { font: 500 0.75rem/1 var(--serif); color: var(--red); }
-.tab[aria-selected="true"] .tab-flag { color: #ffb4a9; }
+.card:hover { color: var(--ink); box-shadow: inset 0 0 0 1px var(--pencil), 0 6px 16px -10px rgb(29 27 22 / 0.4); transform: translateY(-1px); }
+.card[aria-selected="true"], .card[aria-selected="true"]:hover { box-shadow: inset 0 0 0 2px var(--ink), 0 8px 20px -12px rgb(29 27 22 / 0.5); }
+.card-query { font: 500 0.9375rem/1.3 var(--mono); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.card-grades { display: flex; align-items: baseline; gap: 0.375rem; font: 500 1.125rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+.card-from { color: var(--pencil); }
+.card-arrow { color: var(--pencil); font-size: 0.875rem; }
+.card-to { color: var(--red); }
+.card-flag { margin-left: auto; font: 500 0.75rem/1 var(--serif); color: var(--red); padding: 0.2rem 0.45rem; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--red); }
+.card-story { font-size: 0.875rem; line-height: 1.35; color: var(--ink-soft); }
+.card.is-failure { box-shadow: inset 0 0 0 1px var(--margin); }
+.card.is-failure .card-to { color: var(--pencil); }
+.card.is-failure .card-from { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .card, .card:hover { transition: none; transform: none; } }
 
 /* One example: the marked sheet */
 .example { background: var(--paper); box-shadow: 0 1px 1px rgb(29 27 22 / 0.06), 0 12px 32px -18px rgb(29 27 22 / 0.35); border-radius: 4px; padding: 1.25rem 1rem 1rem; margin-bottom: 1rem; }
@@ -184,7 +194,7 @@ h2 { font: 500 clamp(1.5rem, 3.6vw, 2.125rem)/1.15 var(--serif); letter-spacing:
   .intro-side { grid-column: 2; grid-row: 2; padding-top: 0.5rem; }
   .intro .lede { margin: 0; }
   .example { padding: 1.75rem 2rem 1.5rem; }
-  .tabs { flex-wrap: wrap; overflow: visible; }
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
   .columns { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
   .example-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 0 2.5rem; align-items: end; }
   .example-head .note { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
@@ -281,7 +291,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
   <h2 id="examples-title">See it work</h2>
   <p class="section-lede">Real searches for phones, consoles and laptops that the model never saw while learning, hand-picked: clear wins, one honest failure, and two big ready-made AI rerankers on the same search. Over all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Ticks and crosses come from Amazon&#39;s human reviewers.</p>
   <ul class="legend" aria-label="Marks are Amazon's human labels"><li><svg class="mark mark-exact" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12.5l5 5L20 6"/></svg><span>Right product</span></li><li><svg class="mark mark-substitute" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12.5l5 5L20 6"/><path d="M12 20.5h8"/></svg><span>Good alternative</span></li><li><svg class="mark mark-complement" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg><span>Goes with it</span></li><li><svg class="mark mark-irrelevant" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Wrong product</span></li></ul>
-  <nav class="tabs" role="tablist" aria-label="Example searches"><a class="tab" id="tab-0" href="#ex-0" role="tab" aria-selected="true" aria-controls="ex-0">iphone xs pro</a><a class="tab" id="tab-1" href="#ex-1" role="tab" aria-selected="false" aria-controls="ex-1">ps5</a><a class="tab" id="tab-2" href="#ex-2" role="tab" aria-selected="false" aria-controls="ex-2">galaxy s9 plus</a><a class="tab" id="tab-3" href="#ex-3" role="tab" aria-selected="false" aria-controls="ex-3">ipad mini four</a><a class="tab" id="tab-4" href="#ex-4" role="tab" aria-selected="false" aria-controls="ex-4">apple airpods without case</a><a class="tab" id="tab-5" href="#ex-5" role="tab" aria-selected="false" aria-controls="ex-5">chromebook (long request)</a><a class="tab" id="tab-6" href="#ex-6" role="tab" aria-selected="false" aria-controls="ex-6">lg refridgerators</a><a class="tab" id="tab-7" href="#ex-7" role="tab" aria-selected="false" aria-controls="ex-7">nintendo switch console <span class="tab-flag">fails</span></a></nav>
+  <nav class="tabs cards" role="tablist" aria-label="Example searches"><a class="tab card" id="tab-0" href="#ex-0" role="tab" aria-selected="true" aria-controls="ex-0"><span class="card-query">iphone xs pro</span><span class="card-grades"><span class="card-from">0.38</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">1.00</span></span><span class="card-story">Screen protectors → the phones</span></a><a class="tab card" id="tab-1" href="#ex-1" role="tab" aria-selected="false" aria-controls="ex-1"><span class="card-query">ps5</span><span class="card-grades"><span class="card-from">0.65</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">0.99</span></span><span class="card-story">PS4 games → the PS5</span></a><a class="tab card" id="tab-2" href="#ex-2" role="tab" aria-selected="false" aria-controls="ex-2"><span class="card-query">galaxy s9 plus</span><span class="card-grades"><span class="card-from">0.61</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">0.99</span></span><span class="card-story">Cases → the phones</span></a><a class="tab card" id="tab-3" href="#ex-3" role="tab" aria-selected="false" aria-controls="ex-3"><span class="card-query">ipad mini four</span><span class="card-grades"><span class="card-from">0.47</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">1.00</span></span><span class="card-story">Reads “four” as the iPad Mini 4</span></a><a class="tab card" id="tab-4" href="#ex-4" role="tab" aria-selected="false" aria-controls="ex-4"><span class="card-query">apple airpods without case</span><span class="card-grades"><span class="card-from">0.47</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">0.99</span></span><span class="card-story">Understands “without case”</span></a><a class="tab card" id="tab-5" href="#ex-5" role="tab" aria-selected="false" aria-controls="ex-5"><span class="card-query">chromebook (long request)</span><span class="card-grades"><span class="card-from">0.69</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">0.79</span></span><span class="card-story">Better, but big AI models win here</span></a><a class="tab card" id="tab-6" href="#ex-6" role="tab" aria-selected="false" aria-controls="ex-6"><span class="card-query">lg refridgerators</span><span class="card-grades"><span class="card-from">0.78</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">1.00</span></span><span class="card-story">Typo fixed → fridges, not parts</span></a><a class="tab card is-failure" id="tab-7" href="#ex-7" role="tab" aria-selected="false" aria-controls="ex-7"><span class="card-query">nintendo switch console</span><span class="card-grades"><span class="card-from">0.89</span><span class="card-arrow" aria-hidden="true">→</span><span class="sr"> keyword search, then ShopRank </span><span class="card-to">0.72</span><span class="card-flag">fails</span></span><span class="card-story">Puts the Switch Lite first</span></a></nav>
   
 <section class="example" id="ex-0" role="tabpanel" aria-labelledby="tab-0" data-mode="shoprank">
   <div class="example-head">
@@ -521,8 +531,6 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
   const tabs = [...document.querySelectorAll(".tab")];
   const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls")));
 
-  const strip = document.querySelector(".tabs");
-
   function select(i, focus) {
     tabs.forEach((t, j) => {
       const on = i === j;
@@ -531,15 +539,14 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
       panels[j].hidden = !on;
     });
     if (focus) tabs[i].focus();
-    // keep the chosen tab visible inside the strip without scrolling the page
-    const t = tabs[i];
-    if (t.offsetLeft < strip.scrollLeft || t.offsetLeft + t.offsetWidth > strip.scrollLeft + strip.clientWidth) {
-      strip.scrollTo({ left: t.offsetLeft - 16, behavior: reduce.matches ? "auto" : "smooth" });
-    }
   }
 
   tabs.forEach((tab, i) => {
-    tab.addEventListener("click", (e) => { e.preventDefault(); select(i, false); });
+    tab.addEventListener("click", (e) => {
+      e.preventDefault();
+      select(i, false);
+      if (innerWidth < 900) panels[i].scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+    });
     tab.addEventListener("keydown", (e) => {
       const keys = { ArrowRight: 1, ArrowLeft: -1, Home: -i, End: tabs.length - 1 - i };
       if (!(e.key in keys)) return;

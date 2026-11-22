@@ -139,13 +139,23 @@ def short(query: str) -> str:
 
 
 def tabs(examples: list[dict]) -> str:
-    buttons = []
+    """Summary cards: every example visible at a glance (query, before -> after grade, one-line story).
+    Each card is a tab that opens the full side-by-side lists below."""
+    cards = []
     for i, ex in enumerate(examples):
-        flag = ' <span class="tab-flag">fails</span>' if ex["ndcg"]["shoprank"] < ex["ndcg"]["bm25"] else ""
+        fails = ex["ndcg"]["shoprank"] < ex["ndcg"]["bm25"]
+        flag = '<span class="card-flag">fails</span>' if fails else ""
         selected = "true" if i == 0 else "false"
-        buttons.append(f'<a class="tab" id="tab-{i}" href="#ex-{i}" role="tab" aria-selected="{selected}" '
-                       f'aria-controls="ex-{i}">{escape(ex.get("label") or short(ex["query"]))}{flag}</a>')
-    return f'<nav class="tabs" role="tablist" aria-label="Example searches">{"".join(buttons)}</nav>'
+        cards.append(
+            f'<a class="tab card{" is-failure" if fails else ""}" id="tab-{i}" href="#ex-{i}" role="tab" '
+            f'aria-selected="{selected}" aria-controls="ex-{i}">'
+            f'<span class="card-query">{escape(ex.get("label") or short(ex["query"]))}</span>'
+            f'<span class="card-grades"><span class="card-from">{ex["ndcg"]["bm25"]:.2f}</span>'
+            f'<span class="card-arrow" aria-hidden="true">\u2192</span>'
+            f'<span class="sr"> keyword search, then ShopRank </span>'
+            f'<span class="card-to">{ex["ndcg"]["shoprank"]:.2f}</span>{flag}</span>'
+            f'<span class="card-story">{escape(ex.get("headline", ""))}</span></a>')
+    return f'<nav class="tabs cards" role="tablist" aria-label="Example searches">{"".join(cards)}</nav>'
 
 
 def results_table() -> str:
