@@ -32,6 +32,18 @@
   const fromHash = panels.findIndex((p) => "#" + p.id === location.hash);
   select(fromHash >= 0 ? fromHash : 0, false);
 
+  // 3D tilt toward the pointer (mouse only; off for reduced motion)
+  if (!reduce.matches && matchMedia("(hover: hover)").matches) {
+    tabs.forEach((card) => {
+      card.addEventListener("pointermove", (e) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--ry", ((e.clientX - r.left) / r.width - 0.5) * 16 + "deg");
+        card.style.setProperty("--rx", (0.5 - (e.clientY - r.top) / r.height) * 16 + "deg");
+      });
+      card.addEventListener("pointerleave", () => { card.style.setProperty("--rx", "0deg"); card.style.setProperty("--ry", "0deg"); });
+    });
+  }
+
   // In-page links to an example (proof line, "Where it fails") open that tab and scroll to it.
   document.addEventListener("click", (e) => {
     const a = e.target.closest('a[href^="#ex-"]:not(.tab)');

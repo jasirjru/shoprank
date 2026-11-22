@@ -219,7 +219,8 @@
     "qwen3": 0.5899,
     "teacher": 0.6156
    },
-   "headline": "Screen protectors \u2192 the phones"
+   "headline": "Screen protectors \u2192 the phones",
+   "suit": "phones"
   },
   {
    "query_id": 83990,
@@ -431,7 +432,8 @@
     "qwen3": 0.8719,
     "teacher": 0.9999
    },
-   "headline": "PS4 games \u2192 the PS5"
+   "headline": "PS4 games \u2192 the PS5",
+   "suit": "consoles"
   },
   {
    "query_id": 44041,
@@ -607,7 +609,8 @@
     "qwen3": 0.9402,
     "teacher": 0.9914
    },
-   "headline": "Cases \u2192 the phones"
+   "headline": "Cases \u2192 the phones",
+   "suit": "phones"
   },
   {
    "query_id": 53879,
@@ -819,7 +822,8 @@
     "qwen3": 0.9953,
     "teacher": 0.9975
    },
-   "headline": "Reads \u201cfour\u201d as the iPad Mini 4"
+   "headline": "Reads \u201cfour\u201d as the iPad Mini 4",
+   "suit": "tablets"
   },
   {
    "query_id": 9651,
@@ -1031,7 +1035,8 @@
     "qwen3": 0.3584,
     "teacher": 0.9854
    },
-   "headline": "Understands \u201cwithout case\u201d"
+   "headline": "Understands \u201cwithout case\u201d",
+   "suit": "home"
   },
   {
    "query_id": 5665,
@@ -1244,7 +1249,8 @@
     "teacher": 0.9266
    },
    "label": "chromebook (long request)",
-   "headline": "Better, but big AI models win here"
+   "headline": "Better, but big AI models win here",
+   "suit": "tablets"
   },
   {
    "query_id": 61867,
@@ -1456,7 +1462,8 @@
     "qwen3": 0.8999,
     "teacher": 0.9917
    },
-   "headline": "Typo fixed \u2192 fridges, not parts"
+   "headline": "Typo fixed \u2192 fridges, not parts",
+   "suit": "home"
   },
   {
    "query_id": 73878,
@@ -1680,7 +1687,8 @@
     "qwen3": 0.6983,
     "teacher": 0.7163
    },
-   "headline": "Puts the Switch Lite first"
+   "headline": "Puts the Switch Lite first",
+   "suit": "consoles"
   }
  ]
 }
