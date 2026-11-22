@@ -139,12 +139,11 @@ def short(query: str) -> str:
 
 
 SUIT_NAMES = {"phones": "Phones", "consoles": "Consoles", "tablets": "Tablets & laptops", "home": "Audio & home"}
-TILTS = (-2.5, 1.5, -1, 2.5, 1, -2, 2, -1.5)  # cards lie slightly rotated, like a dealt hand
 
 
 def tabs(examples: list[dict]) -> str:
-    """A deck of answer cards (one per example, coloured by product type). Each card is a tab that opens the
-    full side-by-side comparison below. The corner numbers are ShopRank's grade, like a playing card's index."""
+    """Answer cards (paper slips with depth): every example at a glance. Each card is a tab that opens the
+    full side-by-side comparison below."""
     cards = []
     for i, ex in enumerate(examples):
         fails = ex["ndcg"]["shoprank"] < ex["ndcg"]["bm25"]
@@ -153,17 +152,15 @@ def tabs(examples: list[dict]) -> str:
         flag = '<span class="card-flag">fails</span>' if fails else ""
         selected = "true" if i == 0 else "false"
         cards.append(
-            f'<a class="tab card suit-{suit}{" is-failure" if fails else ""}" id="tab-{i}" href="#ex-{i}" role="tab" '
-            f'aria-selected="{selected}" aria-controls="ex-{i}" style="--tilt:{TILTS[i % len(TILTS)]}deg">'
-            f'<span class="card-face">'
-            f'<span class="card-index" aria-hidden="true">{ours:.2f}</span>'
-            f'<span class="card-suit">{SUIT_NAMES[suit]}</span>'
-            f'<span class="card-oval"><span class="card-query">{escape(ex.get("label") or short(ex["query"]))}</span></span>'
-            f'<span class="card-grades">keyword {base:.2f} <span aria-hidden="true">\u2192</span>'
-            f'<span class="sr">, ShopRank</span> <b>{ours:.2f}</b>{flag}</span>'
-            f'<span class="card-story">{escape(ex.get("headline", ""))}</span>'
-            f'<span class="card-index card-index-end" aria-hidden="true">{ours:.2f}</span>'
-            f'</span></a>')
+            f'<a class="tab card{" is-failure" if fails else ""}" id="tab-{i}" href="#ex-{i}" role="tab" '
+            f'aria-selected="{selected}" aria-controls="ex-{i}">'
+            f'<span class="card-top"><span class="card-suit">{SUIT_NAMES[suit]}</span>{flag}</span>'
+            f'<span class="card-query">{escape(ex.get("label") or short(ex["query"]))}</span>'
+            f'<span class="card-grades"><span class="card-from">{base:.2f}</span>'
+            f'<span class="card-arrow" aria-hidden="true">\u2192</span>'
+            f'<span class="sr"> keyword search, then ShopRank </span>'
+            f'<span class="card-to">{ours:.2f}</span></span>'
+            f'<span class="card-story">{escape(ex.get("headline", ""))}</span></a>')
     return f'<nav class="tabs cards" role="tablist" aria-label="Example searches">{"".join(cards)}</nav>'
 
 
