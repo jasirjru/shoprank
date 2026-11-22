@@ -1237,7 +1237,8 @@
     "bge": 0.9011,
     "qwen3": 0.9107,
     "teacher": 0.9266
-   }
+   },
+   "label": "chromebook (long request)"
   },
   {
    "query_id": 61867,

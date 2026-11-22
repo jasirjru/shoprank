@@ -78,7 +78,7 @@ def grade(value: float, side: str) -> str:
 
 
 BOARD = [  # (key, label, size) in the order shown; "bm25" and "shoprank" come from the example's own grades
-    ("bm25", "Keyword search", ""),
+    ("bm25", "Keyword search", "word matching"),
     ("bge", "BGE reranker", "568M, ready-made"),
     ("qwen3", "Qwen3 reranker", "596M, ready-made"),
     ("teacher", "Teacher", "5 DeBERTa models"),
@@ -144,7 +144,7 @@ def tabs(examples: list[dict]) -> str:
         flag = ' <span class="tab-flag">fails</span>' if ex["ndcg"]["shoprank"] < ex["ndcg"]["bm25"] else ""
         selected = "true" if i == 0 else "false"
         buttons.append(f'<a class="tab" id="tab-{i}" href="#ex-{i}" role="tab" aria-selected="{selected}" '
-                       f'aria-controls="ex-{i}">{escape(short(ex["query"]))}{flag}</a>')
+                       f'aria-controls="ex-{i}">{escape(ex.get("label") or short(ex["query"]))}{flag}</a>')
     return f'<nav class="tabs" role="tablist" aria-label="Example searches">{"".join(buttons)}</nav>'
 
 
@@ -174,7 +174,7 @@ def proof_line(ex: dict) -> str:
              + (f" (below the {ROWS_SHOWN} shown)" if bm25_first > ROWS_SHOWN else "") if bm25_first
              else "no right product appears at all")
     return (f'<p class="proof">Example: search <q class="q">{escape(ex["query"])}</q>. In keyword search, {where}. '
-            f'ShopRank puts {lead} right product{"" if lead == 1 else "s"} first. <a href="#ex-0">See both lists</a></p>')
+            f'ShopRank puts {lead} right product{"" if lead == 1 else "s"} first. <a class="nowrap" href="#ex-0">See both lists</a></p>')
 
 
 def known_item_table() -> str:
@@ -249,12 +249,14 @@ def page(data: dict, css: str, js: str) -> str:
   <p class="lede">Share of searches where the top result is exactly what was asked for, on Amazon's public shopping-search test (8,956 searches). ShopRank is a small AI model that re-orders search results so the products people want come first. It runs on a laptop CPU, no GPU needed.</p>
   {proof_line(examples[0])}
   </div>
+  <div class="intro-side">
   <div class="actions">
-    <a class="btn btn-primary" href="{REPO}">{GITHUB_ICON}See the code on GitHub</a>
-    <a class="btn btn-ghost" href="{MODEL}">Get the model on Hugging Face</a>
+      <a class="btn btn-primary" href="{REPO}">{GITHUB_ICON}See the code on GitHub</a>
+      <a class="btn btn-ghost" href="{MODEL}">Get the model on Hugging Face</a>
+    </div>
+    <p class="skills">Python · PyTorch · FastAPI · Docker · ML ranking</p>
+    <p class="byline">Built by <a href="{PORTFOLIO}">{OWNER}</a></p>
   </div>
-  <p class="skills">Python · PyTorch · FastAPI · Docker · ML ranking</p>
-  <p class="byline">Built by <a href="{PORTFOLIO}">{OWNER}</a></p>
 </section>
 
 <section aria-labelledby="examples-title">

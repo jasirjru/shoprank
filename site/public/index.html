@@ -108,6 +108,7 @@ h1 {
 .btn-primary:hover { background: var(--red); color: #fff; }
 .btn-ghost { color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); background: rgb(251 248 241 / 0.8); }
 .btn-ghost:hover { color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+.nowrap { white-space: nowrap; }
 .skills { font: 400 0.875rem/1.6 var(--mono); color: var(--pencil); margin: 0; letter-spacing: -0.01em; }
 .byline { font-size: 0.9375rem; color: var(--pencil); margin: 0.5rem 0 0; }
 
@@ -177,12 +178,13 @@ h2 { font: 500 clamp(1.5rem, 3.6vw, 2.125rem)/1.15 var(--serif); letter-spacing:
   :root { --gutter: 2.5rem; }
   body { font-size: 1.125rem; }
   .sheet::before { left: 1.5rem; }
-  .intro { padding: 1.75rem 0 0.5rem; max-width: none; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: 3rem; align-items: end; }
+  .intro { padding: 1.75rem 0 0.5rem; max-width: none; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); column-gap: 3.5rem; align-items: start; }
   .intro h1 { grid-column: 1 / -1; max-width: 56rem; }
-  .intro .lede-block { grid-column: 1; grid-row: 2 / span 3; }
+  .intro .lede-block { grid-column: 1; grid-row: 2; }
+  .intro-side { grid-column: 2; grid-row: 2; padding-top: 0.5rem; }
   .intro .lede { margin: 0; }
-  .intro .actions, .intro .skills, .intro .byline { grid-column: 2; }
   .example { padding: 1.75rem 2rem 1.5rem; }
+  .tabs { flex-wrap: wrap; overflow: visible; }
   .columns { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
   .example-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 0 2.5rem; align-items: end; }
   .example-head .note { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
@@ -191,7 +193,7 @@ h2 { font: 500 clamp(1.5rem, 3.6vw, 2.125rem)/1.15 var(--serif); letter-spacing:
 /* Results: a ruler from 0.80 to 0.90 */
 .results { width: 100%; max-width: 52rem; border-collapse: collapse; font-size: 0.96875rem; }
 .results th, .results td { text-align: left; padding: 0.5rem 0.5rem 0.5rem 0; border-bottom: 1px solid var(--rule); vertical-align: middle; font-weight: 400; }
-.results thead th { font: 500 0.8125rem/1.2 var(--mono); color: var(--pencil); border-bottom: 1px solid var(--ink); }
+.results thead th { white-space: nowrap; font: 500 0.8125rem/1.2 var(--mono); color: var(--pencil); border-bottom: 1px solid var(--ink); }
 .results .value { font-family: var(--mono); font-variant-numeric: tabular-nums; width: 4.5rem; }
 .results .track { width: 38%; }
 .track-head { display: none; }
@@ -215,7 +217,7 @@ h2 { font: 500 clamp(1.5rem, 3.6vw, 2.125rem)/1.15 var(--serif); letter-spacing:
 .board-score { font: 500 1.25rem/1 var(--mono); letter-spacing: -0.03em; color: var(--pencil); font-variant-numeric: tabular-nums; }
 .board-item.is-ours { box-shadow: inset 0 0 0 2px var(--red); }
 .board-item.is-ours .board-score { color: var(--red); }
-.board-item.is-best .board-score::after { content: " best"; font: 400 0.75rem/1 var(--serif); color: var(--ink-soft); }
+.board-item.is-best .board-score::after { content: "best"; margin-left: 0.4rem; font: 400 0.75rem/1 var(--serif); color: var(--ink-soft); }
 
 /* Known-item searches */
 .known { max-width: 44rem; }
@@ -263,21 +265,23 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
   <div class="lede-block">
   <p class="score"><span class="pair"><span class="num num-ours">75%</span><span class="score-label">ShopRank</span></span><span class="pair"><span class="num num-base">63%</span><span class="score-label">plain keyword search</span></span></p>
   <p class="lede">Share of searches where the top result is exactly what was asked for, on Amazon's public shopping-search test (8,956 searches). ShopRank is a small AI model that re-orders search results so the products people want come first. It runs on a laptop CPU, no GPU needed.</p>
-  <p class="proof">Example: search <q class="q">iphone xs pro</q>. In keyword search, the first right product is number 12 (below the 8 shown). ShopRank puts 3 right products first. <a href="#ex-0">See both lists</a></p>
+  <p class="proof">Example: search <q class="q">iphone xs pro</q>. In keyword search, the first right product is number 12 (below the 8 shown). ShopRank puts 3 right products first. <a class="nowrap" href="#ex-0">See both lists</a></p>
   </div>
+  <div class="intro-side">
   <div class="actions">
-    <a class="btn btn-primary" href="https://github.com/jasirjru/shoprank"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>See the code on GitHub</a>
-    <a class="btn btn-ghost" href="https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8">Get the model on Hugging Face</a>
+      <a class="btn btn-primary" href="https://github.com/jasirjru/shoprank"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>See the code on GitHub</a>
+      <a class="btn btn-ghost" href="https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8">Get the model on Hugging Face</a>
+    </div>
+    <p class="skills">Python · PyTorch · FastAPI · Docker · ML ranking</p>
+    <p class="byline">Built by <a href="https://jasirjru-portfolio.vercel.app">Jasir Abdul Hameed</a></p>
   </div>
-  <p class="skills">Python · PyTorch · FastAPI · Docker · ML ranking</p>
-  <p class="byline">Built by <a href="https://jasirjru-portfolio.vercel.app">Jasir Abdul Hameed</a></p>
 </section>
 
 <section aria-labelledby="examples-title">
   <h2 id="examples-title">See it work</h2>
   <p class="section-lede">Real searches for phones, consoles and laptops that the model never saw while learning, hand-picked: clear wins, one honest failure, and two big ready-made AI rerankers on the same search. Over all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Ticks and crosses come from Amazon&#39;s human reviewers.</p>
   <ul class="legend" aria-label="Marks are Amazon's human labels"><li><svg class="mark mark-exact" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12.5l5 5L20 6"/></svg><span>Right product</span></li><li><svg class="mark mark-substitute" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12.5l5 5L20 6"/><path d="M12 20.5h8"/></svg><span>Good alternative</span></li><li><svg class="mark mark-complement" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg><span>Goes with it</span></li><li><svg class="mark mark-irrelevant" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Wrong product</span></li></ul>
-  <nav class="tabs" role="tablist" aria-label="Example searches"><a class="tab" id="tab-0" href="#ex-0" role="tab" aria-selected="true" aria-controls="ex-0">iphone xs pro</a><a class="tab" id="tab-1" href="#ex-1" role="tab" aria-selected="false" aria-controls="ex-1">ps5</a><a class="tab" id="tab-2" href="#ex-2" role="tab" aria-selected="false" aria-controls="ex-2">galaxy s9 plus</a><a class="tab" id="tab-3" href="#ex-3" role="tab" aria-selected="false" aria-controls="ex-3">ipad mini four</a><a class="tab" id="tab-4" href="#ex-4" role="tab" aria-selected="false" aria-controls="ex-4">apple airpods without case</a><a class="tab" id="tab-5" href="#ex-5" role="tab" aria-selected="false" aria-controls="ex-5">I want a google…</a><a class="tab" id="tab-6" href="#ex-6" role="tab" aria-selected="false" aria-controls="ex-6">lg refridgerators</a><a class="tab" id="tab-7" href="#ex-7" role="tab" aria-selected="false" aria-controls="ex-7">nintendo switch console <span class="tab-flag">fails</span></a></nav>
+  <nav class="tabs" role="tablist" aria-label="Example searches"><a class="tab" id="tab-0" href="#ex-0" role="tab" aria-selected="true" aria-controls="ex-0">iphone xs pro</a><a class="tab" id="tab-1" href="#ex-1" role="tab" aria-selected="false" aria-controls="ex-1">ps5</a><a class="tab" id="tab-2" href="#ex-2" role="tab" aria-selected="false" aria-controls="ex-2">galaxy s9 plus</a><a class="tab" id="tab-3" href="#ex-3" role="tab" aria-selected="false" aria-controls="ex-3">ipad mini four</a><a class="tab" id="tab-4" href="#ex-4" role="tab" aria-selected="false" aria-controls="ex-4">apple airpods without case</a><a class="tab" id="tab-5" href="#ex-5" role="tab" aria-selected="false" aria-controls="ex-5">chromebook (long request)</a><a class="tab" id="tab-6" href="#ex-6" role="tab" aria-selected="false" aria-controls="ex-6">lg refridgerators</a><a class="tab" id="tab-7" href="#ex-7" role="tab" aria-selected="false" aria-controls="ex-7">nintendo switch console <span class="tab-flag">fails</span></a></nav>
   
 <section class="example" id="ex-0" role="tabpanel" aria-labelledby="tab-0" data-mode="shoprank">
   <div class="example-head">
@@ -285,7 +289,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">Keyword search sees &#x27;iphone&#x27; and &#x27;pro&#x27; in screen-protector titles. ShopRank knows the shopper wants a phone.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.38</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.37</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.59</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.62</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">1.00</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.38</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.37</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.59</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.62</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">1.00</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -307,7 +311,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">Keyword search shows PlayStation 4 games first. ShopRank shows the PS5 console and PS5 games.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.65</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.89</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.87</span></li><li class="board-item is-best"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">1.00</span></li><li class="board-item is-ours"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.99</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.65</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.89</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.87</span></li><li class="board-item is-best"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">1.00</span></li><li class="board-item is-ours"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.99</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -329,7 +333,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">Keyword search starts with a privacy screen and a wallet case. ShopRank puts four Galaxy S9+ phones first.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.61</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.83</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.94</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.99</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.99</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.61</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.83</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.94</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.99</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.99</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -351,7 +355,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">The shopper typed &#x27;four&#x27; as a word. Keyword search shows cases; ShopRank understands they mean the iPad Mini 4 and shows the tablets.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.47</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.80</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">1.00</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">1.00</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">1.00</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.47</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.80</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">1.00</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">1.00</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">1.00</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -373,7 +377,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">&#x27;Without case&#x27; is the hard part. Keyword search shows AirPods bundles and case covers; ShopRank puts the AirPods themselves first.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.47</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.35</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.36</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.99</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.99</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.47</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.35</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.36</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.99</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.99</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -395,7 +399,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">A long, chat-style request, like one an AI assistant might pass on. ShopRank beats keyword search (which ranks a Chromecast at #4), but the big ready-made models do better on this kind of request.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.69</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.90</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.91</span></li><li class="board-item is-best"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.93</span></li><li class="board-item is-ours"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.79</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.69</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.90</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.91</span></li><li class="board-item is-best"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.93</span></li><li class="board-item is-ours"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.79</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -417,7 +421,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     <p class="fix">Spell checker changed it to <q class="q">lg refrigerators</q></p>
     <p class="note">A real customer typo. The spell checker fixes it, and ShopRank shows fridges instead of mostly spare parts.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search</span><span class="board-score">0.78</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.99</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.90</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.99</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">1.00</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.78</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.99</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.90</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.99</span></li><li class="board-item is-ours is-best"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">1.00</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
@@ -439,7 +443,7 @@ footer p { margin: 0 0 0.5rem; max-width: 52rem; }
     
     <p class="note">ShopRank fails here: the shopper asked for the Switch console, and ShopRank puts the cheaper Switch Lite first. Keyword search gets the exact console at #1.</p>
   </div>
-  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item is-best"><span class="board-name">Keyword search</span><span class="board-score">0.89</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.70</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.70</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.72</span></li><li class="board-item is-ours"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.72</span></li></ul></div>
+  <div class="board"><p class="board-title">Same search, five systems (ranking score, 1.0 = perfect)</p><ul><li class="board-item is-best"><span class="board-name">Keyword search<span class="board-size">word matching</span></span><span class="board-score">0.89</span></li><li class="board-item"><span class="board-name">BGE reranker<span class="board-size">568M, ready-made</span></span><span class="board-score">0.70</span></li><li class="board-item"><span class="board-name">Qwen3 reranker<span class="board-size">596M, ready-made</span></span><span class="board-score">0.70</span></li><li class="board-item"><span class="board-name">Teacher<span class="board-size">5 DeBERTa models</span></span><span class="board-score">0.72</span></li><li class="board-item is-ours"><span class="board-name">ShopRank<span class="board-size">33M, 32 MB</span></span><span class="board-score">0.72</span></li></ul></div>
   <div class="switch" role="group" aria-label="Show ranking by">
     <button type="button" data-show="bm25" aria-pressed="false">Keyword search</button>
     <button type="button" data-show="shoprank" aria-pressed="true">ShopRank</button>
