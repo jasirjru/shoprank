@@ -3,6 +3,12 @@
 **Live page: [shoprank-jasirjru.vercel.app](https://shoprank-jasirjru.vercel.app)**: real searches ranked by keyword
 search and by ShopRank, side by side. Model: [Hugging Face](https://huggingface.co/jasirjru/shoprank-reranker-minilm-int8).
 
+ShopRank re-orders product search results so the right product comes first. On Amazon's official Shopping Queries
+test (8,956 searches, scored once) the served model scores nDCG 0.867 against 0.820 for keyword search (BM25), and
+puts an exact match at #1 for 74.7% of searches against 62.7%. Compressed to a 32 MB INT8 file (0.001 lower on the
+dev set), it ranks a 16-product search in about 70 ms (median) on a laptop CPU. Built with Python, PyTorch, ONNX
+Runtime, FastAPI and Docker.
+
 Product search re-ranking on the Amazon Shopping Queries dataset (ESCI, Task 1, US English): from BM25 to a
 DeBERTa-v3 cross-encoder ensemble, distilled into a small model served on a CPU. Every test number has a 95%
 confidence interval, every run has a prediction written before it (`docs/lab_notebook.md`), and the official

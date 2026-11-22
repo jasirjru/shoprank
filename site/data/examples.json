@@ -214,7 +214,7 @@
    "query_id": 50847,
    "query": "holey jeans for babys",
    "query_used": "holey jeans for babys",
-   "note": "Casual words. Keyword search shows women's jeans; ShopRank finds ripped jeans for babies.",
+   "note": "Casual wording and a misspelling. Keyword search shows women's jeans; ShopRank finds ripped jeans for babies.",
    "ndcg": {
     "bm25": 0.4922,
     "shoprank": 0.9927
@@ -832,7 +832,7 @@
    "query_id": 61867,
    "query": "lg refridgerators",
    "query_used": "lg refrigerators",
-   "note": "A real customer typo. The spell checker fixes it, and ShopRank shows fridges instead of spare parts.",
+   "note": "A real customer typo. The spell checker fixes it, and ShopRank shows fridges instead of mostly spare parts.",
    "ndcg": {
     "bm25": 0.7815,
     "shoprank": 0.9996

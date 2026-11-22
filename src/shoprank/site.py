@@ -23,16 +23,25 @@ PORTFOLIO = "https://jasirjru-portfolio.vercel.app"
 GITHUB_PROFILE = "https://github.com/jasirjru"
 DATASET = "https://github.com/amazon-science/esci-data"
 OWNER = "Jasir Abdul Hameed"
+SITE = "https://shoprank-jasirjru.vercel.app"
 
-# Official ESCI Task 1 test (US, 8,956 queries), full-list nDCG, scored once (README.md).
+# Official ESCI Task 1 test (US, 8,956 queries), scored once: full-list nDCG (README.md) and the share of
+# queries whose top result is an Exact match, read from the saved test runs (rr_exact == 1).
 RESULTS = [
-    ("Keyword search", 0.8202, "baseline"),
-    ("Classic ranking with hand-made rules", 0.8337, ""),
-    ("Amazon's published method (my re-run)", 0.8544, "published baseline"),
-    ("ShopRank, this model", 0.8674, "this page"),
-    ("Big teacher model (needs a GPU)", 0.8877, "offline"),
+    ("Keyword search", 0.8202, 0.627, "baseline"),
+    ("Classic machine-learned ranking (LambdaMART)", 0.8337, 0.658, ""),
+    ("Amazon's MiniLM method, re-run by me", 0.8544, 0.716, "published baseline"),
+    ("ShopRank, before compression", 0.8674, 0.747, "this page"),
+    ("Large teacher model (too slow for a laptop)", 0.8877, 0.790, "offline"),
 ]
 SCALE_MIN, SCALE_MAX = 0.80, 0.90
+
+# Right product at #1 on the dev split by kind of search (all 2,001 dev queries through the real API, 22 Nov 2026).
+KNOWN_ITEM = [
+    ("With a model number, like \u201cfp30 piano\u201d", 413, 0.593, 0.782),
+    ("With a brand name", 338, 0.672, 0.766),
+    ("General browsing, like \u201cwomens running shoes 10.5\u201d", 1318, 0.618, 0.737),
+]
 
 MARKS = {  # authored SVG paths, one stroke family; shape (not colour) carries the label
     "Exact": '<path d="M4 12.5l5 5L20 6"/>',
@@ -107,14 +116,14 @@ def tabs(examples: list[dict]) -> str:
 
 def results_table() -> str:
     rows = []
-    for name, value, note in RESULTS:
+    for name, value, top1, note in RESULTS:
         width = (value - SCALE_MIN) / (SCALE_MAX - SCALE_MIN) * 100
         cls = " is-ours" if note == "this page" else ""
         rows.append(f'<tr class="result{cls}"><th scope="row">{escape(name)}</th>'
-                    f'<td class="value">{value:.3f}</td>'
+                    f'<td class="value">{value:.3f}</td><td class="value">{top1:.0%}</td>'
                     f'<td class="track" aria-hidden="true"><span class="bar" style="--w:{width:.1f}%"></span></td></tr>')
     return ('<table class="results"><caption class="sr">Ranking score on Amazon&#39;s official test</caption>'
-            '<thead><tr><th scope="col">Method</th><th scope="col">Score</th>'
+            '<thead><tr><th scope="col">Method</th><th scope="col">Score</th><th scope="col">Right at #1</th>'
             '<th scope="col" class="track-head" aria-hidden="true"><span>0.80</span><span>0.85</span><span>0.90</span>'
             f'</th></tr></thead><tbody>{"".join(rows)}</tbody></table>')
 
@@ -127,10 +136,20 @@ def proof_line(ex: dict) -> str:
         if item["label"] != "Exact":
             break
         lead += 1
-    where = (f"the first right product is number {bm25_first}" if bm25_first
+    where = (f"the first right product is number {bm25_first}"
+             + (f" (below the {ROWS_SHOWN} shown)" if bm25_first > ROWS_SHOWN else "") if bm25_first
              else "no right product appears at all")
     return (f'<p class="proof">Example: search <q class="q">{escape(ex["query"])}</q>. In keyword search, {where}. '
             f'ShopRank puts {lead} right product{"" if lead == 1 else "s"} first. <a href="#ex-0">See both lists</a></p>')
+
+
+def known_item_table() -> str:
+    rows = "".join(f'<tr><th scope="row">{label}<span class="count">{n:,} searches</span></th>'
+                   f'<td class="value">{bm:.0%}</td><td class="value ours">{sr:.0%}</td></tr>'
+                   for label, n, bm, sr in KNOWN_ITEM)
+    return ('<table class="results known"><caption class="sr">Right product at number 1, by kind of search</caption>'
+            '<thead><tr><th scope="col">Kind of search</th><th scope="col">Keyword search</th>'
+            f'<th scope="col">ShopRank</th></tr></thead><tbody>{rows}</tbody></table>')
 
 
 def legend() -> str:
@@ -147,7 +166,7 @@ GITHUB_ICON = ('<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><p
                '0016 8c0-4.42-3.58-8-8-8z"/></svg>')
 
 FONTS = ("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500"
-         "&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap")
+         "&family=Newsreader:ital,wght@0,400..600;1,400&display=swap")
 
 
 def page(data: dict, css: str, js: str) -> str:
@@ -159,9 +178,22 @@ def page(data: dict, css: str, js: str) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ShopRank: puts the right product first in Amazon product search</title>
-<meta name="description" content="A 32 MB re-ranking model that beats keyword search on Amazon's Shopping Queries benchmark: nDCG 0.867 vs 0.820 on the official test set. Real examples, numbers and code.">
+<title>ShopRank: puts the right product first in shop search</title>
+<meta name="description" content="A small AI model that re-orders shop search results so the right products come first: the top result is right in 75% of searches, against 63% for keyword search, on Amazon's public shopping benchmark. Real examples and code.">
 <meta name="theme-color" content="#fbf8f1">
+<link rel="canonical" href="{SITE}/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ShopRank">
+<meta property="og:url" content="{SITE}/">
+<meta property="og:title" content="ShopRank: puts the right product first in 3 of 4 shop searches">
+<meta property="og:description" content="A small AI model that re-orders shop search results. Right product at #1 in 75% of searches vs 63% for keyword search, on Amazon's public shopping benchmark. Real examples and code.">
+<meta property="og:image" content="{SITE}/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta property="og:image:alt" content="ShopRank: right product first in 75% of searches, against 63% for keyword search">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{SITE}/og.png">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -173,14 +205,14 @@ def page(data: dict, css: str, js: str) -> str:
 <div class="sheet">
 <header class="topbar">
   <a class="brand" href="#top" id="top">ShopRank</a>
-  <nav class="toplinks" aria-label="Project links"><a href="{REPO}">Code</a><a href="{MODEL}">Model</a></nav>
+  <nav class="toplinks" aria-label="Project links"><a href="{REPO}">Code</a><a href="{MODEL}">Model files</a></nav>
 </header>
 <main id="main">
 <section class="intro" aria-labelledby="headline">
-  <h1 id="headline">Puts the right product first in shop search</h1>
+  <h1 id="headline">Puts the right product first in 3 of 4 shop searches</h1>
   <div class="lede-block">
-  <p class="score"><span class="pair"><span class="num num-ours">0.867</span><span class="score-label">ShopRank</span></span><span class="pair"><span class="num num-base">0.820</span><span class="score-label">keyword search</span></span></p>
-  <p class="lede">Ranking score on Amazon's official test, where 1.0 is a perfect order. ShopRank is a small AI model that re-orders search results so the products people want come first. It runs on a normal laptop.</p>
+  <p class="score"><span class="pair"><span class="num num-ours">75%</span><span class="score-label">ShopRank</span></span><span class="pair"><span class="num num-base">63%</span><span class="score-label">plain keyword search</span></span></p>
+  <p class="lede">Share of searches where the top result is exactly what was asked for, on Amazon's public shopping-search test (8,956 searches). ShopRank is a small AI model that re-orders search results so the products people want come first. It runs on a laptop CPU, no GPU needed.</p>
   {proof_line(examples[0])}
   </div>
   <div class="actions">
@@ -193,7 +225,7 @@ def page(data: dict, css: str, js: str) -> str:
 
 <section aria-labelledby="examples-title">
   <h2 id="examples-title">See it work</h2>
-  <p class="section-lede">Real searches the model never saw while learning. Same products, two orders. The marks are Amazon's human labels.</p>
+  <p class="section-lede">Real searches the model never saw while learning, hand-picked to show typical wins and one failure. Across all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Both lists hold the same products in a different order; the ticks and crosses come from Amazon's human reviewers.</p>
   {legend()}
   {tabs(examples)}
   {panels}
@@ -201,17 +233,23 @@ def page(data: dict, css: str, js: str) -> str:
 
 <section aria-labelledby="results-title">
   <h2 id="results-title">The scores</h2>
-  <p class="section-lede">Amazon's official test: 8,956 searches, checked once at the end. Higher is better.</p>
+  <p class="section-lede">Amazon's public shopping-search test: 8,956 searches, scored only once, at the very end, so the result could not be tuned to the test. Score is the ranking score (1.0 = perfect order); &ldquo;Right at #1&rdquo; is how often the top result is exactly right.</p>
   {results_table()}
+</section>
+
+<section aria-labelledby="known-title">
+  <h2 id="known-title">Best when shoppers already know what they want</h2>
+  <p class="section-lede">Many shoppers now arrive after asking an AI assistant or reading reviews, and search for one specific product. Those searches gain the most: how often the top result is exactly right, on 2,001 development searches.</p>
+  {known_item_table()}
 </section>
 
 <section aria-labelledby="how-title">
   <h2 id="how-title">How it works</h2>
   <ol class="steps">
-    <li><p><strong>Big teacher.</strong> Five large models learn from Amazon's labelled searches. Accurate, but too slow for a normal computer.</p></li>
+    <li><p><strong>Big teacher.</strong> Five DeBERTa models learn from Amazon's labelled searches. Accurate, but too slow for a normal computer.</p></li>
     <li><p><strong>Small student.</strong> A small model learns to copy the teachers and keeps most of their skill.</p></li>
-    <li><p><strong>Compressed.</strong> Shrunk to 32&nbsp;MB, it ranks 16 products in 0.07 seconds on a laptop.</p></li>
-    <li><p><strong>Typo fix.</strong> Typos hurt the ranking, so a spell checker fixes the search first. It wins back almost 90% of the loss.</p></li>
+    <li><p><strong>Compressed.</strong> Shrunk to 32&nbsp;MB with almost no loss, it ranks a typical list of 16 products in about 0.07 seconds (median) on a laptop CPU.</p></li>
+    <li><p><strong>Typo fix.</strong> Typos hurt the ranking, so a spell checker fixes the search first. On made-up one-letter typos it wins back almost 90% of the accuracy that typos cost.</p></li>
   </ol>
 </section>
 
@@ -220,7 +258,7 @@ def page(data: dict, css: str, js: str) -> str:
   <ul class="limits">
     <li>Exact model names can trip it up: for <a href="#ex-{failure}">m23 for cars</a> it showed stickers, not McLaren M23 model cars.</li>
     <li>The spell checker sometimes &ldquo;fixes&rdquo; real names: <q>nivda</q> (Nvidia) became <q>nivea</q>.</li>
-    <li>It only re-orders a list it is given, and only for English (US) searches.</li>
+    <li>It does not search the whole catalogue: it re-orders the results another search returns, and only for English (US) searches.</li>
   </ul>
 </section>
 
@@ -231,7 +269,7 @@ def page(data: dict, css: str, js: str) -> str:
     <li><strong>Test discipline.</strong> Official test (8,956 queries) scored once after pre-registration; 95% query-bootstrap intervals and a trec_eval cross-check in the <a href="{REPO}#readme">README</a>. The examples above come from the dev split.</li>
     <li><strong>Teacher.</strong> 5-fold DeBERTa-v3-base cross-encoders, mean score: 0.8877 [0.8849, 0.8905].</li>
     <li><strong>Student.</strong> MiniLM-L12 (33M parameters) distilled with MSE on each pair's out-of-fold teacher score: 0.8674 [0.8643, 0.8703], +0.013 [+0.011, +0.015] over Amazon's MiniLM recipe re-run on the same queries (0.8544).</li>
-    <li><strong>Serving.</strong> ONNX Runtime dynamic INT8 (32 MB, dev -0.0008 vs fp32), FastAPI in Docker; p50 69 ms / p95 232 ms per 16-candidate request on a 16-thread laptop CPU.</li>
+    <li><strong>Serving.</strong> ONNX Runtime dynamic INT8 (32 MB, dev -0.0008 vs fp32), FastAPI in Docker; p50 69 ms / p95 232 ms per request (median 16 candidates) on a 16-thread laptop CPU.</li>
     <li><strong>Typos.</strong> One synthetic typo costs 0.028 dev nDCG. A one-edit spell corrector over the catalogue vocabulary recovers 87-90% on dev and dev2 with no measurable loss on clean queries; typo-augmented training recovered 14% and was rejected.</li>
     <li><strong>Ready-made rerankers.</strong> Zero-shot BGE-reranker-v2-m3 (568M) 0.8585 and Qwen3-Reranker-0.6B 0.8540 on dev, both below the served model (paired CIs exclude 0).</li>
     <li><strong>Read more.</strong> <a href="{REPO}/blob/main/docs/MODEL_CARD.md">Model card</a> · <a href="{REPO}/blob/main/docs/lab_notebook.md">Lab notebook</a> · <a href="{REPO}">Code</a></li>

@@ -37,5 +37,3 @@ Rules:
 3. Only if the check shows a real gap: label about 200 Manglish queries against one real shop catalogue and compare nDCG for default search versus ShopRank.
 
 Optional later (plan weeks 7-10): QLoRA query parser, serving optimisation, MLOps.
-
-Reference: `C:\Studio\Career\reports\shoprank_career_research_2026-11-17.md` (why ShopRank, honest score 7/10, sources).

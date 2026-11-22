@@ -35,6 +35,17 @@
   const fromHash = panels.findIndex((p) => "#" + p.id === location.hash);
   select(fromHash >= 0 ? fromHash : 0, false);
 
+  // In-page links to an example (proof line, "Where it fails") open that tab and scroll to it.
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="#ex-"]:not(.tab)');
+    if (!a) return;
+    const i = panels.findIndex((p) => "#" + p.id === a.getAttribute("href"));
+    if (i < 0) return;
+    e.preventDefault();
+    select(i, false);
+    panels[i].scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+  });
+
   // Switch: rows animate from their old rank to their new rank (FLIP), so the re-ranking is visible.
   document.querySelectorAll(".example").forEach((panel) => {
     const buttons = panel.querySelectorAll(".switch button");
