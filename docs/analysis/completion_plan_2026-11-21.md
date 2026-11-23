@@ -1,5 +1,7 @@
 # ShopRank: is it complete, and what is left? (21 Nov 2026)
 
+> **HISTORICAL SNAPSHOT, superseded.** Everything listed below as open was closed later (CI runs green, clean-clone reproduction passed, licence added, typo fix shipped). Current state: `README.md`, `CHANGELOG.md`, `docs/analysis/project_status_2026-11-21.md` and `docs/analysis/launch_audit_2026-11-22/`.
+
 > Snapshot taken before v1.0..v1.1.1. Gaps G1-G6 and the licence, Docker, tag and changelog items were closed the
 > same day; G4 (typos) was solved by spell correction, not by typo training: see `CHANGELOG.md`.
 

@@ -308,6 +308,7 @@ def page(data: dict, css: str, js: str) -> str:
 <section aria-labelledby="limits-title">
   <h2 id="limits-title">Where it fails</h2>
   <ul class="limits">
+    <li>Keyword search still ranks better on about a third of searches, though mostly by a little: in over half of those the difference is under 0.05 on the 1.0 scale (development set).</li>
     <li>Exact product names can trip it up: for <a href="#ex-{failure}">nintendo switch console</a> it put the cheaper Switch Lite first, while keyword search found the console.</li>
     <li>On long, chat-style requests the big ready-made models can rank better (see the Chromebook example).</li>
     <li>The spell checker sometimes &ldquo;fixes&rdquo; real names: <q>nivda</q> (Nvidia) became <q>nivea</q>.</li>

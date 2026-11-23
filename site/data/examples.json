@@ -10,219 +10,6 @@
  },
  "examples": [
   {
-   "query_id": 54672,
-   "query": "iphone xs pro",
-   "query_used": "iphone xs pro",
-   "note": "Keyword search sees 'iphone' and 'pro' in screen-protector titles. ShopRank knows the shopper wants a phone.",
-   "ndcg": {
-    "bm25": 0.377,
-    "shoprank": 1.0
-   },
-   "bm25": [
-    {
-     "product_id": "B07JFVM28K",
-     "title": "Fotbor for iPhone Xs Max/iPhone 11 Pro Max Privacy Screen Protector, 2 Pack iPhone Xs Max Screen Protector/iPhone 11 Pro Max Screen Portector 6.5 Inch 9H Hardness Tempered Glass Anti Spy Case Friendly",
-     "brand": "Fotbor",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07QMZPV8M",
-     "title": "Purity Screen Protector for Apple iPhone 11 Pro/iPhone Xs/iPhone X - 3 Pack (w/Installation Frame) Tempered Glass Screen Protector Compatible iPhone XS/X/11Pro (3 Pack) [Fit with Most Cases]",
-     "brand": "Purity",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07515P7PT",
-     "title": "JETech Screen Protector for iPhone 11 Pro, for iPhone Xs, for iPhone X, 5.8-Inch, Tempered Glass Film, 2-Pack",
-     "brand": "JETech",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07VLYNWX9",
-     "title": "Mkeke Compatible with iPhone 11 Pro Screen Protector, iPhone X Screen Protector, iPhone Xs Tempered Glass Screen Protector All 5.8 inch New iPhone [3-Pack]",
-     "brand": "Mkeke",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07GZQBVPC",
-     "title": "JETech Screen Protector for iPhone 11 Pro Max and iPhone Xs Max 6.5-Inch, Tempered Glass Film, 2-Pack",
-     "brand": "JETech",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07YFYKVMZ",
-     "title": "Mkeke Compatible with iPhone 11 Pro Max Screen Protector, iPhone Xs Max Screen Protector Tempered Glass -3 Pack 6.5\"",
-     "brand": "Mkeke",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07H1DHJBV",
-     "title": "Ailun Screen Protector Compatible for iPhone 11 Pro Max/iPhone Xs Max 3 Pack 6.5 Inch 2019/2018 Release Case Friendly Tempered Glass",
-     "brand": "Ailun",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B075S8V728",
-     "title": "Ailun for Apple iPhone 11 Pro/iPhone Xs/iPhone X Screen Protector,3 Pack,5.8 Inch Display,Tempered Glass 2.5D Edge Work Most Case[NOT for iPhone 11,6.1 inch]",
-     "brand": "Ailun",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B073DLZWX7",
-     "title": "Maxboost Screen Protector for Apple iPhone Xs & iPhone X & iPhone 11 Pro (3 Packs, Clear) 0.25mm Tempered Glass Screen Protector with Advanced Clarity [3D Touch] Work w/Most Case 99% Touch Accurate",
-     "brand": "Maxboost",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07FQY28GR",
-     "title": "TETHYS Glass Screen Protector Designed for Apple iPhone 11 Pro Max/iPhone Xs Max (6.5\") [Edge to Edge Coverage] Full Protection Durable Tempered Glass [Guidance Frame Included] - Pack of 3",
-     "brand": "TETHYS",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07KMDX68M",
-     "title": "Mothca Matte Screen Protector for iPhone Xs Max/iPhone 11 Pro Max Anti-Glare & Anti-Fingerprint Tempered Glass Clear Film Case Friendly 3D Touch Easy Install Bubble Free - Smooth as Silk",
-     "brand": "Mothca",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07SC58QBW",
-     "title": "(Renewed) Apple iPhone XS, US Version, 64GB, Space Gray - Unlocked",
-     "brand": "Apple",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07QC4K9BH",
-     "title": "(2 Pack) Supershieldz Designed for Apple iPhone 11 Pro Max and iPhone Xs Max (6.5 inch) (Privacy) Anti Spy Tempered Glass Screen Protector with (Easy Installation Tray) Anti Scratch, Bubble Free",
-     "brand": "Supershieldz",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07FP41MC5",
-     "title": "Trianium (3 Packs) Screen Protector Designed for Apple iPhone 11 Pro Max, iPhone XS Max (6.5\" 2018) Premium HD Clarity 0.25mm Tempered Glass Screen Protector Easy Installation Alignment Case (3-Pack)",
-     "brand": "Trianium",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07K8RNW7H",
-     "title": "(Renewed) Apple iPhone XS Max, US Version, 64GB, Space Gray - Unlocked",
-     "brand": "Apple",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07ZQSKGLZ",
-     "title": "Apple iPhone 11 Pro Max, US Version, 512GB, Midnight Green - Unlocked (Renewed)",
-     "brand": "Apple",
-     "label": "Exact"
-    }
-   ],
-   "shoprank": [
-    {
-     "product_id": "B07SC58QBW",
-     "title": "(Renewed) Apple iPhone XS, US Version, 64GB, Space Gray - Unlocked",
-     "brand": "Apple",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07K8RNW7H",
-     "title": "(Renewed) Apple iPhone XS Max, US Version, 64GB, Space Gray - Unlocked",
-     "brand": "Apple",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B07ZQSKGLZ",
-     "title": "Apple iPhone 11 Pro Max, US Version, 512GB, Midnight Green - Unlocked (Renewed)",
-     "brand": "Apple",
-     "label": "Exact"
-    },
-    {
-     "product_id": "B075S8V728",
-     "title": "Ailun for Apple iPhone 11 Pro/iPhone Xs/iPhone X Screen Protector,3 Pack,5.8 Inch Display,Tempered Glass 2.5D Edge Work Most Case[NOT for iPhone 11,6.1 inch]",
-     "brand": "Ailun",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07YFYKVMZ",
-     "title": "Mkeke Compatible with iPhone 11 Pro Max Screen Protector, iPhone Xs Max Screen Protector Tempered Glass -3 Pack 6.5\"",
-     "brand": "Mkeke",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07GZQBVPC",
-     "title": "JETech Screen Protector for iPhone 11 Pro Max and iPhone Xs Max 6.5-Inch, Tempered Glass Film, 2-Pack",
-     "brand": "JETech",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07JFVM28K",
-     "title": "Fotbor for iPhone Xs Max/iPhone 11 Pro Max Privacy Screen Protector, 2 Pack iPhone Xs Max Screen Protector/iPhone 11 Pro Max Screen Portector 6.5 Inch 9H Hardness Tempered Glass Anti Spy Case Friendly",
-     "brand": "Fotbor",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07H1DHJBV",
-     "title": "Ailun Screen Protector Compatible for iPhone 11 Pro Max/iPhone Xs Max 3 Pack 6.5 Inch 2019/2018 Release Case Friendly Tempered Glass",
-     "brand": "Ailun",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07FQY28GR",
-     "title": "TETHYS Glass Screen Protector Designed for Apple iPhone 11 Pro Max/iPhone Xs Max (6.5\") [Edge to Edge Coverage] Full Protection Durable Tempered Glass [Guidance Frame Included] - Pack of 3",
-     "brand": "TETHYS",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07KMDX68M",
-     "title": "Mothca Matte Screen Protector for iPhone Xs Max/iPhone 11 Pro Max Anti-Glare & Anti-Fingerprint Tempered Glass Clear Film Case Friendly 3D Touch Easy Install Bubble Free - Smooth as Silk",
-     "brand": "Mothca",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B073DLZWX7",
-     "title": "Maxboost Screen Protector for Apple iPhone Xs & iPhone X & iPhone 11 Pro (3 Packs, Clear) 0.25mm Tempered Glass Screen Protector with Advanced Clarity [3D Touch] Work w/Most Case 99% Touch Accurate",
-     "brand": "Maxboost",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07FP41MC5",
-     "title": "Trianium (3 Packs) Screen Protector Designed for Apple iPhone 11 Pro Max, iPhone XS Max (6.5\" 2018) Premium HD Clarity 0.25mm Tempered Glass Screen Protector Easy Installation Alignment Case (3-Pack)",
-     "brand": "Trianium",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07515P7PT",
-     "title": "JETech Screen Protector for iPhone 11 Pro, for iPhone Xs, for iPhone X, 5.8-Inch, Tempered Glass Film, 2-Pack",
-     "brand": "JETech",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07QC4K9BH",
-     "title": "(2 Pack) Supershieldz Designed for Apple iPhone 11 Pro Max and iPhone Xs Max (6.5 inch) (Privacy) Anti Spy Tempered Glass Screen Protector with (Easy Installation Tray) Anti Scratch, Bubble Free",
-     "brand": "Supershieldz",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07QMZPV8M",
-     "title": "Purity Screen Protector for Apple iPhone 11 Pro/iPhone Xs/iPhone X - 3 Pack (w/Installation Frame) Tempered Glass Screen Protector Compatible iPhone XS/X/11Pro (3 Pack) [Fit with Most Cases]",
-     "brand": "Purity",
-     "label": "Complement"
-    },
-    {
-     "product_id": "B07VLYNWX9",
-     "title": "Mkeke Compatible with iPhone 11 Pro Screen Protector, iPhone X Screen Protector, iPhone Xs Tempered Glass Screen Protector All 5.8 inch New iPhone [3-Pack]",
-     "brand": "Mkeke",
-     "label": "Complement"
-    }
-   ],
-   "others": {
-    "bge": 0.3705,
-    "qwen3": 0.5899,
-    "teacher": 0.6156
-   },
-   "headline": "Screen protectors \u2192 the phones",
-   "suit": "phones"
-  },
-  {
    "query_id": 83990,
    "query": "ps5",
    "query_used": "ps5",
@@ -434,6 +221,219 @@
    },
    "headline": "PS4 games \u2192 the PS5",
    "suit": "consoles"
+  },
+  {
+   "query_id": 9651,
+   "query": "apple airpods without case",
+   "query_used": "apple airpods without case",
+   "note": "'Without case' is the hard part. Keyword search shows AirPods bundles and case covers; ShopRank puts the AirPods themselves first.",
+   "ndcg": {
+    "bm25": 0.4723,
+    "shoprank": 0.9886
+   },
+   "bm25": [
+    {
+     "product_id": "B07PYLT6DN",
+     "title": "Apple AirPods with Wireless Charging Case",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07SJJ7FTJ",
+     "title": "(Renewed) Apple AirPods with Wireless Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07SKLLYTW",
+     "title": "(Renewed) Apple AirPods 2 with Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07RLVXV5B",
+     "title": "AirPods Case, Full Protective Silicone AirPods Accessories Cover Compatible with Apple AirPods 1&2 Wireless and Wired Charging Case(Front LED Visible),Black",
+     "brand": "SATLITOG",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09G6F6WCY",
+     "title": "Thick AirPods Case Cover 2nd/1st Generation with Keychain&Carabiner,Full Protective Silicone Case AirPods Compatible for Apple AirPods Wired&Wireless Charging Case for Woman Men,Blue",
+     "brand": "Risehigh",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B09B6Z3SK6",
+     "title": "Faith Can Move Mountains AirPods Case Protective Cover,Matching Airpods Anti-Lost Hook,Black Skin Charging Case Cover for Apple AirPods 2 and 1 (Black)",
+     "brand": "Jaustee",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08XX7MTKL",
+     "title": "Airpods Case Cover, LELONG Soft Silicone Protective Case Cover with Keychain for Apple Airpods 2nd 1st Charging Case Men Women [Front LED Visible]",
+     "brand": "Lelong",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B089H1XRTQ",
+     "title": "Deppa Soft Protective Airpods Pro Case Cover Silicone Skin for Apple Airpod Pro 2019 Without Keychain (Front LED Visible) (hinged) (Sky Blue)",
+     "brand": "Deppa",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07PXGQC1Q",
+     "title": "Apple AirPods (2nd Generation)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B08ZXKBRN2",
+     "title": "Maxjoy Compatible AirPods Pro Case Cover, Clear Butterfly Case Cute Protective Soft Shockproof Case with Keychain for Girls Women Men Compatible with Apple AirPods Pro 2019 Wireless Charging Case,Blue",
+     "brand": "Maxjoy",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SK76S84",
+     "title": "Airpods Case, Full Body Protection and Durable TPU Waterproof and Shockproof Case Charging Earphone Cover with Anti-Lost Carabiner for Apple Airpods 1 and 2 Charging Box (Dark Blue)",
+     "brand": "EVERITES",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09CD8KS8D",
+     "title": "VOFUOE for AirPods Case 2&1 with Keychain\u00a0Pop Fidget Sensory Toys Push Bubble it Cases Soft Silicone Apple AirPod Cover Shockproof Stress Reliever Pop Sound Case for AirPods 2&1(Blue Red)",
+     "brand": "VOFUOE",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08YYK8FJN",
+     "title": "wenew Protective Case Cover Designed for Apple Airpods Pro 2019, Cute Fadeless Patterns Shockproof Hard Case Cover with Portable Keychain for Girls Women Men (Blue)",
+     "brand": "wenew",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09CTT9DS2",
+     "title": "Halloween Airpods Pro Case Cover, Cool 2 Pack Luminous Skull & Pumpkin Airpod Case, Cute 3D Cartoon Funny Character Soft Silicone Case Compatible with AirPod Pro Case for Kids Boys Girls with Keychain",
+     "brand": "Skyconser",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09DFQQ5V2",
+     "title": "Dexnor Compatible with Airpods Pro Case Clear Hard PC & Silicone Protective Cover [LED Visible] [Supports Wireless Charging] 360 Full Body Skin for Men Boys - Black",
+     "brand": "Dexnor",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B08C4KWM9T",
+     "title": "Bose QuietComfort Noise Cancelling Earbuds - Bluetooth Wireless Earphones, Triple Black, the World's Most Effective Noise Cancelling Earbuds",
+     "brand": "Bose",
+     "label": "Substitute"
+    }
+   ],
+   "shoprank": [
+    {
+     "product_id": "B07PXGQC1Q",
+     "title": "Apple AirPods (2nd Generation)",
+     "brand": "Apple",
+     "label": "Exact"
+    },
+    {
+     "product_id": "B07SJJ7FTJ",
+     "title": "(Renewed) Apple AirPods with Wireless Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07PYLT6DN",
+     "title": "Apple AirPods with Wireless Charging Case",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09DFQQ5V2",
+     "title": "Dexnor Compatible with Airpods Pro Case Clear Hard PC & Silicone Protective Cover [LED Visible] [Supports Wireless Charging] 360 Full Body Skin for Men Boys - Black",
+     "brand": "Dexnor",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B07SKLLYTW",
+     "title": "(Renewed) Apple AirPods 2 with Charging Case - White",
+     "brand": "Apple",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09CD8KS8D",
+     "title": "VOFUOE for AirPods Case 2&1 with Keychain\u00a0Pop Fidget Sensory Toys Push Bubble it Cases Soft Silicone Apple AirPod Cover Shockproof Stress Reliever Pop Sound Case for AirPods 2&1(Blue Red)",
+     "brand": "VOFUOE",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B09G6F6WCY",
+     "title": "Thick AirPods Case Cover 2nd/1st Generation with Keychain&Carabiner,Full Protective Silicone Case AirPods Compatible for Apple AirPods Wired&Wireless Charging Case for Woman Men,Blue",
+     "brand": "Risehigh",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07RLVXV5B",
+     "title": "AirPods Case, Full Protective Silicone AirPods Accessories Cover Compatible with Apple AirPods 1&2 Wireless and Wired Charging Case(Front LED Visible),Black",
+     "brand": "SATLITOG",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08ZXKBRN2",
+     "title": "Maxjoy Compatible AirPods Pro Case Cover, Clear Butterfly Case Cute Protective Soft Shockproof Case with Keychain for Girls Women Men Compatible with Apple AirPods Pro 2019 Wireless Charging Case,Blue",
+     "brand": "Maxjoy",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B08C4KWM9T",
+     "title": "Bose QuietComfort Noise Cancelling Earbuds - Bluetooth Wireless Earphones, Triple Black, the World's Most Effective Noise Cancelling Earbuds",
+     "brand": "Bose",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B09CTT9DS2",
+     "title": "Halloween Airpods Pro Case Cover, Cool 2 Pack Luminous Skull & Pumpkin Airpod Case, Cute 3D Cartoon Funny Character Soft Silicone Case Compatible with AirPod Pro Case for Kids Boys Girls with Keychain",
+     "brand": "Skyconser",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08XX7MTKL",
+     "title": "Airpods Case Cover, LELONG Soft Silicone Protective Case Cover with Keychain for Apple Airpods 2nd 1st Charging Case Men Women [Front LED Visible]",
+     "brand": "Lelong",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B09B6Z3SK6",
+     "title": "Faith Can Move Mountains AirPods Case Protective Cover,Matching Airpods Anti-Lost Hook,Black Skin Charging Case Cover for Apple AirPods 2 and 1 (Black)",
+     "brand": "Jaustee",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B07SK76S84",
+     "title": "Airpods Case, Full Body Protection and Durable TPU Waterproof and Shockproof Case Charging Earphone Cover with Anti-Lost Carabiner for Apple Airpods 1 and 2 Charging Box (Dark Blue)",
+     "brand": "EVERITES",
+     "label": "Irrelevant"
+    },
+    {
+     "product_id": "B08YYK8FJN",
+     "title": "wenew Protective Case Cover Designed for Apple Airpods Pro 2019, Cute Fadeless Patterns Shockproof Hard Case Cover with Portable Keychain for Girls Women Men (Blue)",
+     "brand": "wenew",
+     "label": "Substitute"
+    },
+    {
+     "product_id": "B089H1XRTQ",
+     "title": "Deppa Soft Protective Airpods Pro Case Cover Silicone Skin for Apple Airpod Pro 2019 Without Keychain (Front LED Visible) (hinged) (Sky Blue)",
+     "brand": "Deppa",
+     "label": "Complement"
+    }
+   ],
+   "others": {
+    "bge": 0.3533,
+    "qwen3": 0.3584,
+    "teacher": 0.9854
+   },
+   "headline": "Understands \u201cwithout case\u201d",
+   "suit": "home"
   },
   {
    "query_id": 44041,
@@ -826,217 +826,217 @@
    "suit": "tablets"
   },
   {
-   "query_id": 9651,
-   "query": "apple airpods without case",
-   "query_used": "apple airpods without case",
-   "note": "'Without case' is the hard part. Keyword search shows AirPods bundles and case covers; ShopRank puts the AirPods themselves first.",
+   "query_id": 54672,
+   "query": "iphone xs pro",
+   "query_used": "iphone xs pro",
+   "note": "Keyword search sees 'iphone' and 'pro' in screen-protector titles. ShopRank knows the shopper wants a phone.",
    "ndcg": {
-    "bm25": 0.4723,
-    "shoprank": 0.9886
+    "bm25": 0.377,
+    "shoprank": 1.0
    },
    "bm25": [
     {
-     "product_id": "B07PYLT6DN",
-     "title": "Apple AirPods with Wireless Charging Case",
-     "brand": "Apple",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07SJJ7FTJ",
-     "title": "(Renewed) Apple AirPods with Wireless Charging Case - White",
-     "brand": "Apple",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07SKLLYTW",
-     "title": "(Renewed) Apple AirPods 2 with Charging Case - White",
-     "brand": "Apple",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07RLVXV5B",
-     "title": "AirPods Case, Full Protective Silicone AirPods Accessories Cover Compatible with Apple AirPods 1&2 Wireless and Wired Charging Case(Front LED Visible),Black",
-     "brand": "SATLITOG",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B09G6F6WCY",
-     "title": "Thick AirPods Case Cover 2nd/1st Generation with Keychain&Carabiner,Full Protective Silicone Case AirPods Compatible for Apple AirPods Wired&Wireless Charging Case for Woman Men,Blue",
-     "brand": "Risehigh",
+     "product_id": "B07JFVM28K",
+     "title": "Fotbor for iPhone Xs Max/iPhone 11 Pro Max Privacy Screen Protector, 2 Pack iPhone Xs Max Screen Protector/iPhone 11 Pro Max Screen Portector 6.5 Inch 9H Hardness Tempered Glass Anti Spy Case Friendly",
+     "brand": "Fotbor",
      "label": "Complement"
     },
     {
-     "product_id": "B09B6Z3SK6",
-     "title": "Faith Can Move Mountains AirPods Case Protective Cover,Matching Airpods Anti-Lost Hook,Black Skin Charging Case Cover for Apple AirPods 2 and 1 (Black)",
-     "brand": "Jaustee",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B08XX7MTKL",
-     "title": "Airpods Case Cover, LELONG Soft Silicone Protective Case Cover with Keychain for Apple Airpods 2nd 1st Charging Case Men Women [Front LED Visible]",
-     "brand": "Lelong",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B089H1XRTQ",
-     "title": "Deppa Soft Protective Airpods Pro Case Cover Silicone Skin for Apple Airpod Pro 2019 Without Keychain (Front LED Visible) (hinged) (Sky Blue)",
-     "brand": "Deppa",
+     "product_id": "B07QMZPV8M",
+     "title": "Purity Screen Protector for Apple iPhone 11 Pro/iPhone Xs/iPhone X - 3 Pack (w/Installation Frame) Tempered Glass Screen Protector Compatible iPhone XS/X/11Pro (3 Pack) [Fit with Most Cases]",
+     "brand": "Purity",
      "label": "Complement"
     },
     {
-     "product_id": "B07PXGQC1Q",
-     "title": "Apple AirPods (2nd Generation)",
+     "product_id": "B07515P7PT",
+     "title": "JETech Screen Protector for iPhone 11 Pro, for iPhone Xs, for iPhone X, 5.8-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07VLYNWX9",
+     "title": "Mkeke Compatible with iPhone 11 Pro Screen Protector, iPhone X Screen Protector, iPhone Xs Tempered Glass Screen Protector All 5.8 inch New iPhone [3-Pack]",
+     "brand": "Mkeke",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07GZQBVPC",
+     "title": "JETech Screen Protector for iPhone 11 Pro Max and iPhone Xs Max 6.5-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07YFYKVMZ",
+     "title": "Mkeke Compatible with iPhone 11 Pro Max Screen Protector, iPhone Xs Max Screen Protector Tempered Glass -3 Pack 6.5\"",
+     "brand": "Mkeke",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07H1DHJBV",
+     "title": "Ailun Screen Protector Compatible for iPhone 11 Pro Max/iPhone Xs Max 3 Pack 6.5 Inch 2019/2018 Release Case Friendly Tempered Glass",
+     "brand": "Ailun",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B075S8V728",
+     "title": "Ailun for Apple iPhone 11 Pro/iPhone Xs/iPhone X Screen Protector,3 Pack,5.8 Inch Display,Tempered Glass 2.5D Edge Work Most Case[NOT for iPhone 11,6.1 inch]",
+     "brand": "Ailun",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B073DLZWX7",
+     "title": "Maxboost Screen Protector for Apple iPhone Xs & iPhone X & iPhone 11 Pro (3 Packs, Clear) 0.25mm Tempered Glass Screen Protector with Advanced Clarity [3D Touch] Work w/Most Case 99% Touch Accurate",
+     "brand": "Maxboost",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07FQY28GR",
+     "title": "TETHYS Glass Screen Protector Designed for Apple iPhone 11 Pro Max/iPhone Xs Max (6.5\") [Edge to Edge Coverage] Full Protection Durable Tempered Glass [Guidance Frame Included] - Pack of 3",
+     "brand": "TETHYS",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07KMDX68M",
+     "title": "Mothca Matte Screen Protector for iPhone Xs Max/iPhone 11 Pro Max Anti-Glare & Anti-Fingerprint Tempered Glass Clear Film Case Friendly 3D Touch Easy Install Bubble Free - Smooth as Silk",
+     "brand": "Mothca",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07SC58QBW",
+     "title": "(Renewed) Apple iPhone XS, US Version, 64GB, Space Gray - Unlocked",
      "brand": "Apple",
      "label": "Exact"
     },
     {
-     "product_id": "B08ZXKBRN2",
-     "title": "Maxjoy Compatible AirPods Pro Case Cover, Clear Butterfly Case Cute Protective Soft Shockproof Case with Keychain for Girls Women Men Compatible with Apple AirPods Pro 2019 Wireless Charging Case,Blue",
-     "brand": "Maxjoy",
+     "product_id": "B07QC4K9BH",
+     "title": "(2 Pack) Supershieldz Designed for Apple iPhone 11 Pro Max and iPhone Xs Max (6.5 inch) (Privacy) Anti Spy Tempered Glass Screen Protector with (Easy Installation Tray) Anti Scratch, Bubble Free",
+     "brand": "Supershieldz",
      "label": "Complement"
     },
     {
-     "product_id": "B07SK76S84",
-     "title": "Airpods Case, Full Body Protection and Durable TPU Waterproof and Shockproof Case Charging Earphone Cover with Anti-Lost Carabiner for Apple Airpods 1 and 2 Charging Box (Dark Blue)",
-     "brand": "EVERITES",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B09CD8KS8D",
-     "title": "VOFUOE for AirPods Case 2&1 with Keychain\u00a0Pop Fidget Sensory Toys Push Bubble it Cases Soft Silicone Apple AirPod Cover Shockproof Stress Reliever Pop Sound Case for AirPods 2&1(Blue Red)",
-     "brand": "VOFUOE",
+     "product_id": "B07FP41MC5",
+     "title": "Trianium (3 Packs) Screen Protector Designed for Apple iPhone 11 Pro Max, iPhone XS Max (6.5\" 2018) Premium HD Clarity 0.25mm Tempered Glass Screen Protector Easy Installation Alignment Case (3-Pack)",
+     "brand": "Trianium",
      "label": "Complement"
     },
     {
-     "product_id": "B08YYK8FJN",
-     "title": "wenew Protective Case Cover Designed for Apple Airpods Pro 2019, Cute Fadeless Patterns Shockproof Hard Case Cover with Portable Keychain for Girls Women Men (Blue)",
-     "brand": "wenew",
-     "label": "Substitute"
+     "product_id": "B07K8RNW7H",
+     "title": "(Renewed) Apple iPhone XS Max, US Version, 64GB, Space Gray - Unlocked",
+     "brand": "Apple",
+     "label": "Exact"
     },
     {
-     "product_id": "B09CTT9DS2",
-     "title": "Halloween Airpods Pro Case Cover, Cool 2 Pack Luminous Skull & Pumpkin Airpod Case, Cute 3D Cartoon Funny Character Soft Silicone Case Compatible with AirPod Pro Case for Kids Boys Girls with Keychain",
-     "brand": "Skyconser",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B09DFQQ5V2",
-     "title": "Dexnor Compatible with Airpods Pro Case Clear Hard PC & Silicone Protective Cover [LED Visible] [Supports Wireless Charging] 360 Full Body Skin for Men Boys - Black",
-     "brand": "Dexnor",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B08C4KWM9T",
-     "title": "Bose QuietComfort Noise Cancelling Earbuds - Bluetooth Wireless Earphones, Triple Black, the World's Most Effective Noise Cancelling Earbuds",
-     "brand": "Bose",
-     "label": "Substitute"
+     "product_id": "B07ZQSKGLZ",
+     "title": "Apple iPhone 11 Pro Max, US Version, 512GB, Midnight Green - Unlocked (Renewed)",
+     "brand": "Apple",
+     "label": "Exact"
     }
    ],
    "shoprank": [
     {
-     "product_id": "B07PXGQC1Q",
-     "title": "Apple AirPods (2nd Generation)",
+     "product_id": "B07SC58QBW",
+     "title": "(Renewed) Apple iPhone XS, US Version, 64GB, Space Gray - Unlocked",
      "brand": "Apple",
      "label": "Exact"
     },
     {
-     "product_id": "B07SJJ7FTJ",
-     "title": "(Renewed) Apple AirPods with Wireless Charging Case - White",
+     "product_id": "B07K8RNW7H",
+     "title": "(Renewed) Apple iPhone XS Max, US Version, 64GB, Space Gray - Unlocked",
      "brand": "Apple",
-     "label": "Substitute"
+     "label": "Exact"
     },
     {
-     "product_id": "B07PYLT6DN",
-     "title": "Apple AirPods with Wireless Charging Case",
+     "product_id": "B07ZQSKGLZ",
+     "title": "Apple iPhone 11 Pro Max, US Version, 512GB, Midnight Green - Unlocked (Renewed)",
      "brand": "Apple",
-     "label": "Substitute"
+     "label": "Exact"
     },
     {
-     "product_id": "B09DFQQ5V2",
-     "title": "Dexnor Compatible with Airpods Pro Case Clear Hard PC & Silicone Protective Cover [LED Visible] [Supports Wireless Charging] 360 Full Body Skin for Men Boys - Black",
-     "brand": "Dexnor",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B07SKLLYTW",
-     "title": "(Renewed) Apple AirPods 2 with Charging Case - White",
-     "brand": "Apple",
-     "label": "Substitute"
-    },
-    {
-     "product_id": "B09CD8KS8D",
-     "title": "VOFUOE for AirPods Case 2&1 with Keychain\u00a0Pop Fidget Sensory Toys Push Bubble it Cases Soft Silicone Apple AirPod Cover Shockproof Stress Reliever Pop Sound Case for AirPods 2&1(Blue Red)",
-     "brand": "VOFUOE",
+     "product_id": "B075S8V728",
+     "title": "Ailun for Apple iPhone 11 Pro/iPhone Xs/iPhone X Screen Protector,3 Pack,5.8 Inch Display,Tempered Glass 2.5D Edge Work Most Case[NOT for iPhone 11,6.1 inch]",
+     "brand": "Ailun",
      "label": "Complement"
     },
     {
-     "product_id": "B09G6F6WCY",
-     "title": "Thick AirPods Case Cover 2nd/1st Generation with Keychain&Carabiner,Full Protective Silicone Case AirPods Compatible for Apple AirPods Wired&Wireless Charging Case for Woman Men,Blue",
-     "brand": "Risehigh",
+     "product_id": "B07YFYKVMZ",
+     "title": "Mkeke Compatible with iPhone 11 Pro Max Screen Protector, iPhone Xs Max Screen Protector Tempered Glass -3 Pack 6.5\"",
+     "brand": "Mkeke",
      "label": "Complement"
     },
     {
-     "product_id": "B07RLVXV5B",
-     "title": "AirPods Case, Full Protective Silicone AirPods Accessories Cover Compatible with Apple AirPods 1&2 Wireless and Wired Charging Case(Front LED Visible),Black",
-     "brand": "SATLITOG",
-     "label": "Irrelevant"
-    },
-    {
-     "product_id": "B08ZXKBRN2",
-     "title": "Maxjoy Compatible AirPods Pro Case Cover, Clear Butterfly Case Cute Protective Soft Shockproof Case with Keychain for Girls Women Men Compatible with Apple AirPods Pro 2019 Wireless Charging Case,Blue",
-     "brand": "Maxjoy",
+     "product_id": "B07GZQBVPC",
+     "title": "JETech Screen Protector for iPhone 11 Pro Max and iPhone Xs Max 6.5-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
      "label": "Complement"
     },
     {
-     "product_id": "B08C4KWM9T",
-     "title": "Bose QuietComfort Noise Cancelling Earbuds - Bluetooth Wireless Earphones, Triple Black, the World's Most Effective Noise Cancelling Earbuds",
-     "brand": "Bose",
-     "label": "Substitute"
+     "product_id": "B07JFVM28K",
+     "title": "Fotbor for iPhone Xs Max/iPhone 11 Pro Max Privacy Screen Protector, 2 Pack iPhone Xs Max Screen Protector/iPhone 11 Pro Max Screen Portector 6.5 Inch 9H Hardness Tempered Glass Anti Spy Case Friendly",
+     "brand": "Fotbor",
+     "label": "Complement"
     },
     {
-     "product_id": "B09CTT9DS2",
-     "title": "Halloween Airpods Pro Case Cover, Cool 2 Pack Luminous Skull & Pumpkin Airpod Case, Cute 3D Cartoon Funny Character Soft Silicone Case Compatible with AirPod Pro Case for Kids Boys Girls with Keychain",
-     "brand": "Skyconser",
-     "label": "Irrelevant"
+     "product_id": "B07H1DHJBV",
+     "title": "Ailun Screen Protector Compatible for iPhone 11 Pro Max/iPhone Xs Max 3 Pack 6.5 Inch 2019/2018 Release Case Friendly Tempered Glass",
+     "brand": "Ailun",
+     "label": "Complement"
     },
     {
-     "product_id": "B08XX7MTKL",
-     "title": "Airpods Case Cover, LELONG Soft Silicone Protective Case Cover with Keychain for Apple Airpods 2nd 1st Charging Case Men Women [Front LED Visible]",
-     "brand": "Lelong",
-     "label": "Irrelevant"
+     "product_id": "B07FQY28GR",
+     "title": "TETHYS Glass Screen Protector Designed for Apple iPhone 11 Pro Max/iPhone Xs Max (6.5\") [Edge to Edge Coverage] Full Protection Durable Tempered Glass [Guidance Frame Included] - Pack of 3",
+     "brand": "TETHYS",
+     "label": "Complement"
     },
     {
-     "product_id": "B09B6Z3SK6",
-     "title": "Faith Can Move Mountains AirPods Case Protective Cover,Matching Airpods Anti-Lost Hook,Black Skin Charging Case Cover for Apple AirPods 2 and 1 (Black)",
-     "brand": "Jaustee",
-     "label": "Irrelevant"
+     "product_id": "B07KMDX68M",
+     "title": "Mothca Matte Screen Protector for iPhone Xs Max/iPhone 11 Pro Max Anti-Glare & Anti-Fingerprint Tempered Glass Clear Film Case Friendly 3D Touch Easy Install Bubble Free - Smooth as Silk",
+     "brand": "Mothca",
+     "label": "Complement"
     },
     {
-     "product_id": "B07SK76S84",
-     "title": "Airpods Case, Full Body Protection and Durable TPU Waterproof and Shockproof Case Charging Earphone Cover with Anti-Lost Carabiner for Apple Airpods 1 and 2 Charging Box (Dark Blue)",
-     "brand": "EVERITES",
-     "label": "Irrelevant"
+     "product_id": "B073DLZWX7",
+     "title": "Maxboost Screen Protector for Apple iPhone Xs & iPhone X & iPhone 11 Pro (3 Packs, Clear) 0.25mm Tempered Glass Screen Protector with Advanced Clarity [3D Touch] Work w/Most Case 99% Touch Accurate",
+     "brand": "Maxboost",
+     "label": "Complement"
     },
     {
-     "product_id": "B08YYK8FJN",
-     "title": "wenew Protective Case Cover Designed for Apple Airpods Pro 2019, Cute Fadeless Patterns Shockproof Hard Case Cover with Portable Keychain for Girls Women Men (Blue)",
-     "brand": "wenew",
-     "label": "Substitute"
+     "product_id": "B07FP41MC5",
+     "title": "Trianium (3 Packs) Screen Protector Designed for Apple iPhone 11 Pro Max, iPhone XS Max (6.5\" 2018) Premium HD Clarity 0.25mm Tempered Glass Screen Protector Easy Installation Alignment Case (3-Pack)",
+     "brand": "Trianium",
+     "label": "Complement"
     },
     {
-     "product_id": "B089H1XRTQ",
-     "title": "Deppa Soft Protective Airpods Pro Case Cover Silicone Skin for Apple Airpod Pro 2019 Without Keychain (Front LED Visible) (hinged) (Sky Blue)",
-     "brand": "Deppa",
+     "product_id": "B07515P7PT",
+     "title": "JETech Screen Protector for iPhone 11 Pro, for iPhone Xs, for iPhone X, 5.8-Inch, Tempered Glass Film, 2-Pack",
+     "brand": "JETech",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QC4K9BH",
+     "title": "(2 Pack) Supershieldz Designed for Apple iPhone 11 Pro Max and iPhone Xs Max (6.5 inch) (Privacy) Anti Spy Tempered Glass Screen Protector with (Easy Installation Tray) Anti Scratch, Bubble Free",
+     "brand": "Supershieldz",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07QMZPV8M",
+     "title": "Purity Screen Protector for Apple iPhone 11 Pro/iPhone Xs/iPhone X - 3 Pack (w/Installation Frame) Tempered Glass Screen Protector Compatible iPhone XS/X/11Pro (3 Pack) [Fit with Most Cases]",
+     "brand": "Purity",
+     "label": "Complement"
+    },
+    {
+     "product_id": "B07VLYNWX9",
+     "title": "Mkeke Compatible with iPhone 11 Pro Screen Protector, iPhone X Screen Protector, iPhone Xs Tempered Glass Screen Protector All 5.8 inch New iPhone [3-Pack]",
+     "brand": "Mkeke",
      "label": "Complement"
     }
    ],
    "others": {
-    "bge": 0.3533,
-    "qwen3": 0.3584,
-    "teacher": 0.9854
+    "bge": 0.3705,
+    "qwen3": 0.5899,
+    "teacher": 0.6156
    },
-   "headline": "Understands \u201cwithout case\u201d",
-   "suit": "home"
+   "headline": "Screen protectors \u2192 the phones",
+   "suit": "phones"
   },
   {
    "query_id": 5665,

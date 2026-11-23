@@ -63,6 +63,8 @@ to INT8 (32 MB; dev nDCG 0.8654 vs 0.8662 fp32). Load test with real dev queries
 | INT8 | 16 | 1,436 ms | 1,784 ms | 1,950 ms | 230 pairs/s |
 | fp32 | 1 | 115 ms | 313 ms | 335 ms | 143 pairs/s |
 
+How to read this: 69 ms is one search at a time. The server deliberately runs one model call at a time (`SHOPRANK_MAX_CONCURRENT=1`), so with 16 searches arriving together they queue, and each waits for the ones ahead of it (about 1.4 s at p50). Throughput stays about 230 pairs/s. Serving many users at once needs more processes or machines, a smaller model, or batching; that has not been built here.
+
 At high load, latency is queueing: one process handles about 11 requests/s. The 5-model DeBERTa ensemble is
 0.020 nDCG better but scores ~89 pairs/s on an RTX 4060 GPU vs 230 pairs/s for the INT8 MiniLM on CPU, so it
 is used offline as the teacher.
