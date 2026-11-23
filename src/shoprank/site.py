@@ -277,7 +277,7 @@ def page(data: dict, css: str, js: str) -> str:
 
 <section aria-labelledby="examples-title">
   <h2 id="examples-title">See it work</h2>
-  <p class="section-lede">Real searches for phones, consoles and laptops that the model never saw while learning, hand-picked: clear wins, one honest failure, and two big ready-made AI rerankers on the same search. Over all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Ticks and crosses come from Amazon&#39;s human reviewers.</p>
+  <p class="section-lede">Real searches for phones, consoles, laptops, earbuds and fridges that the model never saw while learning, hand-picked: clear wins and one honest failure. Each also shows two big ready-made AI rerankers on the same search. Over all 8,956 test searches, ShopRank ranks better than keyword search on 65% and worse on 33%. Ticks and crosses come from Amazon&#39;s human reviewers.</p>
   {legend()}
   {tabs(examples)}
   {panels}
@@ -291,7 +291,7 @@ def page(data: dict, css: str, js: str) -> str:
 
 <section aria-labelledby="known-title">
   <h2 id="known-title">Biggest gain on searches with a number in them</h2>
-  <p class="section-lede">How often the top result is exactly right, by kind of search, on 2,001 development searches (ShopRank as served, with its spell checker). Searches with a number in them, such as a model number or a size, gain the most.</p>
+  <p class="section-lede">How often the top result is exactly right, by kind of search, on 2,001 development searches (ShopRank as served, with its spell checker). Searches with a number in them, such as a model number or a size, gain the most (a search can be in both of the first two rows).</p>
   {known_item_table()}
 </section>
 
